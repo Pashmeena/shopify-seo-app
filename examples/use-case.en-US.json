@@ -1,0 +1,142 @@
+{
+  "_comment": "Example pipeline output for a use-case PLP (en-US). `content` is the AI output validated against app/config/page-types/use-case.json → output_schema (note the buying_guide, which only this page type requires).",
+  "keyword": "peel and stick wallpaper for renters",
+  "locale": "en-US",
+  "page_type": "use-case",
+  "intent": {
+    "keyword": "peel and stick wallpaper for renters",
+    "locale": "en-US",
+    "facets": {
+      "material": ["peel and stick"],
+      "useCase": ["renters"],
+      "audience": ["renters"]
+    },
+    "pageTypeId": "use-case",
+    "confidence": 1,
+    "method": "rules"
+  },
+  "matched_products": {
+    "count": 8,
+    "threshold": 6,
+    "handles": [
+      "monstera-line-art",
+      "trailing-ivy",
+      "cherry-blossom-mist",
+      "paradise-parrots",
+      "scandi-triangles",
+      "sleepy-clouds",
+      "safari-parade",
+      "rainbow-stripes"
+    ]
+  },
+  "content": {
+    "h1": "Peel and Stick Wallpaper for Renters",
+    "intro": "Renting shouldn't mean living with someone else's beige. This page collects every peel and stick wallpaper in the Wild Palace range that is genuinely safe for rented walls: repositionable during hanging, removable without paste, soaking or residue, and kind to both painted drywall and your security deposit. That last part matters, so let's be precise about it: these panels remove cleanly from sound, properly painted walls — if your rental has flaking paint, fresh unprimed patches, or textured wallpaper already on the wall, adhesion is unpredictable and removal can lift loose paint with it. Test one panel somewhere hidden first. Get that check right and everything else is straightforwardly good news: an accent wall goes up in an afternoon with a level, a smoothing tool and a sharp blade, and comes down in twenty minutes on moving day, rolled up and ready for the next flat.",
+    "sections": [
+      {
+        "heading": "What 'deposit-safe' actually depends on",
+        "body": "The honest answer: it depends on your wall, not just the wallpaper. Peel and stick adhesive is formulated to release from cured, sound paint — eggshell and satin finishes release most cleanly, while flat builder's paint bonds harder and can occasionally pull chalky pigment on removal. Every panel on this page, from Trailing Ivy to Rainbow Stripes, uses that class of adhesive; none require paste or wetting, and none leave gum behind on sound paint. What no manufacturer can promise is a wall that was painted last week (paint cures for ~30 days), painted over dust, or already peeling. Spend two minutes on the fingernail test — if the existing paint chips off at a scratch, wallpaper isn't your risk, the paint is."
+      },
+      {
+        "heading": "Choosing a design your landlord never needs to know about",
+        "body": "Removability frees you to decorate for the life you actually live now. A single accent wall behind the bed or sofa is the classic renter's move — Cherry Blossom Mist and Monstera Line Art are calm enough to anchor a bedroom or living room without dominating a small flat. Families decorating a rented kids' room lean on Sleepy Clouds, Safari Parade and Rainbow Stripes, all of which survive both toddlers and tenancy inspections and come down clean at the end of the lease. Renting long-term? Nothing stops you papering every wall — but panels are priced per 61 cm × 5.5 m roll (about 24 in × 18 ft), so cost scales with ambition; most renters get 80% of the effect from one well-chosen wall at $52–64."
+      },
+      {
+        "heading": "Application on real rental walls: bumps, sockets and old paint",
+        "body": "Rental walls are rarely gallery-smooth, and peel and stick is more forgiving of that than its reputation suggests — but it telegraphs sharp defects. Fine orange-peel texture disappears under a patterned panel like Paradise Parrots; a proud screw head or a gritty patch of filler will show as a bump under any design, so run a scraper over the wall and wipe it with a barely-damp cloth first (skip sugar soap — its residue weakens adhesion). Around sockets and switches, kill the power, loosen the faceplate, and tuck the panel edge behind it rather than cutting around it: the result looks professional and the panel stays fully intact for reuse. Scandi Triangles' scattered geometry is the most forgiving pattern here for imperfect corner-matching."
+      },
+      {
+        "heading": "Cost planning: one wall, one flat, one lease",
+        "body": "Peel and stick pricing is easy to plan because panels are a fixed size: each Wild Palace roll covers roughly 33 sq ft (61 cm × 5.5 m). A typical accent wall of 10 ft × 8 ft is 80 sq ft, so three rolls with sensible offcut reuse — at Sleepy Clouds' $54 per roll, that's $162 for a transformed bedroom, and the panels move house with you if you remove them patiently. Compare that with the cost of not decorating for a three-year tenancy, or with forfeiting a $500 deposit over painted-then-botched walls, and the arithmetic favors the wallpaper. Order one extra roll on large repeats like Paradise Parrots for pattern matching; solid small-scale patterns like Rainbow Stripes waste almost nothing."
+      }
+    ],
+    "buying_guide": {
+      "heading": "From bare rental wall to finished in one afternoon",
+      "steps": [
+        {
+          "title": "Measure the wall in feet",
+          "body": "Measure width and height in feet and multiply for square footage — a 10 ft × 8 ft wall is 80 sq ft. Each roll covers about 33 sq ft, so divide and round up, then add one roll if your chosen design has a large repeat that needs matching across drops."
+        },
+        {
+          "title": "Test your paint before ordering big",
+          "body": "Order a sample (or a single roll), stick a strip somewhere hidden — inside a closet on the same wall type is ideal — and leave it for 48 hours. Peel it back slowly at a sharp angle. Clean release with no paint lift means your wall is safe to decorate."
+        },
+        {
+          "title": "Prep the surface properly",
+          "body": "Remove nails and screws, scrape any proud filler flat, and wipe the wall with a barely-damp cloth to lift dust. Let it dry fully. Do not use cleaning sprays or sugar soap first — their residues are the most common cause of corners lifting a week later."
+        },
+        {
+          "title": "Hang from a level line, not the corner",
+          "body": "Rental walls and ceilings are rarely square. Draw a vertical level line one panel-width from the corner and hang the first drop to that line, peeling backing away a foot at a time while smoothing from the center outwards. Reposition freely — that's the point of the format."
+        },
+        {
+          "title": "Trim and tuck for a professional finish",
+          "body": "Trim top and bottom with a fresh blade against a wide scraper, and tuck edges behind loosened socket faceplates rather than cutting around them. Change blades every two or three drops; a dull blade tears vinyl instead of cutting it."
+        },
+        {
+          "title": "Remove cleanly on moving day",
+          "body": "Peel each panel back on itself, slowly and at an angle close to the wall — never yank outward. Warm the stubborn top corners with a hairdryer for ten seconds if needed. Roll panels around the original tube backing-side out and they're ready for the next home."
+        }
+      ]
+    },
+    "faq": [
+      {
+        "question": "Will peel and stick wallpaper damage my rental's walls or cost me my deposit?",
+        "answer": "Peel and stick wallpaper removes cleanly from sound, fully cured painted walls without residue, which is why it's the standard recommendation for renters protecting a deposit. The real risk is the wall itself: flaking paint, unprimed patches or paint applied in the last month can lift during removal. Test one strip in a hidden spot for 48 hours before papering a whole wall, and remove panels slowly at a sharp angle on moving day."
+      },
+      {
+        "question": "How long does peel and stick wallpaper last on a wall?",
+        "answer": "Quality peel and stick wallpaper stays flat and adhered for years — comfortably the length of a multi-year tenancy — provided the wall was clean and the paint sound at application. The common failure mode isn't age but bad prep: dust or cleaning-product residue under the panel makes corners lift within weeks. Kitchens and bathrooms with heavy steam shorten its life; in living rooms and bedrooms, expect it to outlast your lease."
+      },
+      {
+        "question": "Can I reuse peel and stick wallpaper in my next apartment?",
+        "answer": "Yes, peel and stick wallpaper can usually be reused if you remove it patiently: peel each panel back on itself slowly, keep dust off the adhesive side, and roll panels around a tube rather than folding them. Expect slightly reduced tack on second application — fine for a smooth wall, less reliable in humid rooms. Panels trimmed tightly around sockets survive the move better if you tucked rather than cut them."
+      },
+      {
+        "question": "Does peel and stick wallpaper work on textured or bumpy walls?",
+        "answer": "Peel and stick wallpaper works on lightly textured walls — fine orange-peel texture disappears under most patterns — but it will not grip properly on heavy texture, woodchip, or existing wallpaper. Adhesive needs continuous contact with the surface; on pronounced texture it only touches the high points and edges lift within days. If a strip of masking tape sticks firmly to your wall overnight, peel and stick will hold too."
+      },
+      {
+        "question": "What's the difference between peel and stick and traditional wallpaper for a rental?",
+        "answer": "Peel and stick wallpaper is self-adhesive, repositionable and removable without water or chemicals, making it the rental-safe option; traditional pasted wallpaper bonds to the wall and needs scoring, soaking and scraping to remove, which almost always damages paint and forfeits deposits. The trade-off is that pasted non-woven papers offer larger formats and a flatter, more furniture-like finish — the right choice only when the wall is yours."
+      }
+    ],
+    "meta": {
+      "title": "Peel and Stick Wallpaper for Renters | Wild Palace",
+      "description": "8 deposit-safe peel and stick wallpapers that remove clean on moving day. Honest wall-prep advice, a step-by-step guide, rolls from $52."
+    },
+    "product_alt_texts": [
+      { "product_id": "monstera-line-art", "alt_text": "Removable monstera line-art peel and stick wallpaper, ideal accent wall for renters" },
+      { "product_id": "trailing-ivy", "alt_text": "Trailing ivy peel and stick wallpaper panel being applied to a rented apartment wall" },
+      { "product_id": "cherry-blossom-mist", "alt_text": "Pale pink cherry blossom peel and stick wallpaper, a deposit-safe bedroom accent" },
+      { "product_id": "paradise-parrots", "alt_text": "Bright parrot peel and stick wallpaper that removes cleanly from rental kids' rooms" },
+      { "product_id": "scandi-triangles", "alt_text": "Pastel Scandi triangle peel and stick wallpaper, forgiving pattern for uneven rental walls" },
+      { "product_id": "sleepy-clouds", "alt_text": "Powder blue cloud peel and stick wallpaper for a rented nursery, fully removable" },
+      { "product_id": "safari-parade", "alt_text": "Sandy safari animal peel and stick wallpaper, tenancy-safe decor for kids' rooms" },
+      { "product_id": "rainbow-stripes", "alt_text": "Faded pastel rainbow stripe peel and stick wallpaper, wipeable and renter-removable" }
+    ]
+  },
+  "seo": {
+    "metaTitle": "Peel and Stick Wallpaper for Renters | Wild Palace",
+    "metaDescription": "8 deposit-safe peel and stick wallpapers that remove clean on moving day. Honest wall-prep advice, a step-by-step guide, rolls from $52.",
+    "keywords": [
+      "peel and stick wallpaper renters",
+      "wallpaper for renters",
+      "best wallpaper renters",
+      "removable wallpaper rental"
+    ],
+    "canonicalUrl": "https://your-store.myshopify.com/blogs/seo-plp/en-us-peel-and-stick-wallpaper-renters",
+    "hreflang": [
+      { "locale": "en-US", "url": "https://your-store.myshopify.com/blogs/seo-plp/en-us-peel-and-stick-wallpaper-renters" }
+    ],
+    "jsonLd": [
+      { "@type": "CollectionPage", "_note": "CollectionPage + ItemList with the 8 products above, real prices/URLs" },
+      { "@type": "FAQPage", "_note": "One Question/Answer node per FAQ entry above" },
+      { "@type": "BreadcrumbList", "_note": "Home → Inspiration → this page" }
+    ],
+    "internalLinks": [
+      { "title": "Botanical Wallpaper for Living Rooms", "slug": "en-us-botanical-wallpaper-living-room", "sharedFacets": ["material:peel and stick"] }
+    ],
+    "noindex": false
+  }
+}

@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.sqlite"
+}
+
+// A keyword moving through the pipeline. `intent` holds the parsed
+// IntentProfile as JSON; `clusterKey` groups semantically equivalent
+// keywords so only one canonical page is generated per cluster.
+model Keyword {
+  id         String    @id @default(cuid())
+  shop       String
+  phrase     String
+  locale     String    @default("en-US")
+  source     String // "manual" | "csv" | "auto"
+  status     String    @default("suggested") // "suggested" | "approved" | "rejected" | "generated" | "failed"
+  intent     String? // JSON IntentProfile
+  pageTypeId String? // page-type config this keyword resolves to
+  clusterKey String? // canonical cluster identity for dedup
+  matchCount Int? // products matched at discovery/parse time
+  volume     Int? // search volume — always null until a volume API is plugged in
+  error      String? // last pipeline error, if status == "failed"
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  pages      PlpPage[]
+
+  @@unique([shop, phrase, locale])
+  @@index([shop, status])
+}
+
+// A generated PLP. Content and SEO payloads are stored as JSON so the
+// admin can always inspect the raw structured output. Pages only reach
+// Shopify (as blog articles) once explicitly published by the merchant.
+model PlpPage {
+  id            String    @id @default(cuid())
+  shop          String
+  keywordId     String?
+  keyword       Keyword?  @relation(fields: [keywordId], references: [id], onDelete: SetNull)
+  pageTypeId    String
+  locale        String
+  slug          String
+  title         String
+  status        String    @default("draft") // "draft" | "needs_review" | "published"
+  intent        String // JSON IntentProfile
+  productIds    String // JSON string[] of product GIDs (reflects manual adjustments)
+  content       String? // JSON — validated AI output matching the page type's output_schema
+  seo           String? // JSON SeoPayload: meta, jsonLd, canonical, hreflang, internal links
+  reviewReason  String? // why the page is held in needs_review
+  clusterKey    String?
+  canonicalOfId String? // set on locale/near-duplicate variants → points at the canonical PlpPage
+  articleId     String? // Shopify Article GID once published
+  articleUrl    String?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([shop, slug, locale])
+  @@index([shop, status])
+}
+
+// Per-shop merchant settings. AI provider/key/model intentionally live in
+// .env (brief constraint), not here.
+model ShopSettings {
+  id             String  @id @default(cuid())
+  shop           String  @unique
+  brandName      String  @default("Wild Palace")
+  brandTone      String  @default("Premium but warm; expert interior-design voice; concrete and specific; never salesy filler.")
+  defaultLocale  String  @default("en-US")
+  enabledLocales String  @default("[\"en-US\", \"de-DE\"]") // JSON string[]
+  competitorUrls String  @default("[]") // JSON string[]
+  blogHandle     String  @default("seo-plp") // blog that receives published PLPs
+  minProducts    Int     @default(6)
+  catalogSeeded  Boolean @default(false)
+}
+
+model Session {
+  id                  String    @id
+  shop                String
+  state               String
+  isOnline            Boolean   @default(false)
+  scope               String?
+  expires             DateTime?
+  accessToken         String
+  userId              BigInt?
+  firstName           String?
+  lastName            String?
+  email               String?
+  accountOwner        Boolean   @default(false)
+  locale              String?
+  collaborator        Boolean?  @default(false)
+  emailVerified       Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}

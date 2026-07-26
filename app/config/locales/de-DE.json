@@ -1,0 +1,40 @@
+{
+  "code": "de-DE",
+  "label": "Deutsch (Deutschland)",
+  "languageCode": "de",
+  "languageName": "German",
+  "market": "Germany",
+  "currency": "EUR",
+  "measurementSystem": "metric",
+  "slugPrefix": "de-de",
+  "hreflang": "de-DE",
+  "promptContext": "Sprache: natürliches, idiomatisches Deutsch in der Sie-Form — keine wörtliche Übersetzung aus dem Englischen. Zielgruppe: deutsche Mieter und Eigentümer. Maße: metrisch — Rollengrößen wie 53 cm × 10,05 m, Wandflächen in Quadratmetern; niemals Zoll oder Fuß. Währung: EUR im Format 49,90 €. Terminologie: 'Tapetenkleister' (nicht Klebstoff), 'Vliestapete', 'Mustertapete', 'Akzentwand', 'Raufaser', 'Altbau', 'renovierungsfreundlich', 'Fototapete' nur wo zutreffend. Kultureller Kontext: Mietwohnungen mit Schönheitsreparatur-Klauseln sind verbreitet — rückstandslos ablösbare Tapeten sind ein starkes Kaufargument; Musterbestellung ('Musterstück') erwähnen. Deutsche Suchanfragen sind kompakt: 'Tapete Wohnzimmer botanisch', 'selbstklebende Tapete Mietwohnung'.",
+  "facetTranslations": {
+    "botanical": "botanische",
+    "floral": "florale",
+    "tropical": "tropische",
+    "art deco": "art-deco",
+    "geometric": "geometrische",
+    "chinoiserie": "chinoiserie",
+    "vintage": "vintage",
+    "minimalist": "minimalistische",
+    "living room": "wohnzimmer",
+    "bedroom": "schlafzimmer",
+    "kids room": "kinderzimmer",
+    "bathroom": "badezimmer",
+    "kitchen": "kueche",
+    "hallway": "flur",
+    "home office": "arbeitszimmer",
+    "dining room": "esszimmer",
+    "renters": "mietwohnung",
+    "kids": "kinder",
+    "peel and stick": "selbstklebende",
+    "sustainable": "nachhaltige",
+    "washable": "abwaschbare",
+    "removable": "ablösbare",
+    "non woven": "vliestapete"
+  },
+  "tokens": {
+    "wallpaper": "tapete"
+  }
+}

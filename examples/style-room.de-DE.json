@@ -1,0 +1,160 @@
+{
+  "_comment": "Example pipeline output for the de-DE locale variant of the style × room page. Same intent cluster as the en-US example, therefore canonicalOf points at the en-US page and both appear in each other's hreflang set. Content is genuinely market-aware (Sie-Form, metric, EUR, deutsche Terminologie), not translated.",
+  "keyword": "botanische tapete wohnzimmer",
+  "locale": "de-DE",
+  "page_type": "style-room",
+  "intent": {
+    "keyword": "botanische tapete wohnzimmer",
+    "locale": "de-DE",
+    "facets": {
+      "style": [
+        "botanical"
+      ],
+      "room": [
+        "living room"
+      ]
+    },
+    "pageTypeId": "style-room",
+    "confidence": 1,
+    "method": "rules"
+  },
+  "matched_products": {
+    "count": 9,
+    "threshold": 6,
+    "handles": [
+      "emerald-palm-canopy",
+      "fern-study",
+      "wild-meadow",
+      "midnight-jungle",
+      "eucalyptus-drift",
+      "monstera-line-art",
+      "botanical-sketchbook",
+      "trailing-ivy",
+      "silk-garden-birds"
+    ]
+  },
+  "content": {
+    "h1": "Botanische Tapete fürs Wohnzimmer",
+    "intro": "Eine botanische Tapete macht das Wohnzimmer zum grünsten Raum der Wohnung — und diese Seite versammelt alle botanischen Designs von Wild Palace, die dort wirklich funktionieren: von luftigen Wiesengräsern bis zum tiefdunklen Dschungel für den großen Auftritt. Kein Raum stellt höhere Ansprüche an ein Muster als das Wohnzimmer: Es wird bei Tageslicht und Lampenlicht gesehen, vom Sofa und von der Tür aus, im Altbau mit drei Metern Deckenhöhe ebenso wie im kompakten Neubau. Die neun Tapeten hier decken genau diese Bandbreite ab. Für helle, großzügige Räume trägt Emerald Palm Canopy mit seinem 64-cm-Rapport die Wand mühelos; für kleinere oder nach Norden ausgerichtete Zimmer bringen Wild Meadow und Eucalyptus Drift das Grün, ohne Licht zu schlucken. Jedes Design können Sie vorab als Musterstück bestellen und im eigenen Licht prüfen, bevor Sie sich für ganze Rollen entscheiden.",
+    "sections": [
+      {
+        "heading": "Rapport und Raumgröße: welches Muster Ihre Wand tragen kann",
+        "body": "Vor der Farbe kommt der Rapport. Eine Wohnzimmerwand, die Sie aus drei Metern Entfernung betrachten, verträgt ein deutlich größeres Muster als ein Flur, an dem man vorbeigeht — der 64-cm-Rapport von Emerald Palm Canopy braucht diesen Abstand, um als geschichtetes Blätterdach zu wirken, und gehört deshalb hinter das Sofa oder auf die Wand gegenüber der Tür. Mittlere Rapporte wie Fern Study und Botanical Sketchbook funktionieren in Nischen und hinter Regalen, wo das Muster ohnehin unterbrochen wird. Ist Ihre längste Sichtachse kürzer als zweieinhalb Meter oder die Wand von Fenstern und Heizkörpern zergliedert, wählen Sie die kleinteiligen Streumuster von Wild Meadow oder Trailing Ivy — sie laufen anstandslos um jedes Hindernis."
+      },
+      {
+        "heading": "Grün ist nicht gleich Grün: Farbe und Lichtrichtung",
+        "body": "Nordzimmer kühlen jede Farbe ab: Die blaustichigen Grüntöne von Eucalyptus Drift bleiben dort ruhig und klar, während warme Olivtöne schnell trüb wirken — kombinieren Sie kühles Grün im Nordzimmer lieber mit warmen Textilien, statt gegen das Licht anzustreichen. Süd- und Westzimmer schmeicheln dagegen den tiefen Smaragdtönen von Emerald Palm Canopy und vertragen sogar Midnight Jungle, dessen fast schwarzes Blattwerk im Abendlicht theatralisch statt düster wirkt. Als Faustregel: Beurteilen Sie Muster zur kältesten Stunde des Raums, meist am Vormittag. Bestellen Sie Musterstücke, kleben Sie sie an die Wand und entscheiden Sie dann — ein Grün, das im kühlsten Licht besteht, wird über den Tag nur schöner."
+      },
+      {
+        "heading": "Einrichten vor einer botanischen Akzentwand",
+        "body": "Botanische Wände sind großzügige Kulissen, verlangen davor aber Zurückhaltung. Dichte Designs wie Midnight Jungle und Emerald Palm Canopy wollen einfarbige Polster — Leinen, Bouclé, Leder — in einem Ton, den das Muster leise vorgibt. Bei den gezeichneten Designs gilt das Umgekehrte: Monstera Line Art und Botanical Sketchbook sind im Grunde Zeichnungen, vor ihnen dürfen gemusterte Kissen und Teppiche auftreten, ohne dass es zum Streit kommt. Holz, Rattan und mattes Messing passen zu jeder Tapete auf dieser Seite; Hochglanz und Chrom arbeiten gegen das organische Motiv. Und im Altbau mit Stuck: Lassen Sie zwischen Stuckkante und Musterbeginn eine ruhige Zone — die Tapete muss nicht bis an die Decke kämpfen."
+      },
+      {
+        "heading": "Tapezieren im Wohnzimmer: die Praxis",
+        "body": "Die meisten Designs auf dieser Seite sind Vliestapeten in der Wandklebetechnik: Der Tapetenkleister kommt direkt auf die Wand, nicht auf die Bahn — eine Akzentwand schafft ein geübter Heimwerker so an einem Nachmittag, ganz ohne Weichzeit. Die Standardrolle misst 53 cm × 10,05 m; messen Sie Ihre Wandfläche in Quadratmetern (Breite × Höhe) und rechnen Sie bei großen Rapporten wie Emerald Palm Canopy eine Reserverolle für den Musterversatz ein — bei 2,60 m Deckenhöhe liefert eine Rolle drei Bahnen. Mieter greifen zu den selbstklebenden Optionen Monstera Line Art und Trailing Ivy: repositionierbar beim Anbringen und rückstandslos ablösbar, wenn die Schönheitsreparatur-Klausel des Mietvertrags ruft."
+      }
+    ],
+    "faq": [
+      {
+        "question": "Welche botanische Tapete eignet sich für ein kleines Wohnzimmer?",
+        "answer": "Für kleine Wohnzimmer eignen sich kleinteilige botanische Tapeten auf hellem Grund am besten: Designs wie Wild Meadow (Wiesengräser in Salbeigrün auf Cremeweiß) oder Eucalyptus Drift (graugrüne Zweige auf Kalkweiß) bringen Grün in den Raum, ohne ihn optisch zu verkleinern. Großformatige dunkle Muster brauchen Betrachtungsabstand — unter etwa zweieinhalb Metern Sichtachse wirken sie als dunkle Fläche statt als Muster und gehören eher in große Räume."
+      },
+      {
+        "question": "Ist eine dunkle botanische Tapete im Wohnzimmer ein Fehler?",
+        "answer": "Eine dunkle botanische Tapete ist im Wohnzimmer kein Fehler, wenn der Raum entweder gutes Tageslicht oder eine bewusst gesetzte Abendbeleuchtung hat. Ein fast schwarzes Design wie Midnight Jungle wirkt hinter Lampenlicht dramatisch und tief gestaffelt und wird nach Einbruch der Dunkelheit zur Identität des Raums. In kleinen Nordzimmern mit einer einzelnen Deckenleuchte verflacht dunkles Blattwerk dagegen zur Schattenmasse — dort ist ein mittleres Grün wie Emerald Palm Canopy die bessere Wahl."
+      },
+      {
+        "question": "Wie viele Rollen Tapete brauche ich für eine Wohnzimmer-Akzentwand?",
+        "answer": "Für eine typische Akzentwand von 3,6 m Breite und 2,4 m Höhe benötigen Sie drei Standardrollen (53 cm × 10,05 m), denn jede Rolle ergibt bei dieser Deckenhöhe drei volle Bahnen. Große Rapporte verringern die nutzbaren Bahnen pro Rolle: Bei Designs mit über 60 cm Musterversatz — etwa Emerald Palm Canopy — planen Sie eine vierte Rolle für Anschluss und Verschnitt ein. Im Altbau mit 3 m Deckenhöhe liefert eine Rolle nur noch zwei volle Bahnen."
+      },
+      {
+        "question": "Kann ich eine Vliestapete selbst anbringen oder brauche ich einen Maler?",
+        "answer": "Eine Vliestapete können Sie in der Regel selbst anbringen: Bei der Wandklebetechnik kommt der Tapetenkleister direkt auf die Wand, die Bahn wird trocken eingelegt — nötig sind nur Kleister, Bürste, Lot und ein scharfes Cuttermesser, eine Weichzeit entfällt. Einen Maler lohnt es bei schwierigen Wänden (Erker, Stuck, viele Steckdosen), auf Raufaser-Untergrund, der erst entfernt werden sollte, oder bei großen Rapporten, deren Stöße über eine breite freie Wand hinweg exakt sitzen müssen."
+      },
+      {
+        "question": "Gibt es Musterstücke der botanischen Tapeten vor dem Kauf ganzer Rollen?",
+        "answer": "Ja — jede botanische Tapete von Wild Palace können Sie vor dem Rollenkauf als Musterstück bestellen. Kleben Sie das Muster an die Wohnzimmerwand, die tapeziert werden soll, und beurteilen Sie es morgens, nachmittags und bei Lampenlicht: Grüntöne verschieben sich stärker mit der Lichtrichtung als jede andere Farbfamilie. Zwei Tage Mustertest kosten nichts — eine Fehlentscheidung bei Rollen ab 58 € pro Stück dagegen schon."
+      }
+    ],
+    "meta": {
+      "title": "Botanische Tapete fürs Wohnzimmer | Wild Palace",
+      "description": "9 botanische Wohnzimmer-Tapeten: von luftigen Gräsern bis zum Mitternachtsdschungel. Mit Rapport-Beratung, Musterservice, Rollen ab 58 €."
+    },
+    "product_alt_texts": [
+      {
+        "product_id": "emerald-palm-canopy",
+        "alt_text": "Smaragdgrüne Palmenblatt-Tapete an einer Wohnzimmer-Akzentwand hinter einem Leinensofa"
+      },
+      {
+        "product_id": "fern-study",
+        "alt_text": "Handgezeichnete Farn-Tapete in Waldgrün, botanischer Look für helle Wohnzimmer"
+      },
+      {
+        "product_id": "wild-meadow",
+        "alt_text": "Zarte Wiesengras-Tapete in Salbeigrün als luftiger botanischer Hintergrund im Wohnzimmer"
+      },
+      {
+        "product_id": "midnight-jungle",
+        "alt_text": "Dunkle Dschungel-Tapete mit fast schwarzem Blattwerk für eine dramatische Wohnzimmerwand"
+      },
+      {
+        "product_id": "eucalyptus-drift",
+        "alt_text": "Graugrüne Eukalyptus-Tapete bringt ruhige botanische Farbe ins Wohnzimmer"
+      },
+      {
+        "product_id": "monstera-line-art",
+        "alt_text": "Minimalistische Monstera-Tapete in Terrakotta-Linien, dezente Botanik fürs Wohnzimmer"
+      },
+      {
+        "product_id": "botanical-sketchbook",
+        "alt_text": "Vintage-Tapete mit botanischen Skizzen und lateinischen Pflanzennamen auf Elfenbein"
+      },
+      {
+        "product_id": "trailing-ivy",
+        "alt_text": "Selbstklebende Efeuranken-Tapete, rückstandslos ablösbar — ideal für Mietwohnungen"
+      },
+      {
+        "product_id": "silk-garden-birds",
+        "alt_text": "Chinoiserie-Tapete mit Singvögeln und Blütenzweigen auf Entenei-Blau im Wohnzimmer"
+      }
+    ]
+  },
+  "seo": {
+    "metaTitle": "Botanische Tapete fürs Wohnzimmer | Wild Palace",
+    "metaDescription": "9 botanische Wohnzimmer-Tapeten: von luftigen Gräsern bis zum Mitternachtsdschungel. Mit Rapport-Beratung, Musterservice, Rollen ab 58 €.",
+    "keywords": [
+      "botanische tapete wohnzimmer",
+      "botanische wohnzimmer tapete",
+      "tapete wohnzimmer botanisch",
+      "beste botanische tapete wohnzimmer"
+    ],
+    "canonicalUrl": "https://your-store.myshopify.com/blogs/seo-plp/en-us-botanical-wallpaper-living-room",
+    "_canonical_note": "This de-DE page is a locale variant of the same intent cluster as the en-US page; the en-US page (default locale) is designated canonical and both list each other in hreflang.",
+    "hreflang": [
+      {
+        "locale": "en-US",
+        "url": "https://your-store.myshopify.com/blogs/seo-plp/en-us-botanical-wallpaper-living-room"
+      },
+      {
+        "locale": "de-DE",
+        "url": "https://your-store.myshopify.com/blogs/seo-plp/de-de-botanische-tapete-wohnzimmer"
+      }
+    ],
+    "jsonLd": [
+      {
+        "@type": "CollectionPage",
+        "_note": "inLanguage de-DE; ItemList with the 8 products, prices in store currency (see README currency note)"
+      },
+      {
+        "@type": "FAQPage",
+        "_note": "German Question/Answer nodes from the FAQ above"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "_note": "Home → Inspiration → diese Seite"
+      }
+    ],
+    "internalLinks": [],
+    "noindex": false
+  }
+}

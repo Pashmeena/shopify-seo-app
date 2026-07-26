@@ -1,0 +1,81 @@
+import type { LocaleConfig, PageTypeConfig } from "./types";
+
+/**
+ * Config registry. Page types and locales are discovered from the JSON
+ * files in this directory via glob import — adding a market or page type
+ * means adding one JSON file, with no code changes anywhere.
+ */
+
+const pageTypeModules = import.meta.glob<{ default: PageTypeConfig }>(
+  "./page-types/*.json",
+  { eager: true },
+);
+
+const localeModules = import.meta.glob<{ default: LocaleConfig }>(
+  "./locales/*.json",
+  { eager: true },
+);
+
+function assert(condition: unknown, message: string): asserts condition {
+  if (!condition) throw new Error(`Invalid config: ${message}`);
+}
+
+function validatePageType(config: PageTypeConfig, file: string): PageTypeConfig {
+  assert(config.id, `${file} is missing "id"`);
+  assert(config.slug_template, `${config.id} is missing "slug_template"`);
+  assert(config.required_facets?.length, `${config.id} is missing "required_facets"`);
+  assert(config.generation?.system_prompt, `${config.id} is missing generation.system_prompt`);
+  assert(config.generation?.user_prompt_template, `${config.id} is missing generation.user_prompt_template`);
+  assert(config.output_schema?.type === "object", `${config.id} output_schema must describe an object`);
+  return config;
+}
+
+function validateLocale(config: LocaleConfig, file: string): LocaleConfig {
+  assert(config.code, `${file} is missing "code"`);
+  assert(config.promptContext, `${config.code} is missing "promptContext"`);
+  assert(config.currency, `${config.code} is missing "currency"`);
+  assert(
+    config.measurementSystem === "imperial" || config.measurementSystem === "metric",
+    `${config.code} measurementSystem must be "imperial" or "metric"`,
+  );
+  return config;
+}
+
+const pageTypes = new Map<string, PageTypeConfig>(
+  Object.entries(pageTypeModules).map(([file, mod]) => {
+    const config = validatePageType(mod.default, file);
+    return [config.id, config];
+  }),
+);
+
+const locales = new Map<string, LocaleConfig>(
+  Object.entries(localeModules).map(([file, mod]) => {
+    const config = validateLocale(mod.default, file);
+    return [config.code, config];
+  }),
+);
+
+export function listPageTypes(): PageTypeConfig[] {
+  return [...pageTypes.values()];
+}
+
+export function getPageType(id: string): PageTypeConfig {
+  const config = pageTypes.get(id);
+  if (!config) throw new Error(`Unknown page type "${id}". Available: ${[...pageTypes.keys()].join(", ")}`);
+  return config;
+}
+
+export function listLocales(): LocaleConfig[] {
+  return [...locales.values()];
+}
+
+export function getLocale(code: string): LocaleConfig {
+  const config = locales.get(code);
+  if (!config) throw new Error(`Unknown locale "${code}". Available: ${[...locales.keys()].join(", ")}`);
+  return config;
+}
+
+/** Localize a canonical facet value (falls back to the English value). */
+export function localizeFacetValue(value: string, locale: LocaleConfig): string {
+  return locale.facetTranslations[value.toLowerCase()] ?? value;
+}

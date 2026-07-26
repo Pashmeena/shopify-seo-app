@@ -1,0 +1,32 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "77835ef4889537f8adef37ad234f714d"
+application_url = "https://example.com"
+embedded = true
+name = "Wild ventures test"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+# write_products: read/seed the catalog. write_content: publish PLPs as blog articles.
+scopes = "write_products,write_content"
+optional_scopes = [ ]
+use_legacy_install_flow = false
+
+[build]
+# Point the app's URL at the dev tunnel automatically on every `app dev`.
+automatically_update_urls_on_dev = true
+include_config_on_deploy = true
+
+[webhooks]
+api_version = "2026-07"
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/app/uninstalled"
+  topics = [ "app/uninstalled" ]
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/app/scopes_update"
+  topics = [ "app/scopes_update" ]
+
+[auth]
+redirect_urls = [ ]

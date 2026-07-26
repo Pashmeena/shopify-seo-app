@@ -1,0 +1,174 @@
+{
+  "_comment": "Example pipeline output for a style × room PLP (en-US). `content` is the AI output validated against app/config/page-types/style-room.json → output_schema; `seo` is the deterministic payload assembled around it.",
+  "keyword": "botanical wallpaper living room",
+  "locale": "en-US",
+  "page_type": "style-room",
+  "intent": {
+    "keyword": "botanical wallpaper living room",
+    "locale": "en-US",
+    "facets": {
+      "style": [
+        "botanical"
+      ],
+      "room": [
+        "living room"
+      ]
+    },
+    "pageTypeId": "style-room",
+    "confidence": 1,
+    "method": "rules"
+  },
+  "matched_products": {
+    "count": 9,
+    "threshold": 6,
+    "handles": [
+      "emerald-palm-canopy",
+      "fern-study",
+      "wild-meadow",
+      "midnight-jungle",
+      "eucalyptus-drift",
+      "monstera-line-art",
+      "botanical-sketchbook",
+      "trailing-ivy",
+      "silk-garden-birds"
+    ]
+  },
+  "content": {
+    "h1": "Botanical Wallpaper for Living Rooms",
+    "intro": "Botanical wallpaper turns a living room into the greenest room in the house — and this page collects every botanical design in the Wild Palace range that genuinely works in a living space, from airy, almost-neutral meadows to enveloping midnight jungles. The living room asks more of a pattern than any other room: it is seen in daylight and lamplight, from the sofa and from the doorway, behind screens and behind conversation. The nine papers here span that whole brief. If your room is bright and generously sized, large-repeat designs such as Emerald Palm Canopy hold the wall without shouting; if you are working with a smaller or north-facing room, quieter studies like Wild Meadow and Eucalyptus Drift bring the greenery while keeping the light. Every design is available as an ordered sample, so you can check the colour against your own light before committing to a full wall.",
+    "sections": [
+      {
+        "heading": "Matching pattern scale to your wall and sightlines",
+        "body": "Pattern scale is the first decision, before colour. A living room wall viewed from three metres away can carry a much larger repeat than a hallway you brush past — Emerald Palm Canopy's 64 cm repeat needs that viewing distance to read as layered canopy rather than noise, which is exactly why it suits a sofa wall or chimney breast. Mid-scale designs such as Fern Study and Botanical Sketchbook sit comfortably on alcove walls and behind shelving, where part of the pattern is always interrupted. If your longest sightline is under two and a half metres, or the wall is broken up by windows and radiators, choose the small, scattered repeats of Wild Meadow or Trailing Ivy: they tile gracefully around obstacles and never lose their logic mid-wall."
+      },
+      {
+        "heading": "Green, but which green: colour and light direction",
+        "body": "North-facing living rooms cool every colour down, so the blue-leaning greens in Eucalyptus Drift stay serene while warmer olives can turn muddy — in a north room, pair cool greens with warm textiles rather than fighting the light. South- and west-facing rooms do the opposite: they flatter the deep emeralds of Emerald Palm Canopy and can even handle Midnight Jungle, whose near-black foliage becomes theatrical rather than gloomy once evening lamplight hits it. As a rule of thumb, take the room's coolest hour (usually mid-morning) as your test: order samples, tape them up, and judge them then. A green that works at its coolest will only improve through the day."
+      },
+      {
+        "heading": "Furnishing around a botanical feature wall",
+        "body": "Botanical walls are generous backdrops, but they reward restraint in front of them. Dense designs like Midnight Jungle and Emerald Palm Canopy want plain upholstery — linen, bouclé, leather — in tones pulled from the paper's quietest colour, not its loudest. The line-drawn designs work the other way around: Monstera Line Art and Botanical Sketchbook are effectively drawings, so patterned cushions and layered rugs can live in front of them without visual argument. Timber, rattan and unlacquered brass sit naturally with every paper on this page; high-gloss and chrome tend to fight the organic subject. If you keep one rule, keep this: either the wall performs or the furniture performs, never both at full volume."
+      },
+      {
+        "heading": "Hanging wallpaper in a living room: practicalities",
+        "body": "Most designs on this page are non-woven, paste-the-wall papers — you paste the wall, not the paper, so a competent DIYer can hang a feature wall in an afternoon with no soaking table. Standard rolls are 20.9 in × 33 ft (53 cm × 10.05 m); measure your wall in feet, multiply width by height for square footage, and let the roll calculator on each product page convert that with pattern repeat included — for large repeats like Emerald Palm Canopy, order one roll more than the arithmetic suggests to allow for matching. Renters and commitment-shy decorators should start with the peel and stick options here, Monstera Line Art and Trailing Ivy, which reposition during hanging and remove cleanly from painted drywall when the lease or the mood changes."
+      }
+    ],
+    "faq": [
+      {
+        "question": "Which botanical wallpaper works best in a small living room?",
+        "answer": "In a small living room, small-scale, light-ground botanical wallpapers work best: designs like Wild Meadow (sage grasses on off-white) or Eucalyptus Drift (grey-green sprigs on chalk white) add greenery without shrinking the space. Large dark designs need viewing distance; below roughly 2.5 metres of sightline they read as texture rather than pattern, so save enveloping papers like Midnight Jungle for bigger rooms or single alcoves."
+      },
+      {
+        "question": "Is dark botanical wallpaper a mistake in a living room?",
+        "answer": "Dark botanical wallpaper is not a mistake in a living room if the room has either good natural light or deliberate evening lighting. A near-black design such as Midnight Jungle looks dramatic and layered behind lamplight and becomes the room's identity after dusk. It is a mistake in small north-facing rooms with a single ceiling light, where dark foliage flattens into a shadowy mass — choose a mid-green like Emerald Palm Canopy there instead."
+      },
+      {
+        "question": "How many rolls of wallpaper do I need for one living room feature wall?",
+        "answer": "For a typical living room feature wall of about 12 ft × 8 ft (3.6 m × 2.4 m), you need three standard 20.9 in × 33 ft rolls of wallpaper, because each roll yields three full-height drops at that ceiling height. Large pattern repeats reduce usable drops per roll, so for designs with a repeat over 60 cm — like Emerald Palm Canopy — order a fourth roll to cover pattern matching and trimming waste."
+      },
+      {
+        "question": "Can I hang botanical wallpaper myself or do I need a decorator?",
+        "answer": "You can hang most botanical wallpaper on this page yourself: non-woven, paste-the-wall papers like Fern Study and Eucalyptus Drift are the most DIY-friendly format, needing only wall paste, a brush, a plumb line and a sharp blade. Book a decorator for walls with tricky features (chimney breasts, coving, many sockets) or for large-repeat designs where mismatched seams would be conspicuous across a wide, uninterrupted wall."
+      },
+      {
+        "question": "Do you offer samples of botanical wallpaper before buying full rolls?",
+        "answer": "Yes — every botanical wallpaper in the Wild Palace range can be ordered as a physical sample swatch shipped to your door before you commit to full rolls. Tape the sample to the living room wall you plan to paper and look at it at morning, afternoon and lamplight hours; greens shift more than any other colour family with light direction, and a two-day sample test prevents an expensive wrong call."
+      }
+    ],
+    "meta": {
+      "title": "Botanical Wallpaper for Living Rooms | Wild Palace",
+      "description": "Shop 9 botanical living room wallpapers, from airy sage meadows to midnight jungles. Pattern-scale advice, samples first, rolls from $58."
+    },
+    "product_alt_texts": [
+      {
+        "product_id": "emerald-palm-canopy",
+        "alt_text": "Emerald green palm leaf wallpaper on a living room feature wall behind a linen sofa"
+      },
+      {
+        "product_id": "fern-study",
+        "alt_text": "Hand-drawn fern botanical wallpaper in forest green, styled in a bright living room"
+      },
+      {
+        "product_id": "wild-meadow",
+        "alt_text": "Soft sage meadow grass wallpaper giving a living room an airy botanical backdrop"
+      },
+      {
+        "product_id": "midnight-jungle",
+        "alt_text": "Dark botanical jungle wallpaper with near-black foliage for a moody living room wall"
+      },
+      {
+        "product_id": "eucalyptus-drift",
+        "alt_text": "Grey-green eucalyptus sprig wallpaper bringing calm botanical colour to a living room"
+      },
+      {
+        "product_id": "monstera-line-art",
+        "alt_text": "Minimalist terracotta monstera line-art wallpaper, a subtle botanical for living rooms"
+      },
+      {
+        "product_id": "botanical-sketchbook",
+        "alt_text": "Vintage botanical sketch wallpaper with Latin plant names on ivory, living room styling"
+      },
+      {
+        "product_id": "trailing-ivy",
+        "alt_text": "Peel and stick trailing ivy wallpaper adding removable botanical charm to a living room"
+      },
+      {
+        "product_id": "silk-garden-birds",
+        "alt_text": "Chinoiserie songbird and flowering branch wallpaper on duck-egg blue in a living room"
+      }
+    ]
+  },
+  "seo": {
+    "metaTitle": "Botanical Wallpaper for Living Rooms | Wild Palace",
+    "metaDescription": "Shop 9 botanical living room wallpapers, from airy sage meadows to midnight jungles. Pattern-scale advice, samples first, rolls from $58.",
+    "keywords": [
+      "botanical wallpaper living room",
+      "botanical living room wallpaper",
+      "botanical wallpaper ideas living room",
+      "best botanical wallpaper for living room"
+    ],
+    "canonicalUrl": "https://your-store.myshopify.com/blogs/seo-plp/en-us-botanical-wallpaper-living-room",
+    "hreflang": [
+      {
+        "locale": "en-US",
+        "url": "https://your-store.myshopify.com/blogs/seo-plp/en-us-botanical-wallpaper-living-room"
+      },
+      {
+        "locale": "de-DE",
+        "url": "https://your-store.myshopify.com/blogs/seo-plp/de-de-botanische-tapete-wohnzimmer"
+      }
+    ],
+    "jsonLd": [
+      {
+        "@type": "CollectionPage",
+        "_note": "Full CollectionPage + ItemList/ListItem per product with real prices and URLs — assembled deterministically in code, see app/services/seo/json-ld.server.ts"
+      },
+      {
+        "@type": "FAQPage",
+        "_note": "One Question/Answer node per FAQ entry above"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "_note": "Home → Inspiration → this page"
+      }
+    ],
+    "internalLinks": [
+      {
+        "title": "Botanical Wallpaper for Bedrooms",
+        "slug": "en-us-botanical-wallpaper-bedroom",
+        "sharedFacets": [
+          "style:botanical"
+        ]
+      },
+      {
+        "title": "Tropical Wallpaper for Living Rooms",
+        "slug": "en-us-tropical-wallpaper-living-room",
+        "sharedFacets": [
+          "room:living room"
+        ]
+      }
+    ],
+    "noindex": false
+  }
+}

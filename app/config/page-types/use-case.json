@@ -1,0 +1,182 @@
+{
+  "id": "use-case",
+  "category": "intent-match",
+  "meta": {
+    "title": "Use case / audience",
+    "description": "PLPs matching a practical use case or audience, e.g. peel and stick wallpaper for renters."
+  },
+  "required_facets": [
+    "useCase"
+  ],
+  "slug_template": "{material?}-{wallpaper}-{useCase}",
+  "seo": {
+    "title_template": "{material} Wallpaper for {useCase} | {brand}",
+    "description_template": "{product_count} wallpapers that actually work for {useCase}: practical picks, honest limits and a step-by-step buying guide from {brand}.",
+    "keywords_template": [
+      "{material} wallpaper {useCase}",
+      "wallpaper for {useCase}",
+      "best wallpaper {useCase}",
+      "{attribute} wallpaper {useCase}"
+    ]
+  },
+  "generation": {
+    "temperature": 0.4,
+    "section_count": 4,
+    "faq_count": 5,
+    "system_prompt": "You are a practical home-improvement expert and SEO content strategist writing product listing page copy for a premium wallpaper brand. Your voice is honest and concrete: you explain what works, what does not, and why — surface preparation, adhesion, removal, damage risk, cost per area. You respond with a single valid JSON object matching the schema you are given — no markdown, no code fences, no commentary before or after the JSON. Every claim must be grounded in the specific products and intent you are given: if a product's material makes it unsuitable for part of the use case, say so. Write in the language and register specified in the LOCALE CONTEXT, using its measurement system, currency and local terminology throughout.",
+    "user_prompt_template": "Create the content for a product listing page organised around a practical use case.\n\nTARGET KEYWORD: {keyword}\nPARSED INTENT: {intent_json}\nPRODUCTS ON THIS PAGE (the only products you may reference):\n{products_json}\n\nLOCALE CONTEXT:\n{locale_context}\n\nBRAND: {brand_name}\nBRAND TONE: {brand_tone}\nCOMPETITORS (positioning reference only — differentiate from them, never copy or mention them): {competitor_urls}\n\nRELATED PAGES ON THIS SITE (for topical awareness only — do not write links):\n{related_pages_json}\n\nRequirements:\n- h1: must express the use case and the target keyword's meaning exactly and naturally (localized), unique to this use case.\n- intro: a single string (not an array) containing 2–3 paragraphs separated by blank lines. The first 100 words must state unambiguously who this page is for, the problem it solves, and what the visitor can buy here. Anchor it in the real product range (materials, removability, price band visible in the product data).\n- sections: exactly {section_count} sections focused on practical decision-making for this use case — suitability criteria, application on the surfaces this audience typically has, removal/damage evidence, cost planning in the locale's currency and measurement system. Headings must NOT restate the h1. Bodies must cite specific products from the list by name where it strengthens the advice.\n- buying_guide: a titled step-by-step guide (4–6 steps) taking this audience from measuring to finished wall, written for their constraints (e.g. renters: no surface damage, full removability). Steps must use the locale's measurement system.\n- faq: exactly {faq_count} question/answer pairs. Each answer must be fully self-contained and standalone — quotable by an AI assistant with zero surrounding context (restate the subject in the answer; never reference \"above\" or the page). Cover the sceptical questions this audience actually asks (deposit risk, wall damage, how long it lasts, reuse).\n- meta.title: max 60 characters, written for click-through, front-load the keyword. Separate objective from body copy — optimise for the SERP.\n- meta.description: 120–155 characters, click-through focused, name the audience and the practical promise.\n- product_alt_texts: one entry per product with exactly two keys — product_id (copy the product's id field verbatim) and alt_text describing the image as it serves THIS use case (material, finish, application context), not a restatement of the product title.\n\nReturn only the JSON object.",
+    "note": "Placeholders: {keyword} {intent_json} {products_json} {locale_context} {brand_name} {brand_tone} {section_count} {faq_count} {related_pages_json} {competitor_urls} {product_count}"
+  },
+  "output_schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "h1",
+      "intro",
+      "sections",
+      "buying_guide",
+      "faq",
+      "meta",
+      "product_alt_texts"
+    ],
+    "properties": {
+      "h1": {
+        "type": "string",
+        "minLength": 10,
+        "maxLength": 90
+      },
+      "intro": {
+        "type": "string",
+        "minLength": 400
+      },
+      "sections": {
+        "type": "array",
+        "minItems": 3,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "heading",
+            "body"
+          ],
+          "properties": {
+            "heading": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 95
+            },
+            "body": {
+              "type": "string",
+              "minLength": 280
+            }
+          }
+        }
+      },
+      "buying_guide": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "heading",
+          "steps"
+        ],
+        "properties": {
+          "heading": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 95
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "body"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 5,
+                  "maxLength": 80
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 100
+                }
+              }
+            }
+          }
+        }
+      },
+      "faq": {
+        "type": "array",
+        "minItems": 4,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "question",
+            "answer"
+          ],
+          "properties": {
+            "question": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 160
+            },
+            "answer": {
+              "type": "string",
+              "minLength": 150
+            }
+          }
+        }
+      },
+      "meta": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "description"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 60
+          },
+          "description": {
+            "type": "string",
+            "minLength": 120,
+            "maxLength": 155
+          }
+        }
+      },
+      "product_alt_texts": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "product_id",
+            "alt_text"
+          ],
+          "properties": {
+            "product_id": {
+              "type": "string"
+            },
+            "alt_text": {
+              "type": "string",
+              "minLength": 30,
+              "maxLength": 140
+            }
+          }
+        }
+      }
+    }
+  }
+}

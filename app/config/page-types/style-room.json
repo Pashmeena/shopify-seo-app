@@ -1,0 +1,143 @@
+{
+  "id": "style-room",
+  "category": "intent-match",
+  "meta": {
+    "title": "Style × Room",
+    "description": "PLPs matching a decorative style to a specific room, e.g. botanical wallpaper for living rooms."
+  },
+  "required_facets": [
+    "style",
+    "room"
+  ],
+  "slug_template": "{style}-{wallpaper}-{room}",
+  "seo": {
+    "title_template": "{style} Wallpaper for {room} | {brand}",
+    "description_template": "Shop {product_count} {style} wallpapers chosen for the {room}. Colours, pattern scale and pairing advice from {brand}.",
+    "keywords_template": [
+      "{style} wallpaper {room}",
+      "{style} {room} wallpaper",
+      "{style} wallpaper ideas {room}",
+      "best {style} wallpaper for {room}"
+    ]
+  },
+  "generation": {
+    "temperature": 0.5,
+    "section_count": 4,
+    "faq_count": 5,
+    "system_prompt": "You are a senior interior designer and SEO content strategist writing product listing page copy for a premium wallpaper brand. You write with genuine domain expertise: pattern scale, light direction, colour temperature, sightlines, furniture pairing. You respond with a single valid JSON object matching the schema you are given — no markdown, no code fences, no commentary before or after the JSON. Every claim must be grounded in the specific products and intent you are given; if the product list skews a certain way (e.g. mostly large-scale dark botanicals), the copy must reflect that reality rather than generic statements that would fit any page. Write in the language and register specified in the LOCALE CONTEXT, using its measurement system, currency and local terminology throughout.",
+    "user_prompt_template": "Create the content for a product listing page.\n\nTARGET KEYWORD: {keyword}\nPARSED INTENT: {intent_json}\nPRODUCTS ON THIS PAGE (the only products you may reference):\n{products_json}\n\nLOCALE CONTEXT:\n{locale_context}\n\nBRAND: {brand_name}\nBRAND TONE: {brand_tone}\nCOMPETITORS (positioning reference only — differentiate from them, never copy or mention them): {competitor_urls}\n\nRELATED PAGES ON THIS SITE (for topical awareness only — do not write links):\n{related_pages_json}\n\nRequirements:\n- h1: must contain the target keyword's meaning exactly and naturally (localized), unique to this style × room combination.\n- intro: a single string (not an array) containing 2–3 paragraphs separated by blank lines. The first 100 words must state unambiguously what this page is: which style, which room, and what the visitor can buy here. Reference the actual character of the product range (dominant colours, pattern scales, materials visible in the product data).\n- sections: exactly {section_count} sections. Headings must expand topical coverage around the style × room combination — pattern scale for the room's typical dimensions, colour and light, pairing with furniture and textiles, application advice for that room's conditions. Headings must NOT restate the h1. Bodies must cite specific products from the list by name where it strengthens the advice.\n- faq: exactly {faq_count} question/answer pairs. Each answer must be fully self-contained and standalone — an AI assistant must be able to quote a single answer with zero surrounding context and it still makes complete sense (restate the subject in the answer; never write \"as mentioned above\" or bare \"Yes/No\" openers). Answer real purchase-intent questions for this specific combination (durability, light, sample ordering, quantities in the locale's measurement system).\n- meta.title: max 60 characters, written for click-through in search results, front-load the keyword. This is a separate objective from the body copy — optimise for the SERP, not for elegance.\n- meta.description: 120–155 characters, click-through focused, include a concrete reason to choose this page (range breadth, expertise, samples).\n- product_alt_texts: one entry per product with exactly two keys — product_id (copy the product's id field verbatim) and alt_text describing the image as it serves THIS page's intent (style, colourway, room context), not a restatement of the product title.\n\nReturn only the JSON object.",
+    "note": "Placeholders: {keyword} {intent_json} {products_json} {locale_context} {brand_name} {brand_tone} {section_count} {faq_count} {related_pages_json} {competitor_urls} {product_count}"
+  },
+  "output_schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "h1",
+      "intro",
+      "sections",
+      "faq",
+      "meta",
+      "product_alt_texts"
+    ],
+    "properties": {
+      "h1": {
+        "type": "string",
+        "minLength": 10,
+        "maxLength": 90
+      },
+      "intro": {
+        "type": "string",
+        "minLength": 400
+      },
+      "sections": {
+        "type": "array",
+        "minItems": 3,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "heading",
+            "body"
+          ],
+          "properties": {
+            "heading": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 95
+            },
+            "body": {
+              "type": "string",
+              "minLength": 280
+            }
+          }
+        }
+      },
+      "faq": {
+        "type": "array",
+        "minItems": 4,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "question",
+            "answer"
+          ],
+          "properties": {
+            "question": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 160
+            },
+            "answer": {
+              "type": "string",
+              "minLength": 150
+            }
+          }
+        }
+      },
+      "meta": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "description"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 60
+          },
+          "description": {
+            "type": "string",
+            "minLength": 120,
+            "maxLength": 155
+          }
+        }
+      },
+      "product_alt_texts": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "product_id",
+            "alt_text"
+          ],
+          "properties": {
+            "product_id": {
+              "type": "string"
+            },
+            "alt_text": {
+              "type": "string",
+              "minLength": 30,
+              "maxLength": 140
+            }
+          }
+        }
+      }
+    }
+  }
+}
