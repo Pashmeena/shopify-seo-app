@@ -7,7 +7,7 @@ import {
   useLoaderData,
   useNavigation,
 } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Badge,
   Banner,
@@ -24,6 +24,7 @@ import {
   Page,
   Select,
   Spinner,
+  Tag,
   Text,
   TextField,
   Tooltip,
@@ -241,6 +242,21 @@ export default function Keywords() {
 
   const [pasted, setPasted] = useState("");
   const [locale, setLocale] = useState(defaultLocale);
+  const csvInputRef = useRef<HTMLInputElement>(null);
+  const [csvName, setCsvName] = useState<string | null>(null);
+
+  // A successful import clears the input so the next batch starts clean.
+  useEffect(() => {
+    if (
+      actionData &&
+      "success" in actionData &&
+      actionData.success?.startsWith("Added")
+    ) {
+      setPasted("");
+      setCsvName(null);
+      if (csvInputRef.current) csvInputRef.current.value = "";
+    }
+  }, [actionData]);
 
   const busyAction =
     navigation.state === "submitting"
@@ -323,9 +339,19 @@ export default function Keywords() {
             <Form method="post" encType="multipart/form-data">
               <input type="hidden" name="_action" value="add" />
               <input type="hidden" name="locale" value={locale} />
+              <input
+                ref={csvInputRef}
+                type="file"
+                name="csv"
+                accept=".csv,text/csv,text/plain"
+                hidden
+                onChange={(event) =>
+                  setCsvName(event.currentTarget.files?.[0]?.name ?? null)
+                }
+              />
               <FormLayout>
                 <TextField
-                  label="Keywords (one per line, optionally `keyword,locale`)"
+                  label="Keywords"
                   value={pasted}
                   onChange={setPasted}
                   name="keywords"
@@ -334,10 +360,11 @@ export default function Keywords() {
                   placeholder={
                     "botanical wallpaper living room\nselbstklebende tapete mietwohnung,de-DE"
                   }
+                  helpText="One keyword per line — plain, or `keyword,locale` to target a specific market. A CSV upload uses the same format and is imported together with pasted lines."
                 />
-                <InlineStack gap="400" blockAlign="end" wrap>
+                <InlineStack gap="300" blockAlign="end" wrap>
                   <Select
-                    label="Default locale for lines without one"
+                    label="Locale for lines without one"
                     options={locales.map((entry) => ({
                       label: entry.label,
                       value: entry.code,
@@ -345,16 +372,19 @@ export default function Keywords() {
                     value={locale}
                     onChange={setLocale}
                   />
-                  <BlockStack gap="100">
-                    <Text as="span" variant="bodySm" fontWeight="medium">
-                      CSV upload (keyword[,locale] per line)
-                    </Text>
-                    <input
-                      type="file"
-                      name="csv"
-                      accept=".csv,text/csv,text/plain"
-                    />
-                  </BlockStack>
+                  <Button onClick={() => csvInputRef.current?.click()}>
+                    Upload CSV
+                  </Button>
+                  {csvName && (
+                    <Tag
+                      onRemove={() => {
+                        if (csvInputRef.current) csvInputRef.current.value = "";
+                        setCsvName(null);
+                      }}
+                    >
+                      {csvName}
+                    </Tag>
+                  )}
                   <Button
                     submit
                     variant="primary"
