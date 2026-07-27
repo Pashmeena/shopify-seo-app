@@ -336,82 +336,99 @@ export default function Keywords() {
             <Text as="h2" variant="headingMd">
               Add keywords
             </Text>
-            <Form method="post" encType="multipart/form-data">
-              <input type="hidden" name="_action" value="add" />
-              <input type="hidden" name="locale" value={locale} />
-              <input
-                ref={csvInputRef}
-                type="file"
-                name="csv"
-                accept=".csv,text/csv,text/plain"
-                hidden
-                onChange={(event) =>
-                  setCsvName(event.currentTarget.files?.[0]?.name ?? null)
-                }
-              />
-              <FormLayout>
-                <TextField
-                  label="Keywords"
-                  value={pasted}
-                  onChange={setPasted}
-                  name="keywords"
-                  multiline={4}
-                  autoComplete="off"
-                  placeholder={
-                    "botanical wallpaper living room\nselbstklebende tapete mietwohnung,de-DE"
-                  }
-                  helpText="One keyword per line — plain, or `keyword,locale` to target a specific market. A CSV upload uses the same format and is imported together with pasted lines."
-                />
-                <InlineStack gap="300" blockAlign="end" wrap>
-                  <Select
-                    label="Locale for lines without one"
-                    options={locales.map((entry) => ({
-                      label: entry.label,
-                      value: entry.code,
-                    }))}
-                    value={locale}
-                    onChange={setLocale}
-                  />
-                  <Button
-                    size="large"
-                    onClick={() => csvInputRef.current?.click()}
-                  >
-                    Upload CSV
-                  </Button>
-                  {csvName && (
-                    <Tag
-                      onRemove={() => {
-                        if (csvInputRef.current) csvInputRef.current.value = "";
-                        setCsvName(null);
-                      }}
-                    >
-                      {csvName}
-                    </Tag>
-                  )}
-                  <Button
-                    submit
-                    size="large"
-                    variant="primary"
-                    loading={busyAction === "add"}
-                  >
-                    Add & parse intent
-                  </Button>
-                </InlineStack>
-              </FormLayout>
-            </Form>
-            <InlineStack gap="200" blockAlign="center">
+
+            <InlineStack gap="300" blockAlign="center" wrap>
               <Form method="post">
                 <input type="hidden" name="_action" value="discover" />
-                <Button submit loading={busyAction === "discover"}>
+                <Button
+                  submit
+                  variant="primary"
+                  loading={busyAction === "discover"}
+                >
                   Auto-discover from catalog
                 </Button>
               </Form>
               <Text as="span" tone="subdued" variant="bodySm">
-                Product-first: only facet combinations with ≥ {minProducts}{" "}
-                matching products are suggested. Nothing publishes without your
-                approval.
+                Scans tags, collections and titles — suggests only combinations
+                with ≥ {minProducts} matching products. Nothing publishes
+                without your approval.
               </Text>
             </InlineStack>
+
+            <Divider />
+
+            <BlockStack gap="300">
+              <Text as="h3" variant="headingSm">
+                Or add your own
+              </Text>
+              <Form method="post" encType="multipart/form-data">
+                <input type="hidden" name="_action" value="add" />
+                <input type="hidden" name="locale" value={locale} />
+                <input
+                  ref={csvInputRef}
+                  type="file"
+                  name="csv"
+                  accept=".csv,text/csv,text/plain"
+                  hidden
+                  onChange={(event) =>
+                    setCsvName(event.currentTarget.files?.[0]?.name ?? null)
+                  }
+                />
+                <FormLayout>
+                  <TextField
+                    label="Keywords"
+                    labelAction={{
+                      content: "Upload CSV",
+                      onAction: () => csvInputRef.current?.click(),
+                    }}
+                    value={pasted}
+                    onChange={setPasted}
+                    name="keywords"
+                    multiline={4}
+                    autoComplete="off"
+                    placeholder={
+                      "botanical wallpaper living room\nselbstklebende tapete mietwohnung,de-DE"
+                    }
+                    helpText="One keyword per line — plain, or `keyword,locale` to target a specific market. CSV uses the same format."
+                  />
+                  {csvName && (
+                    <InlineStack gap="200" blockAlign="center">
+                      <Tag
+                        onRemove={() => {
+                          if (csvInputRef.current)
+                            csvInputRef.current.value = "";
+                          setCsvName(null);
+                        }}
+                      >
+                        {csvName}
+                      </Tag>
+                      <Text as="span" tone="subdued" variant="bodySm">
+                        imported together with the pasted lines
+                      </Text>
+                    </InlineStack>
+                  )}
+                  <InlineStack gap="300" blockAlign="end" wrap>
+                    <Select
+                      label="Locale for lines without one"
+                      options={locales.map((entry) => ({
+                        label: entry.label,
+                        value: entry.code,
+                      }))}
+                      value={locale}
+                      onChange={setLocale}
+                    />
+                    <Button
+                      submit
+                      size="large"
+                      variant="primary"
+                      loading={busyAction === "add"}
+                    >
+                      Add & parse intent
+                    </Button>
+                  </InlineStack>
+                </FormLayout>
+              </Form>
+            </BlockStack>
           </BlockStack>
         </Card>
 
