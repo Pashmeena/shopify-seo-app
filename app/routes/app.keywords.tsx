@@ -372,7 +372,10 @@ export default function Keywords() {
                     value={locale}
                     onChange={setLocale}
                   />
-                  <Button onClick={() => csvInputRef.current?.click()}>
+                  <Button
+                    size="large"
+                    onClick={() => csvInputRef.current?.click()}
+                  >
                     Upload CSV
                   </Button>
                   {csvName && (
@@ -387,6 +390,7 @@ export default function Keywords() {
                   )}
                   <Button
                     submit
+                    size="large"
                     variant="primary"
                     loading={busyAction === "add"}
                   >
