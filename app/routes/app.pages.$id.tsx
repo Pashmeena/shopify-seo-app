@@ -60,6 +60,12 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const match = matchProducts(catalog, page.intent, settings.minProducts);
   const includedIds = new Set(page.productIds);
 
+  // Storefront page when the product is published there, admin product
+  // page otherwise, so "View" always lands somewhere useful.
+  const productUrl = (product: { id: string; onlineStoreUrl: string | null }) =>
+    product.onlineStoreUrl ??
+    `https://${shop}/admin/products/${product.id.split("/").pop()}`;
+
   // Candidates = everything the matcher accepts, plus anything currently
   // included (so a selection never silently disappears).
   const candidateIds = new Set(
@@ -71,6 +77,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       title: scored.product.title,
       price: `${scored.product.price.toFixed(2)} ${scored.product.currencyCode}`,
       imageUrl: scored.product.imageUrl,
+      url: productUrl(scored.product),
       score: Number(scored.score.toFixed(2)),
       matchedFacets: scored.matchedFacets,
       included: includedIds.has(scored.product.id),
@@ -85,6 +92,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
         title: product.title,
         price: `${product.price.toFixed(2)} ${product.currencyCode}`,
         imageUrl: product.imageUrl,
+        url: productUrl(product),
         score: 0,
         matchedFacets: {},
         included: true,
@@ -94,10 +102,11 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   return {
     page,
     candidates,
-    excluded: match.excluded.slice(0, 12).map((entry) => ({
+    excluded: match.excluded.map((entry) => ({
       title: entry.product.title,
       reason: entry.reason,
       imageUrl: entry.product.imageUrl,
+      url: productUrl(entry.product),
     })),
     excludedTotal: match.excluded.length,
     minProducts: settings.minProducts,
@@ -123,12 +132,12 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
         if (!page) throw new Error("Page not found");
         if (page.productIds.length < settings.minProducts) {
           return {
-            error: `Cannot approve: ${page.productIds.length} products is below the minimum of ${settings.minProducts}. Add products or reject the page — thin pages are never published.`,
+            error: `Cannot approve: ${page.productIds.length} products is below the minimum of ${settings.minProducts}. Add products or reject the page. Thin pages are never published.`,
           };
         }
         await updatePage(shop, pageId, { status: "draft", reviewReason: null });
         return {
-          success: "Review resolved — page is now a publishable draft.",
+          success: "Review resolved. The page is now a publishable draft.",
         };
       }
       case "products": {
@@ -175,6 +184,7 @@ export default function PageDetail() {
       candidates.map((candidate) => [candidate.id, candidate.included]),
     ),
   );
+  const [showAllExcluded, setShowAllExcluded] = useState(false);
   const selectedCount = Object.values(selection).filter(Boolean).length;
   const isPublished = page.status === "published";
   const content = page.content;
@@ -229,7 +239,7 @@ export default function PageDetail() {
         )}
         {page.status === "needs_review" && (
           <Banner
-            title="Held for review — will not be published"
+            title="Held for review (will not be published)"
             tone="warning"
           >
             <BlockStack gap="200">
@@ -248,8 +258,8 @@ export default function PageDetail() {
             <p>
               <PolarisLink url={page.articleUrl} target="_blank">
                 {page.articleUrl}
-              </PolarisLink>{" "}
-              — product or content changes require a republish.
+              </PolarisLink>
+              . Product or content changes require a republish.
             </p>
           </Banner>
         )}
@@ -300,7 +310,7 @@ export default function PageDetail() {
                         </Text>
                         {content.buying_guide.steps.map((step, index) => (
                           <Text as="p" key={step.title} tone="subdued">
-                            {index + 1}. <strong>{step.title}</strong> —{" "}
+                            {index + 1}. <strong>{step.title}</strong>:{" "}
                             {step.body}
                           </Text>
                         ))}
@@ -327,7 +337,7 @@ export default function PageDetail() {
               <Card>
                 <BlockStack gap="300">
                   <Text as="h2" variant="headingMd">
-                    Structured JSON — generated content
+                    Structured JSON: generated content
                   </Text>
                   <Text as="p" tone="subdued">
                     The validated AI output exactly as it passed the page type’s
@@ -340,7 +350,7 @@ export default function PageDetail() {
               <Card>
                 <BlockStack gap="300">
                   <Text as="h2" variant="headingMd">
-                    Structured JSON — SEO payload
+                    Structured JSON: SEO payload
                   </Text>
                   <Text as="p" tone="subdued">
                     Meta, canonical, hreflang, internal links and the JSON-LD
@@ -370,7 +380,7 @@ export default function PageDetail() {
                   </InlineStack>
                   {isPublished ? (
                     <Text as="p" tone="subdued">
-                      Published pages are read-only here — adjust and republish
+                      Published pages are read-only here. Adjust and republish
                       from a draft.
                     </Text>
                   ) : (
@@ -422,16 +432,29 @@ export default function PageDetail() {
                     Excluded by matcher ({excludedTotal})
                   </Text>
                   <Text as="p" tone="subdued" variant="bodySm">
-                    Why products did not qualify — accuracy over volume.
+                    Why products did not qualify: accuracy over volume.
                   </Text>
-                  {excluded.map((entry) => (
-                    <ExcludedProductRow
-                      key={entry.title}
-                      title={entry.title}
-                      reason={entry.reason}
-                      imageUrl={entry.imageUrl}
-                    />
-                  ))}
+                  {(showAllExcluded ? excluded : excluded.slice(0, 6)).map(
+                    (entry) => (
+                      <ExcludedProductRow
+                        key={entry.title}
+                        title={entry.title}
+                        reason={entry.reason}
+                        imageUrl={entry.imageUrl}
+                        url={entry.url}
+                      />
+                    ),
+                  )}
+                  {excluded.length > 6 && (
+                    <Button
+                      variant="plain"
+                      onClick={() => setShowAllExcluded((current) => !current)}
+                    >
+                      {showAllExcluded
+                        ? "Show fewer"
+                        : `Show all ${excludedTotal}`}
+                    </Button>
+                  )}
                 </BlockStack>
               </Card>
 

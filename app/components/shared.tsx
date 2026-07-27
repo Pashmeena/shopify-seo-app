@@ -5,6 +5,7 @@ import {
   Box,
   Checkbox,
   InlineStack,
+  Link,
   Tag,
   Text,
   Thumbnail,
@@ -41,29 +42,47 @@ export function ProductChoiceRow({
   checked,
   onToggle,
 }: {
-  candidate: { id: string; title: string; imageUrl: string | null };
+  candidate: {
+    id: string;
+    title: string;
+    imageUrl: string | null;
+    url: string;
+  };
   secondary: string;
   checked: boolean;
   onToggle: (checked: boolean) => void;
 }) {
   return (
-    <Checkbox
-      label={
-        <InlineStack gap="200" blockAlign="center" wrap={false}>
-          <ProductThumb imageUrl={candidate.imageUrl} title={candidate.title} />
-          <BlockStack gap="025">
-            <Text as="span" fontWeight="medium">
-              {candidate.title}
-            </Text>
-            <Text as="span" tone="subdued" variant="bodySm">
-              {secondary}
-            </Text>
-          </BlockStack>
-        </InlineStack>
-      }
-      checked={checked}
-      onChange={onToggle}
-    />
+    <InlineStack
+      gap="200"
+      blockAlign="center"
+      align="space-between"
+      wrap={false}
+    >
+      <Checkbox
+        label={
+          <InlineStack gap="200" blockAlign="center" wrap={false}>
+            <ProductThumb
+              imageUrl={candidate.imageUrl}
+              title={candidate.title}
+            />
+            <BlockStack gap="025">
+              <Text as="span" fontWeight="medium">
+                {candidate.title}
+              </Text>
+              <Text as="span" tone="subdued" variant="bodySm">
+                {secondary}
+              </Text>
+            </BlockStack>
+          </InlineStack>
+        }
+        checked={checked}
+        onChange={onToggle}
+      />
+      <Link url={candidate.url} target="_blank" removeUnderline>
+        View
+      </Link>
+    </InlineStack>
   );
 }
 
@@ -72,22 +91,34 @@ export function ExcludedProductRow({
   title,
   reason,
   imageUrl,
+  url,
 }: {
   title: string;
   reason: string;
   imageUrl: string | null;
+  url: string;
 }) {
   return (
-    <InlineStack gap="200" blockAlign="center" wrap={false}>
-      <ProductThumb imageUrl={imageUrl} title={title} />
-      <BlockStack gap="025">
-        <Text as="span" variant="bodySm" fontWeight="medium">
-          {title}
-        </Text>
-        <Text as="span" tone="subdued" variant="bodySm">
-          {reason}
-        </Text>
-      </BlockStack>
+    <InlineStack
+      gap="200"
+      blockAlign="center"
+      align="space-between"
+      wrap={false}
+    >
+      <InlineStack gap="200" blockAlign="center" wrap={false}>
+        <ProductThumb imageUrl={imageUrl} title={title} />
+        <BlockStack gap="025">
+          <Text as="span" variant="bodySm" fontWeight="medium">
+            {title}
+          </Text>
+          <Text as="span" tone="subdued" variant="bodySm">
+            {reason}
+          </Text>
+        </BlockStack>
+      </InlineStack>
+      <Link url={url} target="_blank" removeUnderline>
+        View
+      </Link>
     </InlineStack>
   );
 }

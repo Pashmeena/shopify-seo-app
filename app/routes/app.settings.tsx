@@ -1,5 +1,10 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 import { useState } from "react";
 import {
   Badge,
@@ -23,7 +28,10 @@ import { listLocales } from "../config/index.server";
 import { slugify } from "../lib/slugify";
 import { getAiStatus } from "../services/ai/provider.server";
 import { seedCatalog } from "../services/catalog/seed.server";
-import { getSettings, updateSettings } from "../services/settings/settings.server";
+import {
+  getSettings,
+  updateSettings,
+} from "../services/settings/settings.server";
 import { authenticate } from "../shopify.server";
 import { AiConfigBanner } from "../components/shared";
 
@@ -33,7 +41,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return {
     shop: session.shop,
     settings,
-    locales: listLocales().map((locale) => ({ code: locale.code, label: locale.label })),
+    locales: listLocales().map((locale) => ({
+      code: locale.code,
+      label: locale.label,
+    })),
     ai: getAiStatus(),
   };
 };
@@ -50,10 +61,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       if (result.created > 0 || result.skipped > 0) {
         await updateSettings(shop, { catalogSeeded: true });
       }
-      const failures = result.failed.map((f) => `${f.handle}: ${f.error}`).join("; ");
+      const failures = result.failed
+        .map((f) => `${f.handle}: ${f.error}`)
+        .join("; ");
       return {
-        success: `Seed complete — ${result.created} created, ${result.skipped} already present${
-          result.failed.length ? `, ${result.failed.length} failed (${failures})` : ""
+        success: `Seed complete: ${result.created} created, ${result.skipped} already present${
+          result.failed.length
+            ? `, ${result.failed.length} failed (${failures})`
+            : ""
         }.`,
       };
     }
@@ -62,7 +77,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       const enabledLocaleCodes = formData.getAll("enabledLocales").map(String);
       const defaultLocale = String(formData.get("defaultLocale"));
       if (!enabledLocaleCodes.includes(defaultLocale)) {
-        return { error: "The default locale must be one of the enabled locales." };
+        return {
+          error: "The default locale must be one of the enabled locales.",
+        };
       }
       const minProducts = Number(formData.get("minProducts"));
       if (!Number.isInteger(minProducts) || minProducts < 1) {
@@ -75,7 +92,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         enabledLocaleCodes,
         // Normalized the same way Shopify normalizes handles, so lookups
         // and URLs stay in agreement with the created blog.
-        blogHandle: slugify(String(formData.get("blogHandle") || "")) || "seo-plp",
+        blogHandle:
+          slugify(String(formData.get("blogHandle") || "")) || "seo-plp",
         minProducts,
         competitorUrlList: String(formData.get("competitorUrls") || "")
           .split(/\r?\n/)
@@ -96,15 +114,21 @@ export default function Settings() {
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const busyAction =
-    navigation.state === "submitting" ? String(navigation.formData?.get("_action")) : null;
+    navigation.state === "submitting"
+      ? String(navigation.formData?.get("_action"))
+      : null;
 
   const [brandName, setBrandName] = useState(settings.brandName);
   const [brandTone, setBrandTone] = useState(settings.brandTone);
   const [blogHandle, setBlogHandle] = useState(settings.blogHandle);
   const [minProducts, setMinProducts] = useState(String(settings.minProducts));
   const [defaultLocale, setDefaultLocale] = useState(settings.defaultLocale);
-  const [enabledLocales, setEnabledLocales] = useState<string[]>(settings.enabledLocaleCodes);
-  const [competitorUrls, setCompetitorUrls] = useState(settings.competitorUrlList.join("\n"));
+  const [enabledLocales, setEnabledLocales] = useState<string[]>(
+    settings.enabledLocaleCodes,
+  );
+  const [competitorUrls, setCompetitorUrls] = useState(
+    settings.competitorUrlList.join("\n"),
+  );
 
   return (
     <Page>
@@ -128,7 +152,12 @@ export default function Settings() {
               <input type="hidden" name="_action" value="save" />
               <input type="hidden" name="defaultLocale" value={defaultLocale} />
               {enabledLocales.map((code) => (
-                <input type="hidden" name="enabledLocales" value={code} key={code} />
+                <input
+                  type="hidden"
+                  name="enabledLocales"
+                  value={code}
+                  key={code}
+                />
               ))}
               <BlockStack gap="400">
                 <Card>
@@ -170,8 +199,8 @@ export default function Settings() {
                       Locales
                     </Text>
                     <Text as="p" tone="subdued" variant="bodySm">
-                      Markets are config files (app/config/locales). Adding one there makes it
-                      appear here — no code changes.
+                      Markets are config files (app/config/locales). Adding one
+                      there makes it appear here, with no code changes.
                     </Text>
                     <ChoiceList
                       allowMultiple
@@ -186,8 +215,13 @@ export default function Settings() {
                     <Select
                       label="Default locale (canonical for cross-locale duplicates)"
                       options={locales
-                        .filter((locale) => enabledLocales.includes(locale.code))
-                        .map((locale) => ({ label: locale.label, value: locale.code }))}
+                        .filter((locale) =>
+                          enabledLocales.includes(locale.code),
+                        )
+                        .map((locale) => ({
+                          label: locale.label,
+                          value: locale.code,
+                        }))}
                       value={defaultLocale}
                       onChange={setDefaultLocale}
                     />
@@ -220,7 +254,11 @@ export default function Settings() {
                 </Card>
 
                 <InlineStack align="end">
-                  <Button submit variant="primary" loading={busyAction === "save"}>
+                  <Button
+                    submit
+                    variant="primary"
+                    loading={busyAction === "save"}
+                  >
                     Save settings
                   </Button>
                 </InlineStack>
@@ -243,9 +281,9 @@ export default function Settings() {
                     {ai.model && <Badge>{ai.model}</Badge>}
                   </InlineStack>
                   <Text as="p" tone="subdued" variant="bodySm">
-                    Provider, key and model live in <code>.env</code> (AI_PROVIDER / AI_API_KEY /
-                    AI_MODEL) per the brief — switching Claude ↔ GPT-4o ↔ Gemini is a config
-                    change only.
+                    Provider, key and model live in <code>.env</code>{" "}
+                    (AI_PROVIDER / AI_API_KEY / AI_MODEL) per the brief.
+                    Switching Claude ↔ GPT-4o ↔ Gemini is a config change only.
                   </Text>
                 </BlockStack>
               </Card>
@@ -256,8 +294,9 @@ export default function Settings() {
                     Demo catalog
                   </Text>
                   <Text as="p" tone="subdued" variant="bodySm">
-                    Seeds 36 wallpaper products with structured tags (style:/room:/material:/
-                    attribute:/use-case:). Idempotent — re-running fills gaps only.
+                    Seeds 36 wallpaper products with structured tags
+                    (style:/room:/material:/ attribute:/use-case:). Idempotent:
+                    re-running fills gaps only.
                   </Text>
                   <Form method="post">
                     <input type="hidden" name="_action" value="seed" />
@@ -266,7 +305,9 @@ export default function Settings() {
                       loading={busyAction === "seed"}
                       variant={settings.catalogSeeded ? undefined : "primary"}
                     >
-                      {settings.catalogSeeded ? "Re-run seed" : "Seed demo catalog"}
+                      {settings.catalogSeeded
+                        ? "Re-run seed"
+                        : "Seed demo catalog"}
                     </Button>
                   </Form>
                 </BlockStack>
@@ -283,14 +324,18 @@ export default function Settings() {
                     </PolarisLink>
                   </Text>
                   <Text as="p" variant="bodySm">
-                    <PolarisLink url={`/sitemap-ai.xml?shop=${shop}`} target="_blank">
+                    <PolarisLink
+                      url={`/sitemap-ai.xml?shop=${shop}`}
+                      target="_blank"
+                    >
                       sitemap-ai.xml
                     </PolarisLink>
                   </Text>
                   <Divider />
                   <Text as="p" tone="subdued" variant="bodySm">
-                    Served from the app locally; in production these would be exposed at the store
-                    root via a Shopify App Proxy (see README).
+                    Served from the app locally; in production these would be
+                    exposed at the store root via a Shopify App Proxy (see
+                    README).
                   </Text>
                 </BlockStack>
               </Card>

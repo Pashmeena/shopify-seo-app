@@ -160,7 +160,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         const MAX_BATCH = 50;
         if (entries.length > MAX_BATCH) {
           return {
-            error: `That's ${entries.length} keywords — please add at most ${MAX_BATCH} per batch.`,
+            error: `That's ${entries.length} keywords. Please add at most ${MAX_BATCH} per batch.`,
           };
         }
 
@@ -211,13 +211,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           await updateKeyword(shop, id, { productOverrides: null });
           return {
             success:
-              "Product selection reset — the automatic match will be used.",
+              "Product selection reset. The automatic match will be used.",
           };
         }
         const productIds = formData.getAll("productIds").map(String);
         await updateKeyword(shop, id, { productOverrides: productIds });
         return {
-          success: `Product selection saved (${productIds.length} products) — generation will use it.`,
+          success: `Product selection saved (${productIds.length} products). Generation will use it.`,
         };
       }
       case "generate": {
@@ -230,12 +230,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
   } catch (error) {
     if (error instanceof PipelineRejection) {
-      return { error: `Not generated — ${error.message}` };
+      return { error: `Not generated: ${error.message}` };
     }
     if (error instanceof AiOutputInvalidError) {
       return {
         error:
-          "Generation didn't pass the content quality gate: the AI response failed schema validation after 3 attempts, so nothing was created or published. Click Generate PLP to retry — the full technical detail is in the dev server log.",
+          "Generation didn't pass the content quality gate: the AI response failed schema validation after 3 attempts, so nothing was created or published. Click Generate PLP to retry. The full technical detail is in the dev server log.",
       };
     }
     return { error: error instanceof Error ? error.message : String(error) };
@@ -358,9 +358,9 @@ export default function Keywords() {
                 </Button>
               </Form>
               <Text as="span" tone="subdued" variant="bodySm">
-                Scans tags, collections and titles — suggests only combinations
-                with ≥ {minProducts} matching products. Nothing publishes
-                without your approval.
+                Scans tags, collections and titles, then suggests only
+                combinations with ≥ {minProducts} matching products. Nothing
+                publishes without your approval.
               </Text>
             </InlineStack>
 
@@ -398,7 +398,7 @@ export default function Keywords() {
                     placeholder={
                       "botanical wallpaper living room\nselbstklebende tapete mietwohnung,de-DE"
                     }
-                    helpText="One keyword per line — plain, or `keyword,locale` to target a specific market. CSV uses the same format."
+                    helpText="One keyword per line: plain, or `keyword,locale` to target a specific market. CSV uses the same format."
                   />
                   {csvName && (
                     <InlineStack gap="200" blockAlign="center">
@@ -496,7 +496,7 @@ export default function Keywords() {
                           {effective}
                         </Text>
                         {keyword.productOverrides != null && (
-                          <Tooltip content="Merchant-adjusted selection — generation uses it. Open Preview to change or reset.">
+                          <Tooltip content="Merchant-adjusted selection. Generation uses it. Open Preview to change or reset.">
                             <Badge size="small">edited</Badge>
                           </Tooltip>
                         )}
@@ -504,7 +504,7 @@ export default function Keywords() {
                     )}
                   </IndexTable.Cell>
                   <IndexTable.Cell>
-                    <Tooltip content="No search-volume API connected — see README (pluggable stub).">
+                    <Tooltip content="No search-volume API connected. See README (pluggable stub).">
                       <Text as="span" tone="subdued">
                         {keyword.volume ?? "—"}
                       </Text>
@@ -612,7 +612,7 @@ export default function Keywords() {
           onClose={() => setPreviewId(null)}
           title={
             preview && "phrase" in preview
-              ? `Product match — “${preview.phrase}”`
+              ? `Product match: “${preview.phrase}”`
               : "Product match preview"
           }
           primaryAction={{
@@ -676,6 +676,8 @@ type PreviewData = SerializeFrom<typeof previewLoader>;
  * are already stated by the intent chips at the top — per-row text only
  * carries what distinguishes a product (price, strength, extra facets).
  */
+const EXCLUDED_PREVIEW_COUNT = 8;
+
 function MatchPreviewBody({
   preview,
   selection,
@@ -687,6 +689,7 @@ function MatchPreviewBody({
   selectedCount: number;
   onToggle: (id: string, checked: boolean) => void;
 }) {
+  const [showAllExcluded, setShowAllExcluded] = useState(false);
   const matched = preview.candidates.filter((candidate) => candidate.score > 0);
   const manual = preview.candidates.filter(
     (candidate) => candidate.score === 0,
@@ -724,7 +727,7 @@ function MatchPreviewBody({
             {`${selectedCount} / ${preview.minProducts} min`}
           </Badge>
           <Text as="span" tone="subdued" variant="bodySm">
-            Live against the current catalog — nothing is generated yet. Checked
+            Live against the current catalog. Nothing is generated yet. Checked
             products are used when you generate this PLP.
           </Text>
         </InlineStack>
@@ -732,14 +735,14 @@ function MatchPreviewBody({
       {selectedCount < preview.minProducts && (
         <Banner tone="warning">
           <p>
-            Below the minimum of {preview.minProducts} products — the page would
+            Below the minimum of {preview.minProducts} products. The page would
             be held in “needs review” and never published thin.
           </p>
         </Banner>
       )}
       <BlockStack gap="300">
         <Text as="h3" variant="headingSm">
-          Matched products ({matched.length}) — strongest first
+          Matched products ({matched.length}), strongest first
         </Text>
         {matched.map((candidate) => {
           const extras = distinguishing(candidate);
@@ -781,18 +784,27 @@ function MatchPreviewBody({
         <Text as="h3" variant="headingSm">
           Excluded by the matcher ({preview.excludedTotal})
         </Text>
-        {preview.excluded.map((entry) => (
+        {(showAllExcluded
+          ? preview.excluded
+          : preview.excluded.slice(0, EXCLUDED_PREVIEW_COUNT)
+        ).map((entry) => (
           <ExcludedProductRow
             key={entry.title}
             title={entry.title}
             reason={entry.reason}
             imageUrl={entry.imageUrl}
+            url={entry.url}
           />
         ))}
-        {preview.excludedTotal > preview.excluded.length && (
-          <Text as="p" tone="subdued" variant="bodySm">
-            …and {preview.excludedTotal - preview.excluded.length} more.
-          </Text>
+        {preview.excluded.length > EXCLUDED_PREVIEW_COUNT && (
+          <Button
+            variant="plain"
+            onClick={() => setShowAllExcluded((current) => !current)}
+          >
+            {showAllExcluded
+              ? "Show fewer"
+              : `Show all ${preview.excludedTotal}`}
+          </Button>
         )}
       </BlockStack>
     </BlockStack>

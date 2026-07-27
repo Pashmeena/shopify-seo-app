@@ -31,6 +31,12 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const overrideSet = overrides ? new Set(overrides) : null;
   const isIncluded = (id: string) => (overrideSet ? overrideSet.has(id) : true);
 
+  // Storefront page when the product is published there, admin product
+  // page otherwise, so "View" always lands somewhere useful.
+  const productUrl = (product: { id: string; onlineStoreUrl: string | null }) =>
+    product.onlineStoreUrl ??
+    `https://${shop}/admin/products/${product.id.split("/").pop()}`;
+
   const matchedIds = new Set(match.matches.map((scored) => scored.product.id));
   const candidates = [
     ...match.matches.map((scored) => ({
@@ -38,6 +44,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       title: scored.product.title,
       price: `${scored.product.price.toFixed(2)} ${scored.product.currencyCode}`,
       imageUrl: scored.product.imageUrl,
+      url: productUrl(scored.product),
       score: Number(scored.score.toFixed(2)),
       matchedFacets: scored.matchedFacets,
       included: isIncluded(scored.product.id),
@@ -52,6 +59,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
         title: product.title,
         price: `${product.price.toFixed(2)} ${product.currencyCode}`,
         imageUrl: product.imageUrl,
+        url: productUrl(product),
         score: 0,
         matchedFacets: {} as Partial<Record<string, string[]>>,
         included: true,
@@ -62,10 +70,11 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     phrase: keyword.phrase,
     facets: keyword.intent.facets,
     candidates,
-    excluded: match.excluded.slice(0, 12).map((entry) => ({
+    excluded: match.excluded.map((entry) => ({
       title: entry.product.title,
       reason: entry.reason,
       imageUrl: entry.product.imageUrl,
+      url: productUrl(entry.product),
     })),
     excludedTotal: match.excluded.length,
     minProducts: settings.minProducts,
