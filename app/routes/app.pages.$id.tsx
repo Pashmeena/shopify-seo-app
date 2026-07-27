@@ -1,15 +1,18 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 import { useState } from "react";
 import {
   Badge,
   Banner,
   BlockStack,
-  Box,
   Button,
   Card,
-  Checkbox,
   Divider,
   InlineStack,
   Layout,
@@ -24,12 +27,25 @@ import {
   applyProductSelection,
   regeneratePage,
 } from "../services/plp/pipeline.server";
-import { deletePage, getPage, updatePage } from "../services/plp/repository.server";
+import {
+  deletePage,
+  getPage,
+  updatePage,
+} from "../services/plp/repository.server";
 import { deleteArticle } from "../services/publishing/blog.server";
-import { PublishBlockedError, publishPage } from "../services/publishing/publish.server";
+import {
+  PublishBlockedError,
+  publishPage,
+} from "../services/publishing/publish.server";
 import { getSettings } from "../services/settings/settings.server";
 import { authenticate } from "../shopify.server";
-import { IntentChips, JsonView, StatusBadge } from "../components/shared";
+import {
+  ExcludedProductRow,
+  IntentChips,
+  JsonView,
+  ProductChoiceRow,
+  StatusBadge,
+} from "../components/shared";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
@@ -37,28 +53,38 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const page = await getPage(shop, params.id as string);
   if (!page) throw new Response("Page not found", { status: 404 });
 
-  const [settings, catalog] = await Promise.all([getSettings(shop), fetchCatalog(admin)]);
+  const [settings, catalog] = await Promise.all([
+    getSettings(shop),
+    fetchCatalog(admin),
+  ]);
   const match = matchProducts(catalog, page.intent, settings.minProducts);
   const includedIds = new Set(page.productIds);
 
   // Candidates = everything the matcher accepts, plus anything currently
   // included (so a selection never silently disappears).
-  const candidateIds = new Set(match.matches.map((scored) => scored.product.id));
+  const candidateIds = new Set(
+    match.matches.map((scored) => scored.product.id),
+  );
   const candidates = [
     ...match.matches.map((scored) => ({
       id: scored.product.id,
       title: scored.product.title,
       price: `${scored.product.price.toFixed(2)} ${scored.product.currencyCode}`,
+      imageUrl: scored.product.imageUrl,
       score: Number(scored.score.toFixed(2)),
       matchedFacets: scored.matchedFacets,
       included: includedIds.has(scored.product.id),
     })),
     ...catalog
-      .filter((product) => includedIds.has(product.id) && !candidateIds.has(product.id))
+      .filter(
+        (product) =>
+          includedIds.has(product.id) && !candidateIds.has(product.id),
+      )
       .map((product) => ({
         id: product.id,
         title: product.title,
         price: `${product.price.toFixed(2)} ${product.currencyCode}`,
+        imageUrl: product.imageUrl,
         score: 0,
         matchedFacets: {},
         included: true,
@@ -71,6 +97,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     excluded: match.excluded.slice(0, 12).map((entry) => ({
       title: entry.product.title,
       reason: entry.reason,
+      imageUrl: entry.product.imageUrl,
     })),
     excludedTotal: match.excluded.length,
     minProducts: settings.minProducts,
@@ -100,12 +127,16 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
           };
         }
         await updatePage(shop, pageId, { status: "draft", reviewReason: null });
-        return { success: "Review resolved — page is now a publishable draft." };
+        return {
+          success: "Review resolved — page is now a publishable draft.",
+        };
       }
       case "products": {
         const productIds = formData.getAll("productIds").map(String);
         await applyProductSelection(shop, pageId, productIds);
-        return { success: `Product selection saved (${productIds.length} products).` };
+        return {
+          success: `Product selection saved (${productIds.length} products).`,
+        };
       }
       case "regenerate": {
         await regeneratePage(admin, shop, pageId);
@@ -135,10 +166,14 @@ export default function PageDetail() {
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const busyAction =
-    navigation.state === "submitting" ? String(navigation.formData?.get("_action")) : null;
+    navigation.state === "submitting"
+      ? String(navigation.formData?.get("_action"))
+      : null;
 
   const [selection, setSelection] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(candidates.map((candidate) => [candidate.id, candidate.included])),
+    Object.fromEntries(
+      candidates.map((candidate) => [candidate.id, candidate.included]),
+    ),
   );
   const selectedCount = Object.values(selection).filter(Boolean).length;
   const isPublished = page.status === "published";
@@ -193,7 +228,10 @@ export default function PageDetail() {
           </Banner>
         )}
         {page.status === "needs_review" && (
-          <Banner title="Held for review — will not be published" tone="warning">
+          <Banner
+            title="Held for review — will not be published"
+            tone="warning"
+          >
             <BlockStack gap="200">
               <p>{page.reviewReason}</p>
               <Form method="post">
@@ -225,7 +263,8 @@ export default function PageDetail() {
                     Target intent
                   </Text>
                   <Text as="p" tone="subdued">
-                    Keyword: “{page.intent.keyword}” · parsed via {page.intent.method} · cluster{" "}
+                    Keyword: “{page.intent.keyword}” · parsed via{" "}
+                    {page.intent.method} · cluster{" "}
                     <code>{page.clusterKey}</code>
                   </Text>
                   <IntentChips facets={page.intent.facets} />
@@ -261,7 +300,8 @@ export default function PageDetail() {
                         </Text>
                         {content.buying_guide.steps.map((step, index) => (
                           <Text as="p" key={step.title} tone="subdued">
-                            {index + 1}. <strong>{step.title}</strong> — {step.body}
+                            {index + 1}. <strong>{step.title}</strong> —{" "}
+                            {step.body}
                           </Text>
                         ))}
                       </>
@@ -290,7 +330,8 @@ export default function PageDetail() {
                     Structured JSON — generated content
                   </Text>
                   <Text as="p" tone="subdued">
-                    The validated AI output exactly as it passed the page type’s output_schema.
+                    The validated AI output exactly as it passed the page type’s
+                    output_schema.
                   </Text>
                   <JsonView value={content} />
                 </BlockStack>
@@ -302,8 +343,8 @@ export default function PageDetail() {
                     Structured JSON — SEO payload
                   </Text>
                   <Text as="p" tone="subdued">
-                    Meta, canonical, hreflang, internal links and the JSON-LD stack
-                    (CollectionPage + ItemList, FAQPage, BreadcrumbList).
+                    Meta, canonical, hreflang, internal links and the JSON-LD
+                    stack (CollectionPage + ItemList, FAQPage, BreadcrumbList).
                   </Text>
                   <JsonView value={page.seo} />
                 </BlockStack>
@@ -319,13 +360,18 @@ export default function PageDetail() {
                     <Text as="h2" variant="headingMd">
                       Product match
                     </Text>
-                    <Badge tone={selectedCount >= minProducts ? "success" : "critical"}>
+                    <Badge
+                      tone={
+                        selectedCount >= minProducts ? "success" : "critical"
+                      }
+                    >
                       {`${selectedCount} / ${minProducts} min`}
                     </Badge>
                   </InlineStack>
                   {isPublished ? (
                     <Text as="p" tone="subdued">
-                      Published pages are read-only here — adjust and republish from a draft.
+                      Published pages are read-only here — adjust and republish
+                      from a draft.
                     </Text>
                   ) : (
                     <Form method="post">
@@ -333,19 +379,35 @@ export default function PageDetail() {
                       <BlockStack gap="200">
                         {candidates.map((candidate) => (
                           <BlockStack gap="050" key={candidate.id}>
-                            <Checkbox
-                              label={`${candidate.title} · ${candidate.price} (score ${candidate.score})`}
+                            <ProductChoiceRow
+                              candidate={candidate}
+                              secondary={
+                                candidate.score > 0
+                                  ? `${candidate.price} · match score ${candidate.score}`
+                                  : `${candidate.price} · added manually`
+                              }
                               checked={selection[candidate.id] ?? false}
-                              onChange={(checked) =>
-                                setSelection((current) => ({ ...current, [candidate.id]: checked }))
+                              onToggle={(checked) =>
+                                setSelection((current) => ({
+                                  ...current,
+                                  [candidate.id]: checked,
+                                }))
                               }
                             />
                             {selection[candidate.id] && (
-                              <input type="hidden" name="productIds" value={candidate.id} />
+                              <input
+                                type="hidden"
+                                name="productIds"
+                                value={candidate.id}
+                              />
                             )}
                           </BlockStack>
                         ))}
-                        <Button submit size="slim" loading={busyAction === "products"}>
+                        <Button
+                          submit
+                          size="slim"
+                          loading={busyAction === "products"}
+                        >
                           Save product selection
                         </Button>
                       </BlockStack>
@@ -363,14 +425,12 @@ export default function PageDetail() {
                     Why products did not qualify — accuracy over volume.
                   </Text>
                   {excluded.map((entry) => (
-                    <Box key={entry.title} paddingBlockEnd="100">
-                      <Text as="p" variant="bodySm">
-                        <strong>{entry.title}</strong>
-                      </Text>
-                      <Text as="p" tone="subdued" variant="bodySm">
-                        {entry.reason}
-                      </Text>
-                    </Box>
+                    <ExcludedProductRow
+                      key={entry.title}
+                      title={entry.title}
+                      reason={entry.reason}
+                      imageUrl={entry.imageUrl}
+                    />
                   ))}
                 </BlockStack>
               </Card>
@@ -382,22 +442,26 @@ export default function PageDetail() {
                       SEO summary
                     </Text>
                     <Text as="p" variant="bodySm">
-                      <strong>Meta title</strong> ({page.seo.metaTitle.length}/60):{" "}
-                      {page.seo.metaTitle}
+                      <strong>Meta title</strong> ({page.seo.metaTitle.length}
+                      /60): {page.seo.metaTitle}
                     </Text>
                     <Text as="p" variant="bodySm">
-                      <strong>Meta description</strong> ({page.seo.metaDescription.length}
+                      <strong>Meta description</strong> (
+                      {page.seo.metaDescription.length}
                       /155): {page.seo.metaDescription}
                     </Text>
                     <Text as="p" variant="bodySm">
                       <strong>Canonical:</strong> {page.seo.canonicalUrl}
                     </Text>
                     <Text as="p" variant="bodySm">
-                      <strong>Noindex:</strong> {page.seo.noindex ? "yes (not published)" : "no"}
+                      <strong>Noindex:</strong>{" "}
+                      {page.seo.noindex ? "yes (not published)" : "no"}
                     </Text>
                     <Text as="p" variant="bodySm">
                       <strong>hreflang:</strong>{" "}
-                      {page.seo.hreflang.map((variant) => variant.locale).join(", ")}
+                      {page.seo.hreflang
+                        .map((variant) => variant.locale)
+                        .join(", ")}
                     </Text>
                     <Divider />
                     <Text as="h3" variant="headingSm">
@@ -405,8 +469,8 @@ export default function PageDetail() {
                     </Text>
                     {page.seo.internalLinks.length === 0 && (
                       <Text as="p" tone="subdued" variant="bodySm">
-                        Populated from published PLPs with shared intent facets; refreshed on
-                        every publish.
+                        Populated from published PLPs with shared intent facets;
+                        refreshed on every publish.
                       </Text>
                     )}
                     {page.seo.internalLinks.map((link) => (

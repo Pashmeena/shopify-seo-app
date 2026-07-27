@@ -1,4 +1,8 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  SerializeFrom,
+} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import {
   Form,
@@ -12,10 +16,8 @@ import {
   Badge,
   Banner,
   BlockStack,
-  Box,
   Button,
   Card,
-  Checkbox,
   Divider,
   FormLayout,
   IndexTable,
@@ -51,7 +53,13 @@ import {
 import { clusterKey } from "../services/seo/similarity.server";
 import { getSettings } from "../services/settings/settings.server";
 import { authenticate } from "../shopify.server";
-import { AiConfigBanner, IntentChips, StatusBadge } from "../components/shared";
+import {
+  AiConfigBanner,
+  ExcludedProductRow,
+  IntentChips,
+  ProductChoiceRow,
+  StatusBadge,
+} from "../components/shared";
 import type { loader as previewLoader } from "./app.keywords.$id.preview";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -645,84 +653,148 @@ export default function Keywords() {
             {preview &&
               "candidates" in preview &&
               previewFetcher.state === "idle" && (
-                <BlockStack gap="400">
-                  <InlineStack gap="200" blockAlign="center">
-                    <Badge
-                      tone={
-                        selectedCount >= preview.minProducts
-                          ? "success"
-                          : "critical"
-                      }
-                    >
-                      {`${selectedCount} / ${preview.minProducts} min`}
-                    </Badge>
-                    <Text as="span" tone="subdued" variant="bodySm">
-                      Live match against the current catalog — nothing is
-                      generated yet. Checked products will be used when you
-                      generate this PLP.
-                    </Text>
-                  </InlineStack>
-                  {selectedCount < preview.minProducts && (
-                    <Banner tone="warning">
-                      <p>
-                        Below the minimum of {preview.minProducts} products —
-                        the page would be held in “needs review” and never
-                        published thin.
-                      </p>
-                    </Banner>
-                  )}
-                  <BlockStack gap="200">
-                    {preview.candidates.map((candidate) => (
-                      <Checkbox
-                        key={candidate.id}
-                        label={`${candidate.title} · ${candidate.price}${
-                          candidate.score > 0
-                            ? ` (score ${candidate.score})`
-                            : " (added manually)"
-                        }`}
-                        helpText={Object.entries(candidate.matchedFacets)
-                          .map(
-                            ([facet, values]) =>
-                              `${facet}: ${(values ?? []).join(", ")}`,
-                          )
-                          .join(" · ")}
-                        checked={selection[candidate.id] ?? false}
-                        onChange={(checked) =>
-                          setSelection((current) => ({
-                            ...current,
-                            [candidate.id]: checked,
-                          }))
-                        }
-                      />
-                    ))}
-                  </BlockStack>
-                  <Divider />
-                  <BlockStack gap="200">
-                    <Text as="h3" variant="headingSm">
-                      Excluded by matcher ({preview.excludedTotal})
-                    </Text>
-                    {preview.excluded.map((entry) => (
-                      <Box key={entry.title}>
-                        <Text as="p" variant="bodySm">
-                          <strong>{entry.title}</strong>
-                        </Text>
-                        <Text as="p" tone="subdued" variant="bodySm">
-                          {entry.reason}
-                        </Text>
-                      </Box>
-                    ))}
-                    {preview.excludedTotal > preview.excluded.length && (
-                      <Text as="p" tone="subdued" variant="bodySm">
-                        …and {preview.excludedTotal - preview.excluded.length}{" "}
-                        more.
-                      </Text>
-                    )}
-                  </BlockStack>
-                </BlockStack>
+                <MatchPreviewBody
+                  preview={preview}
+                  selection={selection}
+                  selectedCount={selectedCount}
+                  onToggle={(id, checked) =>
+                    setSelection((current) => ({ ...current, [id]: checked }))
+                  }
+                />
               )}
           </Modal.Section>
         </Modal>
       </BlockStack>
     </Page>
+  );
+}
+
+type PreviewData = SerializeFrom<typeof previewLoader>;
+
+/**
+ * The preview modal's body. Facet values shared by every matched product
+ * are already stated by the intent chips at the top — per-row text only
+ * carries what distinguishes a product (price, strength, extra facets).
+ */
+function MatchPreviewBody({
+  preview,
+  selection,
+  selectedCount,
+  onToggle,
+}: {
+  preview: PreviewData;
+  selection: Record<string, boolean>;
+  selectedCount: number;
+  onToggle: (id: string, checked: boolean) => void;
+}) {
+  const matched = preview.candidates.filter((candidate) => candidate.score > 0);
+  const manual = preview.candidates.filter(
+    (candidate) => candidate.score === 0,
+  );
+
+  const pairCounts = new Map<string, number>();
+  for (const candidate of matched) {
+    for (const [facet, values] of Object.entries(candidate.matchedFacets)) {
+      for (const value of values ?? []) {
+        const key = `${facet}: ${value}`;
+        pairCounts.set(key, (pairCounts.get(key) ?? 0) + 1);
+      }
+    }
+  }
+  const distinguishing = (candidate: PreviewData["candidates"][number]) =>
+    Object.entries(candidate.matchedFacets)
+      .flatMap(([facet, values]) =>
+        (values ?? []).map((value) => `${facet}: ${value}`),
+      )
+      .filter((key) => pairCounts.get(key) !== matched.length);
+
+  return (
+    <BlockStack gap="400">
+      <BlockStack gap="200">
+        <InlineStack gap="200" blockAlign="center" wrap>
+          <Text as="span" tone="subdued" variant="bodySm">
+            Matching against
+          </Text>
+          <IntentChips facets={preview.facets} />
+        </InlineStack>
+        <InlineStack gap="200" blockAlign="center">
+          <Badge
+            tone={selectedCount >= preview.minProducts ? "success" : "critical"}
+          >
+            {`${selectedCount} / ${preview.minProducts} min`}
+          </Badge>
+          <Text as="span" tone="subdued" variant="bodySm">
+            Live against the current catalog — nothing is generated yet. Checked
+            products are used when you generate this PLP.
+          </Text>
+        </InlineStack>
+      </BlockStack>
+      {selectedCount < preview.minProducts && (
+        <Banner tone="warning">
+          <p>
+            Below the minimum of {preview.minProducts} products — the page would
+            be held in “needs review” and never published thin.
+          </p>
+        </Banner>
+      )}
+      <BlockStack gap="300">
+        <Text as="h3" variant="headingSm">
+          Matched products ({matched.length}) — strongest first
+        </Text>
+        {matched.map((candidate) => {
+          const extras = distinguishing(candidate);
+          return (
+            <ProductChoiceRow
+              key={candidate.id}
+              candidate={candidate}
+              secondary={[
+                candidate.price,
+                `match score ${candidate.score}`,
+                extras.length ? `also ${extras.join(", ")}` : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+              checked={selection[candidate.id] ?? false}
+              onToggle={(checked) => onToggle(candidate.id, checked)}
+            />
+          );
+        })}
+      </BlockStack>
+      {manual.length > 0 && (
+        <BlockStack gap="300">
+          <Text as="h3" variant="headingSm">
+            Added manually ({manual.length})
+          </Text>
+          {manual.map((candidate) => (
+            <ProductChoiceRow
+              key={candidate.id}
+              candidate={candidate}
+              secondary={`${candidate.price} · outside the automatic match`}
+              checked={selection[candidate.id] ?? false}
+              onToggle={(checked) => onToggle(candidate.id, checked)}
+            />
+          ))}
+        </BlockStack>
+      )}
+      <Divider />
+      <BlockStack gap="300">
+        <Text as="h3" variant="headingSm">
+          Excluded by the matcher ({preview.excludedTotal})
+        </Text>
+        {preview.excluded.map((entry) => (
+          <ExcludedProductRow
+            key={entry.title}
+            title={entry.title}
+            reason={entry.reason}
+            imageUrl={entry.imageUrl}
+          />
+        ))}
+        {preview.excludedTotal > preview.excluded.length && (
+          <Text as="p" tone="subdued" variant="bodySm">
+            …and {preview.excludedTotal - preview.excluded.length} more.
+          </Text>
+        )}
+      </BlockStack>
+    </BlockStack>
   );
 }

@@ -37,6 +37,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       id: scored.product.id,
       title: scored.product.title,
       price: `${scored.product.price.toFixed(2)} ${scored.product.currencyCode}`,
+      imageUrl: scored.product.imageUrl,
       score: Number(scored.score.toFixed(2)),
       matchedFacets: scored.matchedFacets,
       included: isIncluded(scored.product.id),
@@ -50,6 +51,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
         id: product.id,
         title: product.title,
         price: `${product.price.toFixed(2)} ${product.currencyCode}`,
+        imageUrl: product.imageUrl,
         score: 0,
         matchedFacets: {} as Partial<Record<string, string[]>>,
         included: true,
@@ -58,10 +60,12 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   return {
     phrase: keyword.phrase,
+    facets: keyword.intent.facets,
     candidates,
     excluded: match.excluded.slice(0, 12).map((entry) => ({
       title: entry.product.title,
       reason: entry.reason,
+      imageUrl: entry.product.imageUrl,
     })),
     excludedTotal: match.excluded.length,
     minProducts: settings.minProducts,

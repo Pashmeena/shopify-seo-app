@@ -1,6 +1,96 @@
-import { Badge, Banner, Box, InlineStack, Tag, Text } from "@shopify/polaris";
+import {
+  Badge,
+  Banner,
+  BlockStack,
+  Box,
+  Checkbox,
+  InlineStack,
+  Tag,
+  Text,
+  Thumbnail,
+} from "@shopify/polaris";
 
 /** Shared presentation pieces for the admin routes. */
+
+function ProductThumb({
+  imageUrl,
+  title,
+}: {
+  imageUrl: string | null;
+  title: string;
+}) {
+  return imageUrl ? (
+    <Thumbnail source={imageUrl} alt={title} size="small" />
+  ) : (
+    <Box
+      background="bg-surface-secondary"
+      borderRadius="100"
+      minWidth="40px"
+      minHeight="40px"
+    />
+  );
+}
+
+/**
+ * A selectable product row: thumbnail, title and one subdued context line.
+ * Used wherever the merchant includes/excludes products from a PLP.
+ */
+export function ProductChoiceRow({
+  candidate,
+  secondary,
+  checked,
+  onToggle,
+}: {
+  candidate: { id: string; title: string; imageUrl: string | null };
+  secondary: string;
+  checked: boolean;
+  onToggle: (checked: boolean) => void;
+}) {
+  return (
+    <Checkbox
+      label={
+        <InlineStack gap="200" blockAlign="center" wrap={false}>
+          <ProductThumb imageUrl={candidate.imageUrl} title={candidate.title} />
+          <BlockStack gap="025">
+            <Text as="span" fontWeight="medium">
+              {candidate.title}
+            </Text>
+            <Text as="span" tone="subdued" variant="bodySm">
+              {secondary}
+            </Text>
+          </BlockStack>
+        </InlineStack>
+      }
+      checked={checked}
+      onChange={onToggle}
+    />
+  );
+}
+
+/** A non-selectable product row with the matcher's exclusion reason. */
+export function ExcludedProductRow({
+  title,
+  reason,
+  imageUrl,
+}: {
+  title: string;
+  reason: string;
+  imageUrl: string | null;
+}) {
+  return (
+    <InlineStack gap="200" blockAlign="center" wrap={false}>
+      <ProductThumb imageUrl={imageUrl} title={title} />
+      <BlockStack gap="025">
+        <Text as="span" variant="bodySm" fontWeight="medium">
+          {title}
+        </Text>
+        <Text as="span" tone="subdued" variant="bodySm">
+          {reason}
+        </Text>
+      </BlockStack>
+    </InlineStack>
+  );
+}
 
 export function StatusBadge({ status }: { status: string }) {
   switch (status) {
@@ -34,9 +124,10 @@ export function AiConfigBanner({
   return (
     <Banner title="AI provider not configured" tone="warning">
       <p>
-        Set <code>AI_PROVIDER</code> and <code>AI_API_KEY</code> in <code>.env</code> (see{" "}
-        <code>.env.example</code>) and restart the dev server. Keyword parsing falls back to rules
-        without it, but content generation requires it.
+        Set <code>AI_PROVIDER</code> and <code>AI_API_KEY</code> in{" "}
+        <code>.env</code> (see <code>.env.example</code>) and restart the dev
+        server. Keyword parsing falls back to rules without it, but content
+        generation requires it.
       </p>
     </Banner>
   );
@@ -77,7 +168,14 @@ export function JsonView({ value }: { value: unknown }) {
       overflowX="scroll"
       maxWidth="100%"
     >
-      <pre style={{ margin: 0, fontSize: "12px", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+      <pre
+        style={{
+          margin: 0,
+          fontSize: "12px",
+          lineHeight: 1.5,
+          whiteSpace: "pre-wrap",
+        }}
+      >
         {JSON.stringify(value, null, 2)}
       </pre>
     </Box>
