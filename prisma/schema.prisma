@@ -27,6 +27,7 @@ model Keyword {
   pageTypeId String? // page-type config this keyword resolves to
   clusterKey String? // canonical cluster identity for dedup
   matchCount Int? // products matched at discovery/parse time
+  productOverrides String? // JSON string[] of product GIDs — merchant's pre-generation selection; null = use matcher
   volume     Int? // search volume — always null until a volume API is plugged in
   error      String? // last pipeline error, if status == "failed"
   createdAt  DateTime  @default(now())

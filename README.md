@@ -38,7 +38,7 @@ Then, inside the embedded app:
 
 1. **Settings → Seed demo catalog** — creates 36 tagged wallpaper products (idempotent).
 2. **Keywords → Auto-discover from catalog** — or paste keywords manually, e.g. `botanical wallpaper living room`. CSV upload (`keyword,locale` per line) works too.
-3. Review the **parsed intent** chips, **Approve** a keyword, then **Generate PLP**.
+3. Review the **parsed intent** chips and the live match count, click **Preview** to see exactly which products the page would include (with per-product exclusion reasons) and adjust the selection *before* any AI cost — then **Approve** and **Generate PLP**.
 4. On the page detail screen: content preview, **structured JSON** (content + SEO payload), product match with manual adjustment, exclusion reasons, meta/hreflang/internal links.
 5. **Publish as blog article** — the page goes live at `/blogs/seo-plp/<slug>` on the dev store; `llms.txt` and `sitemap-ai.xml` update automatically (links in Settings).
 
@@ -82,9 +82,9 @@ app/
 ```
 
 **Pipeline** (`services/plp/pipeline.server.ts`):
-parse intent → route to page type → **Gate 1:** cluster key already has a page? → **Gate 2:** intent too similar to an existing page? → match products (threshold) → cross-locale canonical lookup → generate (validated against the page type's `output_schema`, retried with the validator's errors fed back, never published if invalid) → resolve meta → assemble SEO payload → save as `draft` or `needs_review`.
+parse intent → route to page type → **Gate 1:** cluster key already has a page? → **Gate 2:** intent too similar to an existing page? → match products (threshold; a selection saved in the pre-generation match preview overrides the raw matcher) → cross-locale canonical lookup → generate (validated against the page type's `output_schema`, retried with the validator's errors fed back, never published if invalid) → resolve meta → assemble SEO payload → save as `draft` or `needs_review`.
 
-**Data model** (SQLite/Prisma): `Keyword` (phrase, locale, source, parsed intent, cluster key, match count, status) and `PlpPage` (slug, status, intent, product IDs, validated content JSON, SEO payload JSON, cluster key, canonical pointer, article ID). Content and SEO are stored as JSON precisely so the admin can always show the raw structured output.
+**Data model** (SQLite/Prisma): `Keyword` (phrase, locale, source, parsed intent, cluster key, match count, optional pre-generation product selection, status) and `PlpPage` (slug, status, intent, product IDs, validated content JSON, SEO payload JSON, cluster key, canonical pointer, article ID). Content and SEO are stored as JSON precisely so the admin can always show the raw structured output.
 
 ---
 
@@ -96,6 +96,7 @@ Three layers:
 
 - **Discovery can't propose thin pages.** Auto-discovery is product-first: candidate pages are derived *from* facet combinations in the catalog, and only combinations that already clear the threshold (default 6, configurable in Settings) become suggestions. Candidates run through the exact same matcher as real generation, so the suggested count is the real count.
 - **Matching never dilutes.** Every facet the shopper explicitly stated is a hard filter — the matcher will not pad a "botanical living room" page with bedroom florals to reach 6. Accuracy beats volume by design.
+- **Thin keywords are visible before generation.** Matching runs eagerly — at import, at discovery, and live on every keyword-manager view (stored counts self-heal against the current catalog, so they cannot drift as products change). The **Preview** modal shows the exact product set with per-product exclusion reasons and allows manual adjustment, all before any AI spend. The principle: early match results are *advisory* (they inform merchant decisions); the generation-time re-match is *authoritative* (pages are always built from the catalog as it exists at that moment).
 - **Below-threshold pages are quarantined.** If a manual keyword matches fewer than the minimum, the page is still generated (so the merchant can see what it would be) but lands in `needs_review` with the reason recorded. The publish action is disabled for reviewed pages, and the review can only be resolved once the product count meets the threshold (e.g. after re-tagging products or adjusting the selection). Its `noindex` flag stays true, and it is excluded from `llms.txt` and `sitemap-ai.xml`, which list published pages only. The seeded catalog deliberately includes a below-threshold group (`use-case: humid rooms`, 3 products) so this path can be demonstrated live.
 
 ### 2. How does your prompt strategy differentiate pages targeting adjacent queries?

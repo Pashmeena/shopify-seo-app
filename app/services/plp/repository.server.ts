@@ -10,20 +10,29 @@ import type { SeoPayload } from "../seo/types";
  * once, here — everything above this module works with real types.
  */
 
-export interface PageRecord extends Omit<PlpPage, "intent" | "productIds" | "content" | "seo"> {
+export interface PageRecord extends Omit<
+  PlpPage,
+  "intent" | "productIds" | "content" | "seo"
+> {
   intent: IntentProfile;
   productIds: string[];
   content: PlpContent | null;
   seo: SeoPayload | null;
 }
 
-export interface KeywordRecord extends Omit<Keyword, "intent"> {
+export interface KeywordRecord extends Omit<
+  Keyword,
+  "intent" | "productOverrides"
+> {
   intent: IntentProfile | null;
+  /** Merchant's pre-generation product selection; null = trust the matcher. */
+  productOverrides: string[] | null;
 }
 
 function toPageRecord(page: PlpPage): PageRecord {
   const intent = safeParseJson<IntentProfile>(page.intent);
-  if (!intent) throw new Error(`PlpPage ${page.id} has unparseable intent JSON`);
+  if (!intent)
+    throw new Error(`PlpPage ${page.id} has unparseable intent JSON`);
   return {
     ...page,
     intent,
@@ -34,7 +43,13 @@ function toPageRecord(page: PlpPage): PageRecord {
 }
 
 function toKeywordRecord(keyword: Keyword): KeywordRecord {
-  return { ...keyword, intent: safeParseJson<IntentProfile>(keyword.intent) ?? null };
+  return {
+    ...keyword,
+    intent: safeParseJson<IntentProfile>(keyword.intent) ?? null,
+    productOverrides: keyword.productOverrides
+      ? parseJsonArray<string>(keyword.productOverrides)
+      : null,
+  };
 }
 
 // ── Keywords ─────────────────────────────────────────────────────────────
@@ -50,7 +65,10 @@ export async function listKeywords(
   return keywords.map(toKeywordRecord);
 }
 
-export async function getKeyword(shop: string, id: string): Promise<KeywordRecord | null> {
+export async function getKeyword(
+  shop: string,
+  id: string,
+): Promise<KeywordRecord | null> {
   const keyword = await prisma.keyword.findFirst({ where: { id, shop } });
   return keyword ? toKeywordRecord(keyword) : null;
 }
@@ -68,7 +86,10 @@ export interface KeywordInput {
 }
 
 /** Insert keywords, silently skipping (shop, phrase, locale) duplicates. */
-export async function addKeywords(shop: string, inputs: KeywordInput[]): Promise<number> {
+export async function addKeywords(
+  shop: string,
+  inputs: KeywordInput[],
+): Promise<number> {
   let created = 0;
   for (const input of inputs) {
     const phrase = input.phrase.trim();
@@ -105,13 +126,24 @@ export async function updateKeyword(
     pageTypeId: string | null;
     clusterKey: string | null;
     matchCount: number | null;
+    productOverrides: string[] | null;
     error: string | null;
   }>,
 ): Promise<void> {
-  const { intent, ...rest } = data;
+  const { intent, productOverrides, ...rest } = data;
   await prisma.keyword.updateMany({
     where: { id, shop },
-    data: { ...rest, ...(intent ? { intent: JSON.stringify(intent) } : {}) },
+    data: {
+      ...rest,
+      ...(intent ? { intent: JSON.stringify(intent) } : {}),
+      ...(productOverrides !== undefined
+        ? {
+            productOverrides: productOverrides
+              ? JSON.stringify(productOverrides)
+              : null,
+          }
+        : {}),
+    },
   });
 }
 
@@ -132,7 +164,10 @@ export async function listPages(
   return pages.map(toPageRecord);
 }
 
-export async function getPage(shop: string, id: string): Promise<PageRecord | null> {
+export async function getPage(
+  shop: string,
+  id: string,
+): Promise<PageRecord | null> {
   const page = await prisma.plpPage.findFirst({ where: { id, shop } });
   return page ? toPageRecord(page) : null;
 }
@@ -142,7 +177,9 @@ export async function findPageByCluster(
   clusterKey: string,
   locale: string,
 ): Promise<PageRecord | null> {
-  const page = await prisma.plpPage.findFirst({ where: { shop, clusterKey, locale } });
+  const page = await prisma.plpPage.findFirst({
+    where: { shop, clusterKey, locale },
+  });
   return page ? toPageRecord(page) : null;
 }
 
@@ -151,7 +188,9 @@ export async function findPageBySlug(
   slug: string,
   locale: string,
 ): Promise<PageRecord | null> {
-  const page = await prisma.plpPage.findFirst({ where: { shop, slug, locale } });
+  const page = await prisma.plpPage.findFirst({
+    where: { shop, slug, locale },
+  });
   return page ? toPageRecord(page) : null;
 }
 

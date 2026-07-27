@@ -40,7 +40,8 @@ import {
 export class PipelineRejection extends Error {
   constructor(
     message: string,
-    public readonly kind: "no-page-type" | "duplicate" | "blocked-similar" | "slug-taken",
+    public readonly kind:
+      "no-page-type" | "duplicate" | "blocked-similar" | "slug-taken",
   ) {
     super(message);
   }
@@ -62,7 +63,11 @@ export async function analyzeKeyword(
 
   const settings = await getSettings(shop);
   const catalog = await fetchCatalog(admin);
-  const intent = await parseIntent(keyword.phrase, keyword.locale, buildLexicon(catalog));
+  const intent = await parseIntent(
+    keyword.phrase,
+    keyword.locale,
+    buildLexicon(catalog),
+  );
   const match = matchProducts(catalog, intent, settings.minProducts);
 
   await updateKeyword(shop, keywordId, {
@@ -88,9 +93,21 @@ export async function generatePageForKeyword(
 
   try {
     const intent =
-      keyword.intent ?? (await parseIntent(keyword.phrase, keyword.locale, buildLexicon(catalog)));
+      keyword.intent ??
+      (await parseIntent(
+        keyword.phrase,
+        keyword.locale,
+        buildLexicon(catalog),
+      ));
 
-    const outcome = await runPipeline(shop, keyword.id, intent, catalog, settings);
+    const outcome = await runPipeline(
+      shop,
+      keyword.id,
+      intent,
+      catalog,
+      settings,
+      keyword.productOverrides,
+    );
     await updateKeyword(shop, keywordId, {
       status: "generated",
       intent,
@@ -103,7 +120,10 @@ export async function generatePageForKeyword(
   } catch (error) {
     // Full detail goes to the server log; the merchant-facing row gets a
     // short, actionable message.
-    console.error(`PLP generation failed for keyword "${keyword.phrase}":`, error);
+    console.error(
+      `PLP generation failed for keyword "${keyword.phrase}":`,
+      error,
+    );
     const message =
       error instanceof AiOutputInvalidError
         ? "The AI response didn't match the required content structure after 3 attempts, so nothing was created. This is usually transient — click Generate PLP to retry."
@@ -143,12 +163,26 @@ export async function regeneratePage(
     products,
     settings,
     relatedPages: allPages
-      .filter((candidate) => candidate.status === "published" && candidate.locale === locale.code)
+      .filter(
+        (candidate) =>
+          candidate.status === "published" && candidate.locale === locale.code,
+      )
       .slice(0, 8)
-      .map((candidate) => ({ title: candidate.title, slug: candidate.slug, sharedFacets: [] })),
+      .map((candidate) => ({
+        title: candidate.title,
+        slug: candidate.slug,
+        sharedFacets: [],
+      })),
   });
 
-  const meta = resolveMeta(generation.content, pageType, page.intent, locale, settings.brandName, products.length);
+  const meta = resolveMeta(
+    generation.content,
+    pageType,
+    page.intent,
+    locale,
+    settings.brandName,
+    products.length,
+  );
   const reviewReasons: string[] = [];
   if (products.length < settings.minProducts) {
     reviewReasons.push(
@@ -160,7 +194,12 @@ export async function regeneratePage(
       `Alt text for ${generation.backfilledAltTextIds.length} product(s) was backfilled deterministically.`,
     );
   }
-  const status = page.status === "published" ? "published" : reviewReasons.length ? "needs_review" : "draft";
+  const status =
+    page.status === "published"
+      ? "published"
+      : reviewReasons.length
+        ? "needs_review"
+        : "draft";
 
   const seo = assembleSeoPayload({
     shop,
@@ -172,7 +211,8 @@ export async function regeneratePage(
       clusterKey: page.clusterKey ?? clusterKey(page.intent),
       status,
       canonicalSlug: page.canonicalOfId
-        ? (allPages.find((candidate) => candidate.id === page.canonicalOfId)?.slug ?? null)
+        ? (allPages.find((candidate) => candidate.id === page.canonicalOfId)
+            ?.slug ?? null)
         : null,
     },
     content: generation.content,
@@ -213,13 +253,21 @@ export async function applyProductSelection(
   // Preserve non-threshold reasons; replace/remove the threshold one.
   const otherReasons = (page.reviewReason ?? "")
     .split(/(?<=\.)\s+/)
-    .filter((reason) => reason && !reason.includes("thin page, held from publishing"));
-  const reasons = belowThreshold ? [thresholdReason, ...otherReasons] : otherReasons;
+    .filter(
+      (reason) => reason && !reason.includes("thin page, held from publishing"),
+    );
+  const reasons = belowThreshold
+    ? [thresholdReason, ...otherReasons]
+    : otherReasons;
 
   await updatePage(shop, pageId, {
     productIds,
     status:
-      page.status === "published" ? "published" : reasons.length ? "needs_review" : "draft",
+      page.status === "published"
+        ? "published"
+        : reasons.length
+          ? "needs_review"
+          : "draft",
     reviewReason: reasons.length ? reasons.join(" ") : null,
   });
 }
@@ -230,6 +278,7 @@ async function runPipeline(
   intent: IntentProfile,
   catalog: CatalogProduct[],
   settings: Settings,
+  overrideProductIds: string[] | null = null,
 ): Promise<PipelineOutcome> {
   if (!intent.pageTypeId) {
     throw new PipelineRejection(
@@ -253,10 +302,16 @@ async function runPipeline(
 
   // Gate 2 — similarity against existing same-locale pages.
   const allPages = await listPages(shop);
-  const sameLocalePages = allPages.filter((page) => page.locale === locale.code);
+  const sameLocalePages = allPages.filter(
+    (page) => page.locale === locale.code,
+  );
   const similarity = checkSimilarity(
     intent,
-    sameLocalePages.map((page) => ({ title: page.title, slug: page.slug, intent: page.intent })),
+    sameLocalePages.map((page) => ({
+      title: page.title,
+      slug: page.slug,
+      intent: page.intent,
+    })),
   );
   if (similarity.level === "block") {
     throw new PipelineRejection(
@@ -277,9 +332,20 @@ async function runPipeline(
     );
   }
 
-  // Product matching with the minimum threshold.
+  // Product matching with the minimum threshold. A merchant's saved
+  // pre-generation selection (match preview) wins over the raw matcher —
+  // matcher order is kept for ranked products, manual additions follow.
   const match = matchProducts(catalog, intent, settings.minProducts);
-  const products = match.matches.map((scored) => scored.product);
+  let products = match.matches.map((scored) => scored.product);
+  if (overrideProductIds) {
+    const wanted = new Set(overrideProductIds);
+    const ranked = products.filter((product) => wanted.has(product.id));
+    const rankedIds = new Set(ranked.map((product) => product.id));
+    const additions = catalog.filter(
+      (product) => wanted.has(product.id) && !rankedIds.has(product.id),
+    );
+    products = [...ranked, ...additions];
+  }
 
   // Canonical consolidation — an equivalent page in the default locale
   // becomes the canonical; this page is its locale variant.
@@ -298,15 +364,26 @@ async function runPipeline(
     relatedPages: sameLocalePages
       .filter((page) => page.status === "published")
       .slice(0, 8)
-      .map((page) => ({ title: page.title, slug: page.slug, sharedFacets: [] })),
+      .map((page) => ({
+        title: page.title,
+        slug: page.slug,
+        sharedFacets: [],
+      })),
   });
 
-  const meta = resolveMeta(generation.content, pageType, intent, locale, settings.brandName, products.length);
+  const meta = resolveMeta(
+    generation.content,
+    pageType,
+    intent,
+    locale,
+    settings.brandName,
+    products.length,
+  );
 
   const reviewReasons: string[] = [];
-  if (!match.meetsThreshold) {
+  if (products.length < settings.minProducts) {
     reviewReasons.push(
-      `Only ${match.matches.length} matching products (minimum ${match.threshold}) — thin page, held from publishing.`,
+      `Only ${products.length} matching products (minimum ${settings.minProducts}) — thin page, held from publishing.`,
     );
   }
   if (similarity.level === "flag") {
