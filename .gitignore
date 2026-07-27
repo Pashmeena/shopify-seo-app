@@ -24,5 +24,9 @@ pnpm-lock.yaml
 .shopify/*
 .shopify.lock
 
+# GraphQL codegen artifacts (npm run graphql-codegen) — validation only,
+# the app uses hand-written types
+/app/types/
+
 # local files
 WP - Coding test (1).pdf

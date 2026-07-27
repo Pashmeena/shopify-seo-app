@@ -185,6 +185,7 @@ Documented deliberately — these are simplifications, not oversights:
 5. **Synchronous generation.** Generation runs inside the request (roughly 30–90 s with retries). Right for a local demo, wrong at scale — see the roadmap.
 6. **Placeholder product imagery** (picsum.photos, deterministic per handle) — seeding degrades gracefully to imageless products if the image service is unreachable.
 7. **Local SQLite** session/app storage, per the template default; swap the Prisma datasource for production.
+8. **AI alt text lives on the PLP only.** The intent-aware alt text is rendered on the published page and in its JSON-LD `ImageObject`s, but is not written back to the product media's `altText` in Shopify itself — product pages keep their original alt text. A production build would offer that write-back as an opt-in bulk action.
 
 ---
 

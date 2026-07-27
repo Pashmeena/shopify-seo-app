@@ -22,9 +22,11 @@ export default function App() {
   return (
     <div className={styles.index}>
       <div className={styles.content}>
-        <h1 className={styles.heading}>A short heading about [your app]</h1>
+        <h1 className={styles.heading}>SEO PLP Generator</h1>
         <p className={styles.text}>
-          A tagline about [your app] that describes your value proposition.
+          Programmatic SEO for Shopify stores: turn long-tail keywords into
+          published, schema-rich product listing pages — matched to your real
+          catalog, validated before they ever go live.
         </p>
         {showForm && (
           <Form className={styles.form} method="post" action="/auth/login">
@@ -40,16 +42,21 @@ export default function App() {
         )}
         <ul className={styles.list}>
           <li>
-            <strong>Product feature</strong>. Some detail about your feature and
-            its benefit to your customer.
+            <strong>Keyword to page, gated end to end</strong>. Auto-discovered
+            or imported keywords are parsed into structured intent, matched
+            against your products, and only generated once they clear
+            similarity and minimum-product thresholds.
           </li>
           <li>
-            <strong>Product feature</strong>. Some detail about your feature and
-            its benefit to your customer.
+            <strong>Technical SEO built in</strong>. CollectionPage + ItemList
+            + FAQPage + BreadcrumbList JSON-LD, intent-aware alt text,
+            canonical and hreflang handling, automatic internal linking, plus
+            llms.txt and sitemap-ai.xml for AI crawlers.
           </li>
           <li>
-            <strong>Product feature</strong>. Some detail about your feature and
-            its benefit to your customer.
+            <strong>Locale as configuration</strong>. Markets are JSON config
+            files — language, measurement system, terminology and currency
+            flow into every prompt; adding a market needs no code changes.
           </li>
         </ul>
       </div>
