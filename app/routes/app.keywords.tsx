@@ -342,6 +342,7 @@ export default function Keywords() {
                 <input type="hidden" name="_action" value="discover" />
                 <Button
                   submit
+                  size="large"
                   variant="primary"
                   loading={busyAction === "discover"}
                 >
