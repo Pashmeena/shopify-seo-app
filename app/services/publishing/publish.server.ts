@@ -150,7 +150,7 @@ export async function publishPage(
     reviewReason: null,
   });
 
-  await refreshSiblingLinks(admin, shop, settings, catalogById, page);
+  await refreshAffectedPages(admin, shop, settings, catalogById, page);
 
   const published = await getPage(shop, page.id);
   if (!published) throw new Error("Page vanished during publish");
@@ -158,10 +158,56 @@ export async function publishPage(
 }
 
 /**
- * Re-render every other published page in the locale whose internal links
- * changed now that the new page exists.
+ * Just enough of a page to decide what a publish invalidates. Structural
+ * rather than `Pick<PageRecord, …>` because only the *presence* of content
+ * matters here, not its shape.
  */
-async function refreshSiblingLinks(
+interface AffectedCandidate {
+  id: string;
+  status: string;
+  locale: string;
+  clusterKey: string | null;
+  content: unknown;
+}
+
+/**
+ * Published pages whose SEO payload is invalidated by another page going
+ * live.
+ *
+ * Two distinct relationships, and missing either one leaves stale markup:
+ *
+ * - same locale — the new page joins the internal-link graph, so siblings
+ *   may gain a "Related guides" entry
+ * - same intent cluster, any locale — the new page is a locale variant, and
+ *   hreflang has to be reciprocal or search engines discard the annotation
+ *   entirely
+ *
+ * Pure and exported so the relationship is testable without a store.
+ */
+export function affectedByPublish<T extends AffectedCandidate>(
+  pages: T[],
+  justPublished: AffectedCandidate,
+): T[] {
+  return pages.filter(
+    (page) =>
+      page.status === "published" &&
+      page.id !== justPublished.id &&
+      page.content !== null &&
+      (page.locale === justPublished.locale ||
+        (page.clusterKey !== null &&
+          page.clusterKey === justPublished.clusterKey)),
+  );
+}
+
+/**
+ * Rebuild the SEO payload of every page a publish invalidated, and re-render
+ * the ones whose visible body actually changed.
+ *
+ * The two are separate on purpose: hreflang and canonical live in the stored
+ * payload and the AI sitemap, so a locale variant appearing does not require
+ * an Admin API write, while a new internal link does.
+ */
+async function refreshAffectedPages(
   admin: AdminClient,
   shop: string,
   settings: ResolvedSettings,
@@ -169,28 +215,24 @@ async function refreshSiblingLinks(
   justPublished: PageRecord,
 ): Promise<void> {
   const allPages = await listPages(shop);
-  const siblings = allPages.filter(
-    (page) =>
-      page.status === "published" &&
-      page.locale === justPublished.locale &&
-      page.id !== justPublished.id &&
-      page.articleId &&
-      page.content,
-  );
 
-  for (const sibling of siblings) {
-    const products = resolveProducts(sibling, catalogById);
-    const seo = rebuildSeo(shop, settings, sibling, products, allPages);
-    const previousLinks = JSON.stringify(sibling.seo?.internalLinks ?? []);
-    if (previousLinks === JSON.stringify(seo.internalLinks)) continue;
+  for (const page of affectedByPublish(allPages, justPublished)) {
+    const products = resolveProducts(page, catalogById);
+    const seo = rebuildSeo(shop, settings, page, products, allPages);
+    if (JSON.stringify(seo) === JSON.stringify(page.seo)) continue;
 
-    await updateArticle(admin, sibling.articleId as string, {
-      title: sibling.content!.h1,
-      body: renderArticleHtml({ content: sibling.content!, products, seo }),
-      summary: seo.metaDescription,
-      tags: ["wp-plp", sibling.pageTypeId, sibling.locale],
-      authorName: settings.brandName,
-    });
-    await updatePage(shop, sibling.id, { seo });
+    const bodyChanged =
+      JSON.stringify(seo.internalLinks) !==
+      JSON.stringify(page.seo?.internalLinks ?? []);
+    if (bodyChanged && page.articleId) {
+      await updateArticle(admin, page.articleId, {
+        title: page.content!.h1,
+        body: renderArticleHtml({ content: page.content!, products, seo }),
+        summary: seo.metaDescription,
+        tags: ["wp-plp", page.pageTypeId, page.locale],
+        authorName: settings.brandName,
+      });
+    }
+    await updatePage(shop, page.id, { seo });
   }
 }
