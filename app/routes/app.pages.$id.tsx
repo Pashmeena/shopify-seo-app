@@ -80,6 +80,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       url: productUrl(scored.product),
       score: Number(scored.score.toFixed(2)),
       matchedFacets: scored.matchedFacets,
+      inferredFacets: scored.inferredFacets,
       included: includedIds.has(scored.product.id),
     })),
     ...catalog
@@ -95,6 +96,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
         url: productUrl(product),
         score: 0,
         matchedFacets: {},
+        inferredFacets: [] as string[],
         included: true,
       })),
   ];

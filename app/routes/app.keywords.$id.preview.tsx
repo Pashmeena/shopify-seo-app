@@ -47,6 +47,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       url: productUrl(scored.product),
       score: Number(scored.score.toFixed(2)),
       matchedFacets: scored.matchedFacets,
+      inferredFacets: scored.inferredFacets,
       included: isIncluded(scored.product.id),
     })),
     ...catalog
@@ -62,6 +63,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
         url: productUrl(product),
         score: 0,
         matchedFacets: {} as Partial<Record<string, string[]>>,
+        inferredFacets: [] as string[],
         included: true,
       })),
   ];

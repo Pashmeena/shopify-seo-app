@@ -2,6 +2,7 @@ import { listPageTypes } from "../../config/index.server";
 import { INTENT_FACETS, type IntentFacet } from "../../config/types";
 import { completeValidatedJson, getValidator } from "../ai/json-client.server";
 import { getAiProvider, getAiStatus } from "../ai/provider.server";
+import { addFacetValue, extractFacets } from "../facets/vocabulary.server";
 import type { Lexicon } from "./lexicon.server";
 import type { IntentProfile } from "./types";
 
@@ -32,53 +33,16 @@ const INTENT_SCHEMA: Record<string, unknown> = {
   ),
 };
 
-function addFacetValue(
-  facets: IntentProfile["facets"],
-  facet: IntentFacet,
-  value: string,
-): void {
-  const values = (facets[facet] ??= []);
-  if (!values.includes(value)) values.push(value);
-}
-
 /** Greedy longest-phrase-first matching of the keyword against the lexicon. */
 export function parseWithRules(
   keyword: string,
   locale: string,
   lexicon: Lexicon,
 ): IntentProfile {
-  const tokens = keyword
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}\s-]/gu, " ")
-    .split(/[\s]+/)
-    .filter(Boolean);
-
-  const facets: IntentProfile["facets"] = {};
-  let matchedTokens = 0;
-  let significantTokens = 0;
-  let index = 0;
-
-  while (index < tokens.length) {
-    let matched = false;
-    const remaining = tokens.length - index;
-    for (let length = Math.min(lexicon.maxPhraseLength, remaining); length >= 1; length--) {
-      const phrase = tokens.slice(index, index + length).join(" ");
-      const entry = lexicon.entries.get(phrase) ?? lexicon.entries.get(phrase.replace(/-/g, " "));
-      if (entry) {
-        addFacetValue(facets, entry.facet, entry.value);
-        matchedTokens += length;
-        significantTokens += length;
-        index += length;
-        matched = true;
-        break;
-      }
-    }
-    if (!matched) {
-      if (!lexicon.isNoise(tokens[index])) significantTokens++;
-      index++;
-    }
-  }
-
+  const { facets, matchedTokens, significantTokens } = extractFacets(
+    keyword,
+    lexicon,
+  );
   applyDerivedFacets(facets);
 
   return {

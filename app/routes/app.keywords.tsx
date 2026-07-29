@@ -380,9 +380,9 @@ export default function Keywords() {
                 </Button>
               </Form>
               <Text as="span" tone="subdued" variant="bodySm">
-                Scans tags, collections and titles, then suggests only
-                combinations with ≥ {minProducts} matching products. Nothing
-                publishes without your approval.
+                Reads namespaced tags, collection membership and product
+                titles, then suggests only combinations with ≥ {minProducts}{" "}
+                matching products. Nothing publishes without your approval.
               </Text>
             </InlineStack>
 
@@ -787,6 +787,9 @@ function MatchPreviewBody({
                 candidate.price,
                 `match score ${candidate.score}`,
                 extras.length ? `also ${extras.join(", ")}` : null,
+                candidate.inferredFacets.length
+                  ? `inferred from product text: ${candidate.inferredFacets.join(", ")}`
+                  : null,
               ]
                 .filter(Boolean)
                 .join(" · ")}
