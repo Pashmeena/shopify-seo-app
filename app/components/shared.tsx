@@ -3,9 +3,11 @@ import {
   Banner,
   BlockStack,
   Box,
+  Button,
   Checkbox,
   InlineStack,
   Link,
+  List,
   Tag,
   Text,
   Thumbnail,
@@ -186,6 +188,80 @@ export function IntentChips({
         )),
       )}
     </InlineStack>
+  );
+}
+
+/**
+ * Downloads a string as a file. A blob URL keeps this entirely client-side:
+ * embedded apps run in an iframe where a plain link to a server route would
+ * have to re-authenticate, and the content is static anyway.
+ */
+export function DownloadTextButton({
+  filename,
+  content,
+  contentType = "text/csv;charset=utf-8",
+  children,
+}: {
+  filename: string;
+  content: string;
+  contentType?: string;
+  /** Polaris buttons take text, not arbitrary nodes. */
+  children: string;
+}) {
+  const download = () => {
+    const url = URL.createObjectURL(new Blob([content], { type: contentType }));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    // Revoking synchronously can cancel the download in some browsers.
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  };
+
+  return (
+    <Button variant="plain" onClick={download}>
+      {children}
+    </Button>
+  );
+}
+
+/**
+ * Notes and warnings attached to an action result — how an import was read,
+ * and which rows it could not use. Rendered as lists so a long tail of
+ * skipped rows stays scannable.
+ */
+export function ActionDetails({
+  notes,
+  warnings,
+}: {
+  notes?: string[];
+  warnings?: string[];
+}) {
+  if (!notes?.length && !warnings?.length) return null;
+  return (
+    <BlockStack gap="200">
+      {notes && notes.length > 0 && (
+        <List type="bullet">
+          {notes.map((note) => (
+            <List.Item key={note}>{note}</List.Item>
+          ))}
+        </List>
+      )}
+      {warnings && warnings.length > 0 && (
+        <BlockStack gap="100">
+          <Text as="p" fontWeight="semibold">
+            Skipped rows
+          </Text>
+          <List type="bullet">
+            {warnings.map((warning) => (
+              <List.Item key={warning}>{warning}</List.Item>
+            ))}
+          </List>
+        </BlockStack>
+      )}
+    </BlockStack>
   );
 }
 

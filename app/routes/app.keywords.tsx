@@ -50,11 +50,23 @@ import {
   generatePageForKeyword,
   PipelineRejection,
 } from "../services/plp/pipeline.server";
+import {
+  describeSkipped,
+  describeSource,
+  importKeywordSources,
+  MAX_IMPORT_BATCH,
+} from "../services/ingest/keyword-import.server";
+import {
+  KEYWORD_TEMPLATE_CSV,
+  KEYWORD_TEMPLATE_FILENAME,
+} from "../services/ingest/template";
 import { clusterKey } from "../services/seo/similarity.server";
 import { getSettings } from "../services/settings/settings.server";
 import { authenticate } from "../shopify.server";
 import {
+  ActionDetails,
   AiConfigBanner,
+  DownloadTextButton,
   ExcludedProductRow,
   IntentChips,
   ProductChoiceRow,
@@ -102,32 +114,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   };
 };
 
-/** Parse pasted/uploaded keyword lines. Accepts `keyword` or `keyword,locale`. */
-function parseKeywordLines(
-  raw: string,
-  fallbackLocale: string,
-  validLocales: Set<string>,
-): { phrase: string; locale: string }[] {
-  return raw
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line && !/^keyword\s*,/i.test(line))
-    .map((line) => {
-      const lastComma = line.lastIndexOf(",");
-      if (lastComma > 0) {
-        const maybeLocale = line.slice(lastComma + 1).trim();
-        if (validLocales.has(maybeLocale)) {
-          return {
-            phrase: line.slice(0, lastComma).trim(),
-            locale: maybeLocale,
-          };
-        }
-      }
-      return { phrase: line, locale: fallbackLocale };
-    })
-    .filter((entry) => entry.phrase.length > 1);
-}
-
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
   const shop = session.shop;
@@ -138,44 +124,63 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     switch (intent) {
       case "add": {
         const settings = await getSettings(shop);
-        const validLocales = new Set(settings.enabledLocaleCodes);
-        const fallbackLocale = String(
-          formData.get("locale") || settings.defaultLocale,
-        );
+        const requestedLocale = String(formData.get("locale") || "");
+        // The select only offers enabled locales, but a crafted post must
+        // not be able to smuggle in a disabled or unknown market.
+        const fallbackLocale = settings.enabledLocaleCodes.includes(
+          requestedLocale,
+        )
+          ? requestedLocale
+          : settings.defaultLocale;
 
         const pasted = String(formData.get("keywords") || "");
         const file = formData.get("csv");
         const uploaded =
           file instanceof File && file.size > 0 ? await file.text() : "";
 
-        const entries = parseKeywordLines(
-          `${pasted}\n${uploaded}`,
-          fallbackLocale,
-          validLocales,
+        const report = await importKeywordSources(
+          [
+            { raw: pasted, source: "manual" },
+            { raw: uploaded, source: "csv" },
+          ],
+          {
+            enabledLocales: settings.enabledLocaleCodes,
+            fallbackLocale,
+          },
         );
-        if (entries.length === 0)
-          return { error: "No keywords found in the input." };
-        // Parsing happens inline (and may call the AI for fuzzy lines), so
-        // one submission is capped to keep the request comfortably fast.
-        const MAX_BATCH = 50;
-        if (entries.length > MAX_BATCH) {
+
+        const notes = report.sources
+          .map(describeSource)
+          .filter((note): note is string => note !== null);
+        const warnings = describeSkipped(report.skipped);
+
+        if (report.entries.length === 0) {
           return {
-            error: `That's ${entries.length} keywords. Please add at most ${MAX_BATCH} per batch.`,
+            error: report.skipped.length
+              ? "No usable keywords found in the input."
+              : "No keywords found in the input.",
+            notes,
+            warnings,
+          };
+        }
+        if (report.entries.length > MAX_IMPORT_BATCH) {
+          return {
+            error: `That's ${report.entries.length} keywords. Please add at most ${MAX_IMPORT_BATCH} per batch.`,
+            notes,
           };
         }
 
         // Parse intent immediately so the queue shows structured facets.
         const catalog = await fetchCatalog(admin);
         const lexicon = buildLexicon(catalog);
-        const source: KeywordInput["source"] = uploaded ? "csv" : "manual";
         const inputs: KeywordInput[] = [];
-        for (const entry of entries) {
+        for (const entry of report.entries) {
           const parsed = await parseIntent(entry.phrase, entry.locale, lexicon);
           const match = matchProducts(catalog, parsed, settings.minProducts);
           inputs.push({
             phrase: entry.phrase,
             locale: entry.locale,
-            source,
+            source: entry.source,
             status: "suggested",
             intent: parsed,
             pageTypeId: parsed.pageTypeId,
@@ -184,8 +189,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           });
         }
         const created = await addKeywords(shop, inputs);
+        const alreadyKnown = report.entries.length - created;
         return {
-          success: `Added ${created} keyword(s) (${entries.length - created} already known).`,
+          success:
+            `Added ${created} keyword(s)` +
+            (alreadyKnown > 0 ? ` (${alreadyKnown} already known).` : "."),
+          notes,
+          warnings,
         };
       }
       case "discover": {
@@ -275,6 +285,12 @@ export default function Keywords() {
       ? String(navigation.formData?.get("keywordId"))
       : null;
 
+  // Import diagnostics: how each input was read, and every row skipped.
+  const notes =
+    actionData && "notes" in actionData ? (actionData.notes ?? []) : [];
+  const warnings =
+    actionData && "warnings" in actionData ? (actionData.warnings ?? []) : [];
+
   // ── Product match preview (pre-generation) ────────────────────────────
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [selection, setSelection] = useState<Record<string, boolean>>({});
@@ -330,12 +346,18 @@ export default function Keywords() {
         <AiConfigBanner ai={ai} />
         {actionData && "error" in actionData && actionData.error && (
           <Banner tone="critical" title="Action failed">
-            <p>{actionData.error}</p>
+            <BlockStack gap="200">
+              <p>{actionData.error}</p>
+              <ActionDetails notes={notes} warnings={warnings} />
+            </BlockStack>
           </Banner>
         )}
         {actionData && "success" in actionData && actionData.success && (
-          <Banner tone="success">
-            <p>{actionData.success}</p>
+          <Banner tone={warnings.length > 0 ? "warning" : "success"}>
+            <BlockStack gap="200">
+              <p>{actionData.success}</p>
+              <ActionDetails notes={notes} warnings={warnings} />
+            </BlockStack>
           </Banner>
         )}
 
@@ -398,8 +420,19 @@ export default function Keywords() {
                     placeholder={
                       "botanical wallpaper living room\nselbstklebende tapete mietwohnung,de-DE"
                     }
-                    helpText="One keyword per line: plain, or `keyword,locale` to target a specific market. CSV uses the same format."
+                    helpText="One keyword per line, optionally `keyword,locale` to target a market. Uploaded files can be any keyword-tool export: extra columns are ignored, comma/semicolon/tab separators and quoted fields are handled, and the keyword column is found by name (or by AI when the header is unfamiliar)."
                   />
+                  <InlineStack gap="200" blockAlign="center">
+                    <DownloadTextButton
+                      filename={KEYWORD_TEMPLATE_FILENAME}
+                      content={KEYWORD_TEMPLATE_CSV}
+                    >
+                      Download CSV template
+                    </DownloadTextButton>
+                    <Text as="span" tone="subdued" variant="bodySm">
+                      the canonical format, though your own export will work
+                    </Text>
+                  </InlineStack>
                   {csvName && (
                     <InlineStack gap="200" blockAlign="center">
                       <Tag
