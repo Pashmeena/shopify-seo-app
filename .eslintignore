@@ -4,3 +4,8 @@ public/build
 shopify-app-remix
 */*.yml
 .shopify
+
+# GraphQL codegen output (npm run graphql-codegen). Generated, gitignored,
+# and it carries blanket eslint-disable comments that trip rules this config
+# does not load.
+app/types
