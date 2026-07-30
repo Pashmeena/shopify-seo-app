@@ -8,7 +8,6 @@ import {
 } from "@remix-run/react";
 import { useState } from "react";
 import {
-  Badge,
   Banner,
   BlockStack,
   Button,
@@ -22,7 +21,7 @@ import {
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { fetchCatalog } from "../services/catalog/products.server";
-import { matchProducts } from "../services/matching/match.server";
+import { buildMatchPanel } from "../services/matching/panel.server";
 import {
   applyProductSelection,
   regeneratePage,
@@ -40,10 +39,9 @@ import {
 import { getSettings } from "../services/settings/settings.server";
 import { authenticate } from "../shopify.server";
 import {
-  ExcludedProductRow,
   IntentChips,
   JsonView,
-  ProductChoiceRow,
+  MatchPanelView,
   StatusBadge,
 } from "../components/shared";
 
@@ -57,60 +55,19 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     getSettings(shop),
     fetchCatalog(admin),
   ]);
-  const match = matchProducts(catalog, page.intent, settings.minProducts);
-  const includedIds = new Set(page.productIds);
-
-  // Storefront page when the product is published there, admin product
-  // page otherwise, so "View" always lands somewhere useful.
-  const productUrl = (product: { id: string; onlineStoreUrl: string | null }) =>
-    product.onlineStoreUrl ??
-    `https://${shop}/admin/products/${product.id.split("/").pop()}`;
-
-  // Candidates = everything the matcher accepts, plus anything currently
-  // included (so a selection never silently disappears).
-  const candidateIds = new Set(
-    match.matches.map((scored) => scored.product.id),
-  );
-  const candidates = [
-    ...match.matches.map((scored) => ({
-      id: scored.product.id,
-      title: scored.product.title,
-      price: `${scored.product.price.toFixed(2)} ${scored.product.currencyCode}`,
-      imageUrl: scored.product.imageUrl,
-      url: productUrl(scored.product),
-      score: Number(scored.score.toFixed(2)),
-      matchedFacets: scored.matchedFacets,
-      inferredFacets: scored.inferredFacets,
-      included: includedIds.has(scored.product.id),
-    })),
-    ...catalog
-      .filter(
-        (product) =>
-          includedIds.has(product.id) && !candidateIds.has(product.id),
-      )
-      .map((product) => ({
-        id: product.id,
-        title: product.title,
-        price: `${product.price.toFixed(2)} ${product.currencyCode}`,
-        imageUrl: product.imageUrl,
-        url: productUrl(product),
-        score: 0,
-        matchedFacets: {},
-        inferredFacets: [] as string[],
-        included: true,
-      })),
-  ];
 
   return {
     page,
-    candidates,
-    excluded: match.excluded.map((entry) => ({
-      title: entry.product.title,
-      reason: entry.reason,
-      imageUrl: entry.product.imageUrl,
-      url: productUrl(entry.product),
-    })),
-    excludedTotal: match.excluded.length,
+    // The page's saved selection is authoritative, so the panel reflects
+    // exactly what will be published rather than what the matcher would pick
+    // today.
+    panel: buildMatchPanel({
+      shop,
+      catalog,
+      intent: page.intent,
+      minProducts: settings.minProducts,
+      selectedIds: page.productIds,
+    }),
     minProducts: settings.minProducts,
   };
 };
@@ -172,8 +129,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 };
 
 export default function PageDetail() {
-  const { page, candidates, excluded, excludedTotal, minProducts } =
-    useLoaderData<typeof loader>();
+  const { page, panel, minProducts } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const busyAction =
@@ -183,11 +139,15 @@ export default function PageDetail() {
 
   const [selection, setSelection] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(
-      candidates.map((candidate) => [candidate.id, candidate.included]),
+      [...panel.matched, ...panel.excluded].map((entry) => [
+        entry.id,
+        entry.included,
+      ]),
     ),
   );
-  const [showAllExcluded, setShowAllExcluded] = useState(false);
-  const selectedCount = Object.values(selection).filter(Boolean).length;
+  const selectedIds = Object.entries(selection)
+    .filter(([, included]) => included)
+    .map(([id]) => id);
   const isPublished = page.status === "published";
   const content = page.content;
 
@@ -283,6 +243,59 @@ export default function PageDetail() {
                 </BlockStack>
               </Card>
 
+              <Card>
+                <BlockStack gap="300">
+                  <Text as="h2" variant="headingMd">
+                    Product match
+                  </Text>
+                  {isPublished ? (
+                    <BlockStack gap="300">
+                      <Text as="p" tone="subdued">
+                        Published pages are read-only here. Adjust and republish
+                        from a draft.
+                      </Text>
+                      <MatchPanelView
+                        panel={panel}
+                        selection={selection}
+                        onToggle={() => undefined}
+                        readOnly
+                      />
+                    </BlockStack>
+                  ) : (
+                    <Form method="post">
+                      <input type="hidden" name="_action" value="products" />
+                      {selectedIds.map((id) => (
+                        <input
+                          key={id}
+                          type="hidden"
+                          name="productIds"
+                          value={id}
+                        />
+                      ))}
+                      <BlockStack gap="300">
+                        <MatchPanelView
+                          panel={panel}
+                          selection={selection}
+                          onToggle={(id, checked) =>
+                            setSelection((current) => ({
+                              ...current,
+                              [id]: checked,
+                            }))
+                          }
+                        />
+                        <Button
+                          submit
+                          size="slim"
+                          loading={busyAction === "products"}
+                        >
+                          Save product selection
+                        </Button>
+                      </BlockStack>
+                    </Form>
+                  )}
+                </BlockStack>
+              </Card>
+
               {content && (
                 <Card>
                   <BlockStack gap="300">
@@ -366,100 +379,6 @@ export default function PageDetail() {
 
           <Layout.Section variant="oneThird">
             <BlockStack gap="400">
-              <Card>
-                <BlockStack gap="300">
-                  <InlineStack align="space-between" blockAlign="center">
-                    <Text as="h2" variant="headingMd">
-                      Product match
-                    </Text>
-                    <Badge
-                      tone={
-                        selectedCount >= minProducts ? "success" : "critical"
-                      }
-                    >
-                      {`${selectedCount} / ${minProducts} min`}
-                    </Badge>
-                  </InlineStack>
-                  {isPublished ? (
-                    <Text as="p" tone="subdued">
-                      Published pages are read-only here. Adjust and republish
-                      from a draft.
-                    </Text>
-                  ) : (
-                    <Form method="post">
-                      <input type="hidden" name="_action" value="products" />
-                      <BlockStack gap="200">
-                        {candidates.map((candidate) => (
-                          <BlockStack gap="050" key={candidate.id}>
-                            <ProductChoiceRow
-                              candidate={candidate}
-                              secondary={
-                                candidate.score > 0
-                                  ? `${candidate.price} · match score ${candidate.score}`
-                                  : `${candidate.price} · added manually`
-                              }
-                              checked={selection[candidate.id] ?? false}
-                              onToggle={(checked) =>
-                                setSelection((current) => ({
-                                  ...current,
-                                  [candidate.id]: checked,
-                                }))
-                              }
-                            />
-                            {selection[candidate.id] && (
-                              <input
-                                type="hidden"
-                                name="productIds"
-                                value={candidate.id}
-                              />
-                            )}
-                          </BlockStack>
-                        ))}
-                        <Button
-                          submit
-                          size="slim"
-                          loading={busyAction === "products"}
-                        >
-                          Save product selection
-                        </Button>
-                      </BlockStack>
-                    </Form>
-                  )}
-                </BlockStack>
-              </Card>
-
-              <Card>
-                <BlockStack gap="200">
-                  <Text as="h2" variant="headingMd">
-                    Excluded by matcher ({excludedTotal})
-                  </Text>
-                  <Text as="p" tone="subdued" variant="bodySm">
-                    Why products did not qualify: accuracy over volume.
-                  </Text>
-                  {(showAllExcluded ? excluded : excluded.slice(0, 6)).map(
-                    (entry) => (
-                      <ExcludedProductRow
-                        key={entry.title}
-                        title={entry.title}
-                        reason={entry.reason}
-                        imageUrl={entry.imageUrl}
-                        url={entry.url}
-                      />
-                    ),
-                  )}
-                  {excluded.length > 6 && (
-                    <Button
-                      variant="plain"
-                      onClick={() => setShowAllExcluded((current) => !current)}
-                    >
-                      {showAllExcluded
-                        ? "Show fewer"
-                        : `Show all ${excludedTotal}`}
-                    </Button>
-                  )}
-                </BlockStack>
-              </Card>
-
               {page.seo && (
                 <Card>
                   <BlockStack gap="200">

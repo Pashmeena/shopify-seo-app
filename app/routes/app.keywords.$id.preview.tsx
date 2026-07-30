@@ -1,16 +1,16 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { fetchCatalog } from "../services/catalog/products.server";
-import { matchProducts } from "../services/matching/match.server";
+import { buildMatchPanel } from "../services/matching/panel.server";
 import { getKeyword } from "../services/plp/repository.server";
 import { getSettings } from "../services/settings/settings.server";
 import { authenticate } from "../shopify.server";
 
 /**
  * Resource route: live product-match preview for a keyword, fetched on
- * demand when the merchant opens the preview modal — before any
- * generation cost is spent. Same candidate semantics as the page detail
- * screen: everything the matcher accepts, plus manual additions already
- * saved on the keyword (so a selection never silently disappears).
+ * demand when the merchant opens the preview modal — before any generation
+ * cost is spent. The panel itself is built by the shared builder, so this
+ * screen and the page detail screen can never disagree about what the
+ * matcher decided or why.
  */
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
@@ -25,61 +25,15 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     getSettings(shop),
     fetchCatalog(admin),
   ]);
-  const match = matchProducts(catalog, keyword.intent, settings.minProducts);
 
-  const overrides = keyword.productOverrides;
-  const overrideSet = overrides ? new Set(overrides) : null;
-  const isIncluded = (id: string) => (overrideSet ? overrideSet.has(id) : true);
-
-  // Storefront page when the product is published there, admin product
-  // page otherwise, so "View" always lands somewhere useful.
-  const productUrl = (product: { id: string; onlineStoreUrl: string | null }) =>
-    product.onlineStoreUrl ??
-    `https://${shop}/admin/products/${product.id.split("/").pop()}`;
-
-  const matchedIds = new Set(match.matches.map((scored) => scored.product.id));
-  const candidates = [
-    ...match.matches.map((scored) => ({
-      id: scored.product.id,
-      title: scored.product.title,
-      price: `${scored.product.price.toFixed(2)} ${scored.product.currencyCode}`,
-      imageUrl: scored.product.imageUrl,
-      url: productUrl(scored.product),
-      score: Number(scored.score.toFixed(2)),
-      matchedFacets: scored.matchedFacets,
-      inferredFacets: scored.inferredFacets,
-      included: isIncluded(scored.product.id),
-    })),
-    ...catalog
-      .filter(
-        (product) =>
-          overrideSet?.has(product.id) && !matchedIds.has(product.id),
-      )
-      .map((product) => ({
-        id: product.id,
-        title: product.title,
-        price: `${product.price.toFixed(2)} ${product.currencyCode}`,
-        imageUrl: product.imageUrl,
-        url: productUrl(product),
-        score: 0,
-        matchedFacets: {} as Partial<Record<string, string[]>>,
-        inferredFacets: [] as string[],
-        included: true,
-      })),
-  ];
-
-  return {
-    phrase: keyword.phrase,
-    facets: keyword.intent.facets,
-    candidates,
-    excluded: match.excluded.map((entry) => ({
-      title: entry.product.title,
-      reason: entry.reason,
-      imageUrl: entry.product.imageUrl,
-      url: productUrl(entry.product),
-    })),
-    excludedTotal: match.excluded.length,
+  const panel = buildMatchPanel({
+    shop,
+    catalog,
+    intent: keyword.intent,
     minProducts: settings.minProducts,
-    overridden: overrides != null,
-  };
+    // Null keeps the matcher's own verdict until the merchant saves a choice.
+    selectedIds: keyword.productOverrides,
+  });
+
+  return { phrase: keyword.phrase, ...panel };
 };

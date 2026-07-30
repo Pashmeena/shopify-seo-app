@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Badge,
   Banner,
@@ -5,6 +6,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Divider,
   InlineStack,
   Link,
   List,
@@ -43,6 +45,7 @@ export function ProductChoiceRow({
   secondary,
   checked,
   onToggle,
+  disabled = false,
 }: {
   candidate: {
     id: string;
@@ -53,6 +56,7 @@ export function ProductChoiceRow({
   secondary: string;
   checked: boolean;
   onToggle: (checked: boolean) => void;
+  disabled?: boolean;
 }) {
   return (
     <InlineStack
@@ -80,6 +84,7 @@ export function ProductChoiceRow({
         }
         checked={checked}
         onChange={onToggle}
+        disabled={disabled}
       />
       <Link url={candidate.url} target="_blank" removeUnderline>
         View
@@ -88,40 +93,174 @@ export function ProductChoiceRow({
   );
 }
 
-/** A non-selectable product row with the matcher's exclusion reason. */
-export function ExcludedProductRow({
-  title,
-  reason,
-  imageUrl,
-  url,
+/** How many rejected products to show before collapsing the rest. */
+const EXCLUDED_PREVIEW_COUNT = 8;
+
+/**
+ * The product-match panel: what the matcher accepted, what it rejected and
+ * why, with both lists selectable so a merchant can overrule either way.
+ *
+ * Shared by the pre-generation preview and the page detail screen, which ask
+ * the same question at two points in the pipeline.
+ */
+export function MatchPanelView({
+  panel,
+  selection,
+  onToggle,
+  readOnly = false,
 }: {
-  title: string;
-  reason: string;
-  imageUrl: string | null;
-  url: string;
+  panel: {
+    minProducts: number;
+    matched: PanelProduct[];
+    excluded: PanelProduct[];
+  };
+  selection: Record<string, boolean>;
+  onToggle: (id: string, checked: boolean) => void;
+  readOnly?: boolean;
 }) {
+  const [showAllExcluded, setShowAllExcluded] = useState(false);
+  const selectedCount = Object.values(selection).filter(Boolean).length;
+  const addedAnyway = panel.excluded.filter((entry) => selection[entry.id]);
+  const visibleExcluded = showAllExcluded
+    ? panel.excluded
+    : panel.excluded.slice(0, EXCLUDED_PREVIEW_COUNT);
+
   return (
-    <InlineStack
-      gap="200"
-      blockAlign="center"
-      align="space-between"
-      wrap={false}
-    >
-      <InlineStack gap="200" blockAlign="center" wrap={false}>
-        <ProductThumb imageUrl={imageUrl} title={title} />
-        <BlockStack gap="025">
-          <Text as="span" variant="bodySm" fontWeight="medium">
-            {title}
+    <BlockStack gap="400">
+      <InlineStack gap="200" blockAlign="center">
+        <Badge
+          tone={selectedCount >= panel.minProducts ? "success" : "critical"}
+        >
+          {`${selectedCount} / ${panel.minProducts} min`}
+        </Badge>
+        <Text as="span" tone="subdued" variant="bodySm">
+          Checked products are the ones this page will contain.
+        </Text>
+      </InlineStack>
+
+      {selectedCount < panel.minProducts && (
+        <Banner tone="warning">
+          <p>
+            Below the minimum of {panel.minProducts} products. The page is held
+            in “needs review” and cannot be published while it is thin.
+          </p>
+        </Banner>
+      )}
+
+      {addedAnyway.length > 0 && (
+        <Banner tone="warning" title="Included against the matcher's judgement">
+          <List type="bullet">
+            {addedAnyway.map((entry) => (
+              <List.Item key={entry.id}>
+                {entry.title} — {entry.excludedReason}
+              </List.Item>
+            ))}
+          </List>
+        </Banner>
+      )}
+
+      <BlockStack gap="300">
+        <Text as="h3" variant="headingSm">
+          Matched by the app ({panel.matched.length}), strongest first
+        </Text>
+        {panel.matched.length === 0 && (
+          <Text as="p" tone="subdued" variant="bodySm">
+            Nothing matched this intent. Anything below can still be added by
+            hand.
           </Text>
-          <Text as="span" tone="subdued" variant="bodySm">
-            {reason}
+        )}
+        {panel.matched.map((entry) => (
+          <PanelRow
+            key={entry.id}
+            entry={entry}
+            checked={selection[entry.id] ?? false}
+            onToggle={onToggle}
+            readOnly={readOnly}
+          />
+        ))}
+      </BlockStack>
+
+      <Divider />
+
+      <BlockStack gap="300">
+        <BlockStack gap="100">
+          <Text as="h3" variant="headingSm">
+            Not matched ({panel.excluded.length})
+          </Text>
+          <Text as="p" tone="subdued" variant="bodySm">
+            Accuracy over volume: each product below failed a facet the keyword
+            asked for. Tick one to include it anyway.
           </Text>
         </BlockStack>
-      </InlineStack>
-      <Link url={url} target="_blank" removeUnderline>
-        View
-      </Link>
-    </InlineStack>
+        {visibleExcluded.map((entry) => (
+          <PanelRow
+            key={entry.id}
+            entry={entry}
+            checked={selection[entry.id] ?? false}
+            onToggle={onToggle}
+            readOnly={readOnly}
+          />
+        ))}
+        {panel.excluded.length > EXCLUDED_PREVIEW_COUNT && (
+          <Button
+            variant="plain"
+            onClick={() => setShowAllExcluded((current) => !current)}
+          >
+            {showAllExcluded
+              ? "Show fewer"
+              : `Show all ${panel.excluded.length}`}
+          </Button>
+        )}
+      </BlockStack>
+    </BlockStack>
+  );
+}
+
+export interface PanelProduct {
+  id: string;
+  title: string;
+  price: string;
+  imageUrl: string | null;
+  url: string;
+  score: number;
+  matchedFacets: Partial<Record<string, string[]>>;
+  inferredFacets: string[];
+  excludedReason: string | null;
+  included: boolean;
+}
+
+/** One row of the match panel, with the evidence for or against it. */
+function PanelRow({
+  entry,
+  checked,
+  onToggle,
+  readOnly,
+}: {
+  entry: PanelProduct;
+  checked: boolean;
+  onToggle: (id: string, checked: boolean) => void;
+  readOnly: boolean;
+}) {
+  const secondary = entry.excludedReason
+    ? `${entry.price} · ${entry.excludedReason}`
+    : [
+        entry.price,
+        `match score ${entry.score}`,
+        entry.inferredFacets.length
+          ? `inferred from product text: ${entry.inferredFacets.join(", ")}`
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+
+  return (
+    <ProductChoiceRow
+      candidate={entry}
+      secondary={secondary}
+      checked={checked}
+      onToggle={(next) => onToggle(entry.id, next)}
+      disabled={readOnly}
+    />
   );
 }
 
