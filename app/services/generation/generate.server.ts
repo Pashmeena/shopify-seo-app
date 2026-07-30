@@ -1,3 +1,4 @@
+import type { LocaleConfig } from "../../config/types";
 import { completeValidatedJson, getValidator } from "../ai/json-client.server";
 import { getAiProvider } from "../ai/provider.server";
 import type { CatalogProduct } from "../catalog/types";
@@ -29,7 +30,12 @@ export async function generatePlpContent(input: PromptInput): Promise<Generation
     validator,
   );
 
-  const backfilledAltTextIds = ensureAltTextCoverage(data, input.products, input.intent.keyword);
+  const backfilledAltTextIds = ensureAltTextCoverage(
+    data,
+    input.products,
+    input.intent.keyword,
+    input.locale,
+  );
 
   return {
     content: data,
@@ -45,20 +51,27 @@ export async function generatePlpContent(input: PromptInput): Promise<Generation
  * every matched product must have alt text. Missing entries get a
  * deterministic intent-based fallback rather than failing the whole
  * generation, and the backfill is reported so the UI can show it.
+ *
+ * The fallback is built from the locale's own token table and the keyword,
+ * which is already in the market's language — an English noun on a German
+ * page would be a locale leak on the one surface a screen reader reads
+ * aloud.
  */
 function ensureAltTextCoverage(
   content: PlpContent,
   products: CatalogProduct[],
   keyword: string,
+  locale: LocaleConfig,
 ): string[] {
   const covered = new Set(content.product_alt_texts.map((entry) => entry.product_id));
   const backfilled: string[] = [];
+  const noun = locale.tokens.wallpaper;
 
   for (const product of products) {
     if (covered.has(product.id) || covered.has(product.handle)) continue;
     content.product_alt_texts.push({
       product_id: product.id,
-      alt_text: `${product.title} wallpaper — ${keyword}`,
+      alt_text: `${product.title}${noun ? ` ${noun}` : ""} — ${keyword}`,
     });
     backfilled.push(product.id);
   }

@@ -28,6 +28,7 @@ import { listLocales } from "../config/index.server";
 import { slugify } from "../lib/slugify";
 import { getAiStatus } from "../services/ai/provider.server";
 import { seedCatalog } from "../services/catalog/seed.server";
+import { AI_FILES_PROXY_PATH, aiFileUrl } from "../services/seo/urls.server";
 import {
   getSettings,
   updateSettings,
@@ -41,6 +42,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return {
     shop: session.shop,
     settings,
+    // Built server-side from the same helper llms.txt uses, so the links here
+    // cannot drift from the path the file actually answers on.
+    aiFiles: {
+      llmsTxt: aiFileUrl(session.shop, "llms.txt"),
+      aiSitemap: aiFileUrl(session.shop, "sitemap-ai.xml"),
+      proxyPath: AI_FILES_PROXY_PATH,
+    },
     locales: listLocales().map((locale) => ({
       code: locale.code,
       label: locale.label,
@@ -110,7 +118,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Settings() {
-  const { shop, settings, locales, ai } = useLoaderData<typeof loader>();
+  const { shop, settings, locales, ai, aiFiles } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const busyAction =
@@ -323,19 +331,13 @@ export default function Settings() {
                     to give crawlers.
                   </Text>
                   <Text as="p" variant="bodySm">
-                    <PolarisLink
-                      url={`https://${shop}/apps/seo/llms.txt`}
-                      target="_blank"
-                    >
-                      /apps/seo/llms.txt
+                    <PolarisLink url={aiFiles.llmsTxt} target="_blank">
+                      {aiFiles.proxyPath}/llms.txt
                     </PolarisLink>
                   </Text>
                   <Text as="p" variant="bodySm">
-                    <PolarisLink
-                      url={`https://${shop}/apps/seo/sitemap-ai.xml`}
-                      target="_blank"
-                    >
-                      /apps/seo/sitemap-ai.xml
+                    <PolarisLink url={aiFiles.aiSitemap} target="_blank">
+                      {aiFiles.proxyPath}/sitemap-ai.xml
                     </PolarisLink>
                   </Text>
                   <Divider />

@@ -1,4 +1,4 @@
-import { getLocale } from "../../config/index.server";
+import { findLocale, getLocale } from "../../config/index.server";
 import type { CatalogProduct } from "../catalog/types";
 import type { PlpContent } from "../generation/types";
 import type { PageRecord } from "../plp/repository.server";
@@ -38,21 +38,37 @@ export function assembleSeoPayload(input: SeoAssemblyInput): SeoPayload {
   const { shop, settings, page, content, products, meta, allPages } = input;
   const blogHandle = settings.blogHandle;
   const selfUrl = articleUrl(shop, blogHandle, page.slug);
+  // Throwing is right for the page's *own* market: there is no honest payload
+  // to build for a page whose language, currency and measurement system are
+  // unknown. Siblings below are treated more leniently, because one missing
+  // config must not take every other page's assembly down with it.
   const locale = getLocale(page.locale);
 
   // hreflang: every locale variant of this cluster references every other.
   // Only published siblings qualify — an alternate must resolve to a live
   // URL — plus self (the page being assembled is about to be live or is
   // being previewed as such).
+  //
+  // A sibling whose market config has since been deleted is skipped rather
+  // than thrown on: it was generated for a market this install no longer
+  // serves, and an hreflang annotation naming an unknown language code is
+  // worse than a missing one. Dropping it also keeps the annotation
+  // reciprocal, because that page can no longer be assembled either.
   const variants = allPages
     .filter(
       (candidate) =>
         candidate.clusterKey === page.clusterKey && candidate.status === "published",
     )
-    .map((candidate) => ({
-      locale: getLocale(candidate.locale).hreflang,
-      url: articleUrl(shop, blogHandle, candidate.slug),
-    }));
+    .flatMap((candidate) => {
+      const candidateLocale = findLocale(candidate.locale);
+      if (!candidateLocale) return [];
+      return [
+        {
+          locale: candidateLocale.hreflang,
+          url: articleUrl(shop, blogHandle, candidate.slug),
+        },
+      ];
+    });
   const hreflang = variants.some((v) => v.url === selfUrl)
     ? variants
     : [...variants, { locale: locale.hreflang, url: selfUrl }];

@@ -24,9 +24,17 @@ import { getVolumeProvider } from "./keyword-volume.server";
  * as "suggested" for the merchant to approve or reject.
  */
 
-/** Facet combinations that seed candidates, mapped to search-phrase shape. */
+/**
+ * Facet combinations that seed candidates, mapped to search-phrase shape.
+ *
+ * One shape per page type the app can route to, plus the bare `useCase` shape
+ * for the broad practical pages. `attribute × room` is here because "washable
+ * wallpaper bathroom" is a real query shape that no other combination reaches:
+ * without it, discovery could never propose the page type that answers it.
+ */
 const CANDIDATE_SHAPES: { facets: [IntentFacet, ...IntentFacet[]] }[] = [
   { facets: ["style", "room"] },
+  { facets: ["attribute", "room"] },
   { facets: ["material", "useCase"] },
   { facets: ["attribute", "useCase"] },
   { facets: ["useCase"] },

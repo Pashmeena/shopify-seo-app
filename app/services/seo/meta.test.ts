@@ -132,7 +132,41 @@ describe("template fallback", () => {
 
     expect(meta.description).toContain("9");
     expect(meta.description).toContain("botanische");
-    expect(meta.description).toContain("wohnzimmer");
+    expect(meta.description).toContain("Wohnzimmer");
+  });
+
+  it("uses the market's own phrasing, not the shared template's word order", () => {
+    // The shared style-room templates are English: "{Style} {Wallpaper} for
+    // {Room}s". Translating only the values produced "Botanische Wallpaper for
+    // Wohnzimmers" — every value right, the sentence wrong. de-DE supplies its
+    // own phrasing, and the product noun comes from the locale token table.
+    const meta = resolveMeta(
+      content(),
+      styleRoom,
+      intent({ style: ["botanical"], room: ["living room"] }, { locale: "de-DE" }),
+      deDE,
+      "Wild Palace",
+      9,
+    );
+
+    expect(meta.title).toBe("Botanische Tapete für Wohnzimmer | Wild Palace");
+    expect(meta.title).not.toMatch(/wallpaper/i);
+    expect(meta.title).not.toMatch(/\bfor\b/);
+  });
+
+  it("still uses the shared English template in a market that overrides nothing", () => {
+    // en-GB carries no seoTemplates, which is the point: a market whose grammar
+    // the shared template already fits should not have to restate it.
+    const meta = resolveMeta(
+      content(),
+      styleRoom,
+      intent({ style: ["botanical"], room: ["living room"] }, { locale: "en-GB" }),
+      getLocale("en-GB"),
+      "Wild Palace",
+      9,
+    );
+
+    expect(meta.title).toBe("Botanical Wallpaper for Living Rooms | Wild Palace");
   });
 
   it("does not leave a space before punctuation", () => {
@@ -150,6 +184,22 @@ describe("template fallback", () => {
 });
 
 describe("keywords", () => {
+  it("spells the product noun in the market's own language", () => {
+    // These always come from the templates — the AI never writes them — so this
+    // was the one surface where the locale leak shipped on every German page.
+    const meta = resolveMeta(
+      content({ title: "Irrelevant", description: "Irrelevant" }),
+      styleRoom,
+      intent({ style: ["botanical"], room: ["living room"] }, { locale: "de-DE" }),
+      deDE,
+      "Wild Palace",
+      9,
+    );
+
+    expect(meta.keywords).toContain("botanische tapete wohnzimmer");
+    expect(meta.keywords.some((keyword) => /wallpaper/.test(keyword))).toBe(false);
+  });
+
   it("fills every template that has values to fill", () => {
     const meta = resolveMeta(
       content(),

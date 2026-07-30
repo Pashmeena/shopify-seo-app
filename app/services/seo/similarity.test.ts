@@ -15,7 +15,8 @@ import {
  */
 
 function existing(title: string, facets: Parameters<typeof intent>[0]) {
-  return { title, slug: title.toLowerCase().replace(/\s+/g, "-"), intent: intent(facets) };
+  const slug = title.toLowerCase().replace(/\s+/g, "-");
+  return { id: `page-${slug}`, title, slug, intent: intent(facets) };
 }
 
 describe("clusterKey", () => {
@@ -195,6 +196,23 @@ describe("checkSimilarity", () => {
     ]);
 
     expect(verdict.level).toBe("block");
+  });
+
+  it("identifies the page by id, so a canonical can point at it", () => {
+    const verdict = checkSimilarity(target, [
+      existing("Sustainable Botanical Wallpaper for Living Rooms", {
+        style: ["botanical"],
+        room: ["living room"],
+        attribute: ["sustainable"],
+      }),
+    ]);
+
+    expect(verdict.level).toBe("flag");
+    if (verdict.level === "flag") {
+      expect(verdict.against.id).toBe(
+        "page-sustainable-botanical-wallpaper-for-living-rooms",
+      );
+    }
   });
 
   it("reports the worst flag when several are in range", () => {

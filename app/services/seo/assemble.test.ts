@@ -151,6 +151,31 @@ describe("hreflang", () => {
 
     expect(seo.hreflang.map((entry) => entry.locale)).toEqual(["en-US"]);
   });
+
+  it("skips a sibling whose market config no longer exists", () => {
+    // A locale file can be deleted after pages were generated in it. An
+    // annotation naming a language code the app can no longer resolve is worse
+    // than a missing one — and that page cannot be assembled either, so the
+    // annotation would not be reciprocal, which makes search engines discard
+    // the whole set. Assembling every *other* page must still succeed.
+    const seo = assemble({
+      allPages: [
+        page({ slug: "fr-fr-papier-peint-botanique-salon", locale: "fr-FR", status: "published" }),
+        page({ slug: "de-de-botanische-tapete-wohnzimmer", locale: "de-DE", status: "published" }),
+      ],
+    });
+
+    expect(seo.hreflang.map((entry) => entry.locale)).toEqual(["de-DE", "en-US"]);
+  });
+
+  it("throws when the page's own market config is missing, rather than guessing", () => {
+    // The opposite call for the page being assembled: there is no honest
+    // payload to build for a page whose language, currency and measurement
+    // system are unknown.
+    expect(() => assemble({ page: { locale: "fr-FR" } })).toThrow(
+      /Unknown locale "fr-FR"/,
+    );
+  });
 });
 
 describe("noindex", () => {

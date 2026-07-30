@@ -79,7 +79,7 @@
     ],
     "meta": {
       "title": "Botanische Tapete fürs Wohnzimmer | Wild Palace",
-      "description": "9 botanische Wohnzimmer-Tapeten: von luftigen Gräsern bis zum Mitternachtsdschungel. Mit Rapport-Beratung, Musterservice, Rollen ab 58 €."
+      "description": "10 botanische Wohnzimmer-Tapeten: von luftigen Gräsern bis zum Mitternachtsdschungel. Mit Rapport-Beratung, Musterservice, Rollen ab 58 €."
     },
     "product_alt_texts": [
       {
@@ -126,12 +126,12 @@
   },
   "seo": {
     "metaTitle": "Botanische Tapete fürs Wohnzimmer | Wild Palace",
-    "metaDescription": "9 botanische Wohnzimmer-Tapeten: von luftigen Gräsern bis zum Mitternachtsdschungel. Mit Rapport-Beratung, Musterservice, Rollen ab 58 €.",
+    "metaDescription": "10 botanische Wohnzimmer-Tapeten: von luftigen Gräsern bis zum Mitternachtsdschungel. Mit Rapport-Beratung, Musterservice, Rollen ab 58 €.",
     "keywords": [
-      "botanische wallpaper wohnzimmer",
-      "botanische wohnzimmer wallpaper",
-      "botanische wallpaper ideas wohnzimmer",
-      "best botanische wallpaper for wohnzimmer"
+      "botanische tapete wohnzimmer",
+      "botanische tapete",
+      "tapeten ideen wohnzimmer",
+      "botanische tapete für wohnzimmer"
     ],
     "canonicalUrl": "https://your-store.myshopify.com/blogs/seo-plp/de-de-botanische-tapete-wohnzimmer",
     "hreflang": [
@@ -151,7 +151,7 @@
         "@id": "https://your-store.myshopify.com/blogs/seo-plp/de-de-botanische-tapete-wohnzimmer",
         "url": "https://your-store.myshopify.com/blogs/seo-plp/de-de-botanische-tapete-wohnzimmer",
         "name": "Botanische Tapete fürs Wohnzimmer",
-        "description": "9 botanische Wohnzimmer-Tapeten: von luftigen Gräsern bis zum Mitternachtsdschungel. Mit Rapport-Beratung, Musterservice, Rollen ab 58 €.",
+        "description": "10 botanische Wohnzimmer-Tapeten: von luftigen Gräsern bis zum Mitternachtsdschungel. Mit Rapport-Beratung, Musterservice, Rollen ab 58 €.",
         "inLanguage": "de-DE",
         "isPartOf": {
           "@type": "WebSite",
@@ -469,7 +469,7 @@
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "Home",
+            "name": "Startseite",
             "item": "https://your-store.myshopify.com"
           },
           {

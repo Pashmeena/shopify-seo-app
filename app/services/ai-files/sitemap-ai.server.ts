@@ -1,4 +1,4 @@
-import { getLocale } from "../../config/index.server";
+import { findLocale } from "../../config/index.server";
 import { escapeHtml } from "../../lib/html";
 import type { PageRecord } from "../plp/repository.server";
 
@@ -24,7 +24,9 @@ function intentSummary(page: PageRecord): string {
 
 function urlEntry(page: PageRecord): string {
   if (!page.articleUrl) return "";
-  const locale = getLocale(page.locale);
+  // A live URL stays listed even if its market config was removed; the market
+  // name is simply omitted rather than crashing the whole sitemap.
+  const locale = findLocale(page.locale);
   const alternates = (page.seo?.hreflang ?? [])
     .map(
       (variant) =>
@@ -32,15 +34,21 @@ function urlEntry(page: PageRecord): string {
     )
     .join("\n");
 
+  // No canonical element here, deliberately. An earlier version recorded the
+  // consolidation decision in a `plp:canonical` tag — a private vocabulary no
+  // crawler reads, which meant the decision was written down rather than acted
+  // on. Consolidation is now a real 301 (publishing/consolidation.server.ts),
+  // so a consolidated page has no URL of its own and never reaches this file.
+  // Every page listed here is canonical for itself, which is why `loc` alone
+  // is the whole truth about it.
   return `  <url>
     <loc>${escapeHtml(page.articleUrl)}</loc>
     <lastmod>${(page.publishedAt ?? page.updatedAt).toISOString()}</lastmod>
 ${alternates ? alternates + "\n" : ""}    <plp:intent>${escapeHtml(intentSummary(page))}</plp:intent>
     <plp:keyword>${escapeHtml(page.intent.keyword)}</plp:keyword>
     <plp:productCount>${page.productIds.length}</plp:productCount>
-    <plp:locale>${escapeHtml(locale.code)}</plp:locale>
-    <plp:market>${escapeHtml(locale.market)}</plp:market>
-  </url>`;
+    <plp:locale>${escapeHtml(page.locale)}</plp:locale>
+${locale ? `    <plp:market>${escapeHtml(locale.market)}</plp:market>\n` : ""}  </url>`;
 }
 
 export function buildAiSitemap(publishedPages: PageRecord[]): string {

@@ -1,8 +1,8 @@
-import { getLocale } from "../../config/index.server";
+import { findLocale } from "../../config/index.server";
 import type { CatalogProduct } from "../catalog/types";
 import type { PageRecord } from "../plp/repository.server";
 import type { ResolvedSettings } from "../settings/settings.server";
-import { storeBaseUrl } from "../seo/urls.server";
+import { aiFileUrl, storeBaseUrl } from "../seo/urls.server";
 
 /**
  * llms.txt — a plain-language index for AI crawlers: what the store
@@ -45,6 +45,10 @@ export function buildLlmsTxt(
     "",
     `Store: ${base}`,
     `Product type: Wallpaper (${catalog.length} products)`,
+    // Named here as well as being separately discoverable: an agent that found
+    // this file should not have to guess that a machine-readable index of the
+    // same pages exists one path over.
+    `Curated page sitemap: ${aiFileUrl(shop, "sitemap-ai.xml")}`,
     "",
     "## Styles",
     ...facetSummary(catalog, "style"),
@@ -62,12 +66,23 @@ export function buildLlmsTxt(
   ];
 
   for (const page of publishedPages) {
-    const locale = getLocale(page.locale);
+    // A page generated for a market whose config was since removed is still a
+    // real, live URL, so it stays listed — with the code alone, since there is
+    // no market name left to give.
+    const locale = findLocale(page.locale);
+    // The deterministic keyword variants. They are not emitted as a meta
+    // keywords tag anywhere — search engines have ignored that tag for two
+    // decades — but naming the phrasings a page is meant to answer is exactly
+    // what an AI index is for, and it is the one place they are worth having.
+    const variants = page.seo?.keywords ?? [];
     lines.push(
       `- [${page.title}](${page.articleUrl ?? ""})`,
       `  - intent: ${intentLine(page)}`,
       `  - keyword: ${page.intent.keyword}`,
-      `  - locale: ${locale.code} (${locale.market})`,
+      ...(variants.length > 0
+        ? [`  - also answers: ${variants.join("; ")}`]
+        : []),
+      `  - locale: ${page.locale}${locale ? ` (${locale.market})` : ""}`,
       `  - products: ${page.productIds.length}`,
     );
   }

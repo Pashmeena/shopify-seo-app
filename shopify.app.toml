@@ -9,7 +9,11 @@ name = "Wild ventures test"
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 # write_products: read/seed the catalog. write_content: publish PLPs as blog articles.
 # read_publications + write_publications: publish seeded products to the Online Store.
-scopes = "write_products,write_content,read_publications,write_publications"
+# write_online_store_navigation: create the 301 redirects that make a canonical
+#   consolidation real. A blog article's <head> canonical belongs to the theme,
+#   so a redirect is how a near-duplicate is folded onto its canonical page —
+#   see app/services/publishing/consolidation.server.ts.
+scopes = "write_products,write_content,read_publications,write_publications,write_online_store_navigation"
 optional_scopes = [ ]
 use_legacy_install_flow = false
 

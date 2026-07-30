@@ -271,14 +271,14 @@ export default function Keywords() {
     }
   }, [actionData]);
 
-  const busyAction =
-    navigation.state === "submitting"
-      ? String(navigation.formData?.get("_action"))
-      : null;
-  const busyKeywordId =
-    navigation.state === "submitting"
-      ? String(navigation.formData?.get("keywordId"))
-      : null;
+  const isBusy =
+    navigation.state === "submitting" || navigation.state === "loading";
+  const busyAction = isBusy
+    ? String(navigation.formData?.get("_action") ?? "")
+    : null;
+  const busyKeywordId = isBusy
+    ? String(navigation.formData?.get("keywordId") ?? "")
+    : null;
 
   // Import diagnostics: how each input was read, and every row skipped.
   const notes =
@@ -355,6 +355,26 @@ export default function Keywords() {
             </BlockStack>
           </Banner>
         )}
+        {isBusy && (
+          <Banner tone="info">
+            <InlineStack gap="200" blockAlign="center">
+              <Spinner
+                size="small"
+                accessibilityLabel="Processing keyword action"
+              />
+              <Text as="span">
+                {busyAction === "approve" && "Approving keyword…"}
+                {busyAction === "reject" && "Rejecting keyword…"}
+                {busyAction === "generate" && "Generating page…"}
+                {busyAction === "add" && "Adding and parsing keywords…"}
+                {busyAction === "discover" &&
+                  "Discovering keywords from catalog…"}
+                {busyAction === "selection" && "Saving product selection…"}
+                {!busyAction && "Processing…"}
+              </Text>
+            </InlineStack>
+          </Banner>
+        )}
 
         <Card>
           <BlockStack gap="400">
@@ -370,6 +390,7 @@ export default function Keywords() {
                   size="large"
                   variant="primary"
                   loading={busyAction === "discover"}
+                  disabled={isBusy}
                 >
                   Auto-discover from catalog
                 </Button>
@@ -459,6 +480,7 @@ export default function Keywords() {
                       size="large"
                       variant="primary"
                       loading={busyAction === "add"}
+                      disabled={isBusy}
                     >
                       Add & parse intent
                     </Button>
@@ -554,6 +576,7 @@ export default function Keywords() {
                         <Button
                           size="micro"
                           onClick={() => openPreview(keyword.id)}
+                          disabled={isBusy}
                         >
                           Preview
                         </Button>
@@ -574,6 +597,7 @@ export default function Keywords() {
                               busyAction === "approve" &&
                               busyKeywordId === keyword.id
                             }
+                            disabled={isBusy}
                           >
                             Approve
                           </Button>
@@ -596,6 +620,7 @@ export default function Keywords() {
                               busyAction === "reject" &&
                               busyKeywordId === keyword.id
                             }
+                            disabled={isBusy}
                           >
                             Reject
                           </Button>
@@ -622,6 +647,7 @@ export default function Keywords() {
                               busyAction === "generate" &&
                               busyKeywordId === keyword.id
                             }
+                            disabled={isBusy}
                           >
                             Generate PLP
                           </Button>
@@ -646,7 +672,10 @@ export default function Keywords() {
           primaryAction={{
             content: `Save selection (${selectedCount})`,
             onAction: () => submitSelection(false),
-            disabled: selectedCount === 0 || previewFetcher.state !== "idle",
+            disabled:
+              selectedCount === 0 ||
+              previewFetcher.state !== "idle" ||
+              isBusy,
             loading: saveFetcher.state !== "idle",
           }}
           secondaryActions={[
@@ -657,7 +686,7 @@ export default function Keywords() {
                 preview &&
                 "overridden" in preview &&
                 preview.overridden
-              ),
+              ) || isBusy,
             },
           ]}
         >

@@ -15,6 +15,7 @@ import {
 import { TitleBar } from "@shopify/app-bridge-react";
 import { getAiStatus } from "../services/ai/provider.server";
 import { listPages } from "../services/plp/repository.server";
+import { PAGE_STATUS } from "../services/plp/status";
 import { getSettings } from "../services/settings/settings.server";
 import { authenticate } from "../shopify.server";
 import { AiConfigBanner, StatusBadge } from "../components/shared";
@@ -49,6 +50,10 @@ const STATUS_TABS = [
   { id: "draft", content: "Draft" },
   { id: "needs_review", content: "Needs review" },
   { id: "published", content: "Published" },
+  // Pages live as a 301 onto their canonical page. Their own tab because they
+  // are neither drafts nor competing pages, and a merchant auditing
+  // cannibalization wants to see exactly which duplicates were folded away.
+  { id: PAGE_STATUS.CONSOLIDATED, content: "Consolidated" },
 ];
 
 export default function Dashboard() {

@@ -17,6 +17,15 @@ export interface PlpContent {
     heading: string;
     points: string[];
   };
+  /**
+   * Honest limits of a stated property in a specific room. Required only by
+   * `attribute-room`, whose whole reason to exist is that a property claim
+   * needs qualifying rather than repeating.
+   */
+  suitability_notes?: {
+    heading: string;
+    points: { label: string; detail: string }[];
+  };
   faq: { question: string; answer: string }[];
   meta: { title: string; description: string };
   product_alt_texts: { product_id: string; alt_text: string }[];

@@ -35,10 +35,20 @@ const METAFIELDS_SET = `#graphql
   }
 `;
 
-/** Exactly what the Liquid block consumes. Kept minimal so the block stays trivial. */
+/**
+ * Exactly what the Liquid block consumes. Kept minimal so the block stays
+ * trivial — and deliberately without a canonical.
+ *
+ * The block cannot emit one: every Shopify Theme Store theme already outputs
+ * a self-referencing canonical for an article, an app extension cannot remove
+ * it, and two canonicals naming different URLs is a mixed signal Google may
+ * discard entirely. Since the policy now makes every page self-canonical
+ * anyway (see seo/canonical.server.ts), the theme's tag is already the tag
+ * this app wants. The one case that differs — a same-market consolidation —
+ * is recorded in sitemap-ai.xml instead of being half-emitted here.
+ */
 export interface SeoHeadPayload {
   hreflang: { locale: string; url: string }[];
-  canonical: string;
   noindex: boolean;
 }
 
@@ -47,7 +57,6 @@ export function toSeoHeadPayload(seo: SeoPayload): SeoHeadPayload {
     // A single variant is only ever the page itself, and a lone self-
     // referencing hreflang says nothing, so it is not worth emitting.
     hreflang: seo.hreflang.length > 1 ? seo.hreflang : [],
-    canonical: seo.canonicalUrl,
     noindex: seo.noindex,
   };
 }
@@ -84,7 +93,7 @@ export async function ensureSeoHeadDefinition(
         namespace: SEO_HEAD_NAMESPACE,
         key: SEO_HEAD_KEY,
         description:
-          "hreflang alternates, canonical and noindex for a generated product listing page. Written by the SEO PLP app and read by its theme extension.",
+          "hreflang alternates and noindex for a generated product listing page. Written by the SEO PLP app and read by its theme extension.",
         type: "json",
         ownerType: "ARTICLE",
         access: { storefront: "PUBLIC_READ" },

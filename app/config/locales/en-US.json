@@ -12,6 +12,10 @@
   "promptContext": "Language: US English, US spelling (color, gray). Audience: US homeowners and renters. Measurements: imperial — quote roll sizes like 20.5 in × 33 ft and wall areas in square feet; never use metric. Currency: USD with $ symbol. Terminology: 'wallpaper paste' (not adhesive), 'accent wall', 'drywall', 'nursery', 'baseboard', 'crown molding'. Cultural context: renting with security deposits is common — removable and peel-and-stick options matter; mention sample swatches shipped to your door. Search phrasing tends to be '<style> wallpaper for <room>'.",
   "facetTranslations": {},
   "tokens": {
-    "wallpaper": "wallpaper"
+    "wallpaper": "wallpaper",
+    "breadcrumb_home": "Home",
+    "breadcrumb_blog": "Inspiration",
+    "faq_heading": "Frequently asked questions",
+    "related_heading": "Related guides"
   }
 }

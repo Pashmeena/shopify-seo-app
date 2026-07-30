@@ -5,6 +5,7 @@ import {
   useActionData,
   useLoaderData,
   useNavigation,
+  useSubmit,
 } from "@remix-run/react";
 import { useState } from "react";
 import {
@@ -26,15 +27,14 @@ import {
   applyProductSelection,
   regeneratePage,
 } from "../services/plp/pipeline.server";
-import {
-  deletePage,
-  getPage,
-  updatePage,
-} from "../services/plp/repository.server";
-import { deleteArticle } from "../services/publishing/blog.server";
+import { getPage, listPages, updatePage } from "../services/plp/repository.server";
+import { PAGE_STATUS } from "../services/plp/status";
+import { articlePath } from "../services/seo/urls.server";
 import {
   PublishBlockedError,
   publishPage,
+  releaseConsolidation,
+  retirePage,
 } from "../services/publishing/publish.server";
 import { getSettings } from "../services/settings/settings.server";
 import { authenticate } from "../shopify.server";
@@ -51,13 +51,28 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const page = await getPage(shop, params.id as string);
   if (!page) throw new Response("Page not found", { status: 404 });
 
-  const [settings, catalog] = await Promise.all([
+  const [settings, catalog, allPages] = await Promise.all([
     getSettings(shop),
     fetchCatalog(admin),
+    listPages(shop),
   ]);
+
+  // The consolidation target, named so the banner can explain the decision in
+  // terms of a page the merchant recognises rather than an opaque id.
+  const canonicalTarget = page.canonicalOfId
+    ? (allPages.find((candidate) => candidate.id === page.canonicalOfId) ?? null)
+    : null;
 
   return {
     page,
+    canonicalTarget: canonicalTarget && {
+      id: canonicalTarget.id,
+      title: canonicalTarget.title,
+      slug: canonicalTarget.slug,
+      status: canonicalTarget.status,
+      articleUrl: canonicalTarget.articleUrl,
+    },
+    redirectPath: articlePath(settings.blogHandle, page.slug),
     // The page's saved selection is authoritative, so the panel reflects
     // exactly what will be published rather than what the matcher would pick
     // today.
@@ -83,7 +98,25 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     switch (intent) {
       case "publish": {
         const page = await publishPage(admin, shop, pageId);
+        if (page.status === PAGE_STATUS.CONSOLIDATED) {
+          return {
+            success:
+              `Consolidated. /${page.slug} now serves a 301 redirect to its ` +
+              "canonical page, so the two cannot compete for the same queries.",
+          };
+        }
         return { success: `Published to ${page.articleUrl}` };
+      }
+      case "release-consolidation": {
+        const page = await releaseConsolidation(admin, shop, pageId);
+        return {
+          success:
+            "Consolidation cleared and the redirect removed. " +
+            (page.status === PAGE_STATUS.DRAFT
+              ? `"${page.title}" is a draft — publish it to put it live as its own page.`
+              : `"${page.title}" is still ${page.status.replace("_", " ")}; ` +
+                "clearing a consolidation does not resolve anything else it is held for."),
+        };
       }
       case "approve": {
         const page = await getPage(shop, pageId);
@@ -100,10 +133,26 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
         };
       }
       case "products": {
-        const productIds = formData.getAll("productIds").map(String);
+        // Only real, distinct catalog products count. The form cannot send
+        // anything else, but the threshold is decided from this list, so a
+        // request that bypassed the form must not be able to clear it with
+        // repeats or ids that resolve to nothing at render time.
+        const catalog = await fetchCatalog(admin);
+        const known = new Set(catalog.map((product) => product.id));
+        const distinct = [...new Set(formData.getAll("productIds").map(String))];
+        const productIds = distinct.filter((id) => known.has(id));
+        // Counted separately: a repeated id and an id that is not in the
+        // catalog are different mistakes, and reporting one as the other
+        // would be a lie the merchant cannot check.
+        const unknown = distinct.length - productIds.length;
+
         await applyProductSelection(shop, pageId, productIds);
         return {
-          success: `Product selection saved (${productIds.length} products).`,
+          success:
+            `Product selection saved (${productIds.length} products).` +
+            (unknown > 0
+              ? ` ${unknown} id${unknown === 1 ? "" : "s"} ignored — not in this catalog.`
+              : ""),
         };
       }
       case "regenerate": {
@@ -116,12 +165,11 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
         };
       }
       case "delete": {
-        const page = await getPage(shop, pageId);
-        if (page?.articleId) {
-          // Never orphan a live article — remove it from the store first.
-          await deleteArticle(admin, page.articleId);
-        }
-        await deletePage(shop, pageId);
+        // Deleting a page has three consequences on the storefront — its own
+        // article or redirect, the redirects of any pages consolidated onto
+        // it, and the links and hreflang of its published siblings. All three
+        // are handled together in retirePage.
+        await retirePage(admin, shop, pageId);
         return redirect("/app");
       }
       default:
@@ -134,13 +182,20 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 };
 
 export default function PageDetail() {
-  const { page, panel, minProducts } = useLoaderData<typeof loader>();
+  const { page, panel, minProducts, canonicalTarget, redirectPath } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
+  const submit = useSubmit();
   const busyAction =
     navigation.state === "submitting"
       ? String(navigation.formData?.get("_action"))
       : null;
+  const submitAction = (action: string) => {
+    const formData = new FormData();
+    formData.set("_action", action);
+    submit(formData, { method: "post" });
+  };
 
   const selectionFromLoader = () =>
     Object.fromEntries(
@@ -169,6 +224,10 @@ export default function PageDetail() {
     .filter(([, included]) => included)
     .map(([id]) => id);
   const isPublished = page.status === "published";
+  const isConsolidated = page.status === PAGE_STATUS.CONSOLIDATED;
+  // A pending consolidation: the decision is recorded but the redirect is not
+  // installed until the page is published.
+  const willConsolidate = Boolean(page.canonicalOfId) && !isConsolidated;
   const content = page.content;
 
   return (
@@ -178,32 +237,36 @@ export default function PageDetail() {
       titleMetadata={<StatusBadge status={page.status} />}
       subtitle={`${page.pageTypeId} · ${page.locale} · /${page.slug}`}
       primaryAction={
-        <Form method="post">
-          <input type="hidden" name="_action" value="publish" />
-          <Button
-            submit
-            variant="primary"
-            disabled={page.status === "needs_review"}
-            loading={busyAction === "publish"}
-          >
-            {isPublished ? "Republish" : "Publish as blog article"}
-          </Button>
-        </Form>
+        <Button
+          variant="primary"
+          disabled={page.status === "needs_review"}
+          loading={busyAction === "publish"}
+          onClick={() => submitAction("publish")}
+        >
+          {isConsolidated
+            ? "Re-apply redirect"
+            : willConsolidate
+              ? "Publish as 301 redirect"
+              : isPublished
+                ? "Republish"
+                : "Publish as blog article"}
+        </Button>
       }
       secondaryActions={
-        <InlineStack gap="200">
-          <Form method="post">
-            <input type="hidden" name="_action" value="regenerate" />
-            <Button submit loading={busyAction === "regenerate"}>
-              Regenerate content
-            </Button>
-          </Form>
-          <Form method="post">
-            <input type="hidden" name="_action" value="delete" />
-            <Button submit tone="critical" loading={busyAction === "delete"}>
-              Delete
-            </Button>
-          </Form>
+        <InlineStack gap="200" blockAlign="center">
+          <Button
+            loading={busyAction === "regenerate"}
+            onClick={() => submitAction("regenerate")}
+          >
+            Regenerate content
+          </Button>
+          <Button
+            tone="critical"
+            loading={busyAction === "delete"}
+            onClick={() => submitAction("delete")}
+          >
+            Delete
+          </Button>
         </InlineStack>
       }
     >
@@ -217,6 +280,58 @@ export default function PageDetail() {
         {actionData && "success" in actionData && actionData.success && (
           <Banner tone="success">
             <p>{actionData.success}</p>
+          </Banner>
+        )}
+        {(willConsolidate || isConsolidated) && (
+          <Banner
+            tone={isConsolidated ? "info" : "warning"}
+            title={
+              isConsolidated
+                ? "Consolidated onto its canonical page"
+                : "Will publish as a redirect, not as a page"
+            }
+          >
+            <BlockStack gap="200">
+              <p>
+                The similarity check found this page to be a near-duplicate of{" "}
+                <strong>{canonicalTarget?.title ?? "another page"}</strong> in
+                the same market, so{" "}
+                <code>{redirectPath}</code>{" "}
+                {isConsolidated ? "serves" : "will serve"} a 301 redirect to{" "}
+                <code>/{canonicalTarget?.slug}</code> instead of becoming a
+                second page competing for the same queries. A 301 consolidates
+                link equity onto the canonical page; a canonical tag is not
+                available here, because the theme owns it.
+              </p>
+              {canonicalTarget && canonicalTarget.status !== "published" && (
+                <p>
+                  <strong>Blocked:</strong> {canonicalTarget.title} is{" "}
+                  {canonicalTarget.status}, not published. Publish it first, or
+                  the redirect would lead to a page that does not exist.
+                </p>
+              )}
+              {canonicalTarget?.articleUrl && (
+                <p>
+                  <PolarisLink url={canonicalTarget.articleUrl} target="_blank">
+                    View the canonical page
+                  </PolarisLink>
+                </p>
+              )}
+              <Form method="post">
+                <input
+                  type="hidden"
+                  name="_action"
+                  value="release-consolidation"
+                />
+                <Button
+                  submit
+                  size="slim"
+                  loading={busyAction === "release-consolidation"}
+                >
+                  Disagree — publish as its own page
+                </Button>
+              </Form>
+            </BlockStack>
           </Banner>
         )}
         {page.status === "needs_review" && (
@@ -235,11 +350,16 @@ export default function PageDetail() {
             </BlockStack>
           </Banner>
         )}
-        {/* A caveat can be raised on a page that is already live, where it is
-            advisory rather than blocking. Without this it would be recorded
-            and never shown, since the banner above only covers needs_review. */}
-        {isPublished && page.reviewReason && (
-          <Banner title="Published, with a caveat" tone="warning">
+        {/* A caveat can outlive the review that raised it: on a live page, and
+            on a draft whose consolidation the merchant overruled, it is
+            advisory rather than blocking. needs_review has its own banner
+            above, so this covers every other status — without it the reason
+            would be recorded and never shown. */}
+        {page.status !== "needs_review" && page.reviewReason && (
+          <Banner
+            title={isPublished ? "Published, with a caveat" : "Noted caveat"}
+            tone="warning"
+          >
             <p>{page.reviewReason}</p>
           </Banner>
         )}
@@ -346,6 +466,36 @@ export default function PageDetail() {
                         </Text>
                       </BlockStack>
                     ))}
+                    {/* The page-type-specific blocks. Each exists on exactly
+                        one page type, and a block the preview skips is a block
+                        the merchant reviews only by reading raw JSON — which is
+                        not reviewing it. */}
+                    {content.compliance_notes && (
+                      <>
+                        <Divider />
+                        <Text as="h4" variant="headingSm">
+                          {content.compliance_notes.heading}
+                        </Text>
+                        {content.compliance_notes.points.map((point) => (
+                          <Text as="p" key={point} tone="subdued">
+                            {point}
+                          </Text>
+                        ))}
+                      </>
+                    )}
+                    {content.suitability_notes && (
+                      <>
+                        <Divider />
+                        <Text as="h4" variant="headingSm">
+                          {content.suitability_notes.heading}
+                        </Text>
+                        {content.suitability_notes.points.map((point) => (
+                          <Text as="p" key={point.label} tone="subdued">
+                            <strong>{point.label}</strong>: {point.detail}
+                          </Text>
+                        ))}
+                      </>
+                    )}
                     {content.buying_guide && (
                       <>
                         <Divider />

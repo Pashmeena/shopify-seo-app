@@ -50,7 +50,10 @@ model PlpPage {
   locale        String
   slug          String
   title         String
-  status        String    @default("draft") // "draft" | "needs_review" | "published"
+  // "consolidated" means live as a 301 onto `canonicalOfId`'s page rather than
+  // as an article of its own, so it holds no URL and is excluded from
+  // hreflang, internal links, llms.txt and sitemap-ai.xml.
+  status        String    @default("draft") // "draft" | "needs_review" | "published" | "consolidated"
   intent        String // JSON IntentProfile
   productIds    String // JSON string[] of product GIDs (reflects manual adjustments)
   content       String? // JSON — validated AI output matching the page type's output_schema

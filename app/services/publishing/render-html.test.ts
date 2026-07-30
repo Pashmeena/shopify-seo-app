@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { getLocale } from "../../config/index.server";
 import { product } from "../../test-support/catalog";
 import type { PlpContent } from "../generation/types";
 import type { SeoPayload } from "../seo/types";
@@ -54,11 +55,13 @@ function render(overrides: {
   content?: Partial<PlpContent>;
   seo?: Partial<SeoPayload>;
   products?: ReturnType<typeof product>[];
+  locale?: string;
 } = {}) {
   return renderArticleHtml({
     content: content(overrides.content),
     products: overrides.products ?? [PRODUCT],
     seo: seo(overrides.seo),
+    locale: getLocale(overrides.locale ?? "en-US"),
   });
 }
 
@@ -73,7 +76,7 @@ describe("heading hierarchy", () => {
   it("puts FAQ questions at h3 under an h2", () => {
     const html = render();
 
-    expect(html).toContain("<h2>FAQ</h2>");
+    expect(html).toContain("<h2>Frequently asked questions</h2>");
     expect(html).toContain("<h3>Is it washable?</h3>");
   });
 
@@ -139,6 +142,60 @@ describe("optional blocks", () => {
 
     expect(html).toContain('aria-label="Related guides"');
     expect(html).toContain("Botanical Wallpaper for Bedrooms");
+  });
+
+  it("renders suitability notes as a definition list", () => {
+    // attribute-room's differentiator: label plus explanation, so each point is
+    // quotable on its own rather than as a bare bullet.
+    const html = render({
+      content: {
+        suitability_notes: {
+          heading: "Where washable stops being enough",
+          points: [
+            { label: "Splash zone", detail: "Behind a basin, expect standing water." },
+          ],
+        },
+      },
+    });
+
+    expect(html).toContain("<h2>Where washable stops being enough</h2>");
+    expect(html).toContain("<dt>Splash zone</dt>");
+    expect(html).toContain("<dd><p>Behind a basin, expect standing water.</p></dd>");
+  });
+
+  it("omits suitability notes on page types that have none", () => {
+    expect(render()).not.toContain("plp-suitability");
+  });
+});
+
+describe("headings the app writes rather than the model", () => {
+  /**
+   * Every other string in the body comes from the model in the market's
+   * language. These two come from the app, and hard-coding them put an English
+   * "Related guides" h2 on every German page.
+   */
+  const withLinks = { internalLinks: [
+    {
+      title: "Botanische Tapete fürs Schlafzimmer",
+      slug: "de-de-botanische-tapete-schlafzimmer",
+      url: "https://demo.myshopify.com/blogs/seo-plp/de-de-botanische-tapete-schlafzimmer",
+      sharedFacets: ["style:botanical"],
+    },
+  ] };
+
+  it("takes both headings from the page's own locale", () => {
+    const html = render({ locale: "de-DE", seo: withLinks });
+
+    expect(html).toContain("<h2>Häufige Fragen</h2>");
+    expect(html).toContain("<h2>Verwandte Ratgeber</h2>");
+    expect(html).toContain('aria-label="Verwandte Ratgeber"');
+  });
+
+  it("leaves no English heading on a German page", () => {
+    const html = render({ locale: "de-DE", seo: withLinks });
+
+    expect(html).not.toContain("Related guides");
+    expect(html).not.toContain("Frequently asked questions");
   });
 });
 

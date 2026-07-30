@@ -51,6 +51,19 @@ function page(overrides: Partial<PageRecord> = {}): PageRecord {
   } as PageRecord;
 }
 
+function seoPayload(): NonNullable<PageRecord["seo"]> {
+  return {
+    metaTitle: "t",
+    metaDescription: "d",
+    keywords: [],
+    canonicalUrl: `https://${SHOP}/blogs/seo-plp/en-us-botanical-wallpaper-living-room`,
+    hreflang: [],
+    jsonLd: [],
+    internalLinks: [],
+    noindex: false,
+  };
+}
+
 describe("llms.txt", () => {
   const output = buildLlmsTxt(SHOP, SETTINGS, CATALOG, [page()]);
 
@@ -85,6 +98,46 @@ describe("llms.txt", () => {
 
   it("tells a crawler the answers are meant to be citable", () => {
     expect(output).toContain("self-contained and citable");
+  });
+
+  it("names the AI sitemap, so finding one file leads to the other", () => {
+    expect(output).toContain(
+      "Curated page sitemap: https://demo.myshopify.com/apps/seo/sitemap-ai.xml",
+    );
+  });
+
+  it("lists the phrasings a page also answers", () => {
+    // The deterministic keyword variants. They are emitted nowhere else — a
+    // meta keywords tag would be cargo cult — so this is the one surface where
+    // they do any work, and it is the surface they suit.
+    const output = buildLlmsTxt(SHOP, SETTINGS, CATALOG, [
+      page({
+        seo: {
+          ...seoPayload(),
+          keywords: ["botanical wallpaper living room", "botanical living room ideas"],
+        },
+      }),
+    ]);
+
+    expect(output).toContain(
+      "also answers: botanical wallpaper living room; botanical living room ideas",
+    );
+  });
+
+  it("omits the variants line rather than printing an empty one", () => {
+    expect(output).not.toContain("also answers:");
+  });
+
+  it("still lists a page whose market config has since been removed", () => {
+    // A locale can be deleted after pages were generated in it. The page is
+    // still a live URL, so dropping it from the index would hide a real page;
+    // throwing would take the whole file down over one stale row.
+    const output = buildLlmsTxt(SHOP, SETTINGS, CATALOG, [
+      page({ locale: "fr-FR" }),
+    ]);
+
+    expect(output).toContain("locale: fr-FR");
+    expect(output).toContain("Botanical Wallpaper for Living Rooms");
   });
 
   it("says so plainly when nothing is published yet", () => {
@@ -123,6 +176,17 @@ describe("sitemap-ai.xml", () => {
     );
     expect(output).toContain("<plp:productCount>6</plp:productCount>");
     expect(output).toContain("<plp:locale>en-US</plp:locale>");
+    expect(output).toContain("<plp:market>United States</plp:market>");
+  });
+
+  it("keeps a page whose market config was removed, minus the market name", () => {
+    const output = buildAiSitemap([page({ locale: "fr-FR" })]);
+
+    expect(output).toContain("<loc>");
+    expect(output).toContain("<plp:locale>fr-FR</plp:locale>");
+    // There is no market name left to give, and inventing one would be worse
+    // than omitting the element.
+    expect(output).not.toContain("<plp:market>");
   });
 
   it("uses the publish time as lastmod", () => {
@@ -164,6 +228,54 @@ describe("sitemap-ai.xml", () => {
     const output = buildAiSitemap([page({ articleUrl: null })]);
 
     expect(output).not.toContain("<loc>");
+  });
+
+  // Consolidation used to be recorded here, in a `plp:canonical` element.
+  // That was a decision written down rather than acted on: the namespace is
+  // this app's own invention and no crawler reads it. Consolidation is now a
+  // real 301 (publishing/consolidation.server.ts), which means a consolidated
+  // page has no URL of its own and simply is not a sitemap entry.
+  it("never advertises a canonical, because every page listed is its own", () => {
+    const output = buildAiSitemap([page({ seo: seoPayload() })]);
+
+    expect(output).not.toContain("<plp:canonical>");
+  });
+
+  it("omits a consolidated page entirely rather than listing a redirecting URL", () => {
+    // `serve.server.ts` only ever passes published pages, so a consolidated
+    // page should not arrive here at all — but if one did, it has no
+    // `articleUrl`, and a sitemap must never list a URL that 301s away.
+    const output = buildAiSitemap([
+      page({
+        status: "consolidated",
+        canonicalOfId: "page-original",
+        articleUrl: null,
+        seo: {
+          ...seoPayload(),
+          canonicalUrl: `https://${SHOP}/blogs/seo-plp/en-us-original`,
+        },
+      }),
+    ]);
+
+    expect(output).not.toContain("<loc>");
+    expect(output).not.toContain("en-us-original");
+  });
+
+  // The stored articleUrl and the freshly computed canonicalUrl drift apart
+  // whenever the blog handle changes, so the emission must key off the
+  // recorded decision rather than off the two strings disagreeing.
+  it("stays silent when the URLs merely drift, with no consolidation recorded", () => {
+    const output = buildAiSitemap([
+      page({
+        canonicalOfId: null,
+        seo: {
+          ...seoPayload(),
+          canonicalUrl: `https://${SHOP}/blogs/renamed-blog/en-us-botanical-wallpaper-living-room`,
+        },
+      }),
+    ]);
+
+    expect(output).not.toContain("<plp:canonical>");
   });
 
   it("escapes XML-significant characters in metadata", () => {

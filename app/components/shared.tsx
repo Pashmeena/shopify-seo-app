@@ -14,6 +14,7 @@ import {
   Text,
   Thumbnail,
 } from "@shopify/polaris";
+import { PAGE_STATUS } from "../services/plp/status";
 
 /** Shared presentation pieces for the admin routes. */
 
@@ -272,6 +273,10 @@ export function StatusBadge({ status }: { status: string }) {
   switch (status) {
     case "published":
       return <Badge tone="success">Published</Badge>;
+    case PAGE_STATUS.CONSOLIDATED:
+      // Live, but as a 301 onto its canonical page rather than as a page of
+      // its own — so it is neither "published" nor held back.
+      return <Badge tone="warning">Consolidated (301)</Badge>;
     case "needs_review":
       return <Badge tone="attention">Needs review</Badge>;
     case "draft":

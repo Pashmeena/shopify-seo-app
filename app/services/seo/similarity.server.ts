@@ -14,9 +14,11 @@ import type { IntentProfile } from "../intent/types";
  *    compared against existing pages in the same locale with a weighted
  *    per-facet Jaccard. ≥ BLOCK is treated as a duplicate; ≥ FLAG is
  *    held for merchant review.
- * 3. Canonical consolidation — the same cluster in another locale is a
- *    legitimate variant: it's linked via canonicalOf + hreflang instead
- *    of being blocked.
+ * 3. Canonical consolidation — a page that lands in the flag band is a
+ *    near-duplicate of an existing page in the same market, so it can be
+ *    pointed at that page. See canonical.server.ts for the policy; the
+ *    same cluster in another locale is a legitimate variant and is linked
+ *    by hreflang instead, never consolidated.
  *
  * "Too similar" is defined numerically below and explained in the README.
  */
@@ -61,24 +63,32 @@ export function intentSimilarity(a: IntentProfile, b: IntentProfile): number {
   return weightTotal === 0 ? 0 : weightedSum / weightTotal;
 }
 
+/** The page a verdict was raised against. `id` lets the canonical policy point at it. */
+export interface SimilarityMatch {
+  id: string;
+  title: string;
+  slug: string;
+}
+
 export type SimilarityVerdict =
   | { level: "ok" }
-  | { level: "flag" | "block"; score: number; against: { title: string; slug: string } };
+  | { level: "flag" | "block"; score: number; against: SimilarityMatch };
 
 /** Compare a new intent against existing same-locale pages. */
 export function checkSimilarity(
   intent: IntentProfile,
-  existing: { title: string; slug: string; intent: IntentProfile }[],
+  existing: (SimilarityMatch & { intent: IntentProfile })[],
 ): SimilarityVerdict {
   let worst: Extract<SimilarityVerdict, { level: "flag" | "block" }> | null = null;
 
   for (const page of existing) {
     const score = intentSimilarity(intent, page.intent);
+    const against = { id: page.id, title: page.title, slug: page.slug };
     if (score >= SIMILARITY_BLOCK_THRESHOLD) {
-      return { level: "block", score, against: { title: page.title, slug: page.slug } };
+      return { level: "block", score, against };
     }
     if (score >= SIMILARITY_FLAG_THRESHOLD && (!worst || score > worst.score)) {
-      worst = { level: "flag", score, against: { title: page.title, slug: page.slug } };
+      worst = { level: "flag", score, against };
     }
   }
   return worst ?? { level: "ok" };

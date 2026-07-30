@@ -90,15 +90,27 @@ export function buildFaqPage(input: JsonLdInput): Record<string, unknown> {
 
 export function buildBreadcrumbList(input: JsonLdInput): Record<string, unknown> {
   const base = storeBaseUrl(input.shop);
+  // Breadcrumb labels are the one part of the stack a shopper can read in
+  // search results, so they come from the locale's token table rather than
+  // being hardcoded in English. The registry now refuses a locale that omits
+  // either token, so the fallbacks below are unreachable via config — they
+  // remain only because this builder also runs against locale objects
+  // assembled in tests, and a breadcrumb is not worth a crash.
+  const tokens = input.locale.tokens;
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: base },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: tokens?.breadcrumb_home ?? "Home",
+        item: base,
+      },
       {
         "@type": "ListItem",
         position: 2,
-        name: "Inspiration",
+        name: tokens?.breadcrumb_blog ?? "Inspiration",
         item: `${base}/blogs/${input.blogHandle}`,
       },
       { "@type": "ListItem", position: 3, name: input.content.h1, item: input.url },

@@ -33,9 +33,47 @@
     "sustainable": "nachhaltige",
     "washable": "abwaschbare",
     "removable": "ablösbare",
-    "non woven": "vliestapete"
+    "non woven": "vliestapete",
+    "humid rooms": "feuchträume",
+    "high traffic": "stark beansprucht"
   },
   "tokens": {
-    "wallpaper": "tapete"
+    "wallpaper": "tapete",
+    "breadcrumb_home": "Startseite",
+    "breadcrumb_blog": "Inspiration",
+    "faq_heading": "Häufige Fragen",
+    "related_heading": "Verwandte Ratgeber"
+  },
+  "seoTemplates": {
+    "style-room": {
+      "title_template": "{Style} {Wallpaper} für {Room} | {brand}",
+      "description_template": "{product_count} {style} {Wallpaper}n für {Room}: Farbwirkung, Musterproportion und Tipps zur Möbelkombination von {brand}.",
+      "keywords_template": [
+        "{style} {wallpaper} {room}",
+        "{style} {wallpaper}",
+        "{wallpaper}n ideen {room}",
+        "{style} {wallpaper} für {room}"
+      ]
+    },
+    "use-case": {
+      "title_template": "{Material} {Wallpaper} für {UseCase} | {brand}",
+      "description_template": "{product_count} {Wallpaper}n, die für {UseCase} wirklich funktionieren: praktische Empfehlungen und eine Schritt-für-Schritt-Anleitung von {brand}.",
+      "keywords_template": [
+        "{material} {wallpaper} {useCase}",
+        "{wallpaper} für {useCase}",
+        "beste {wallpaper} {useCase}",
+        "{attribute} {wallpaper} {useCase}"
+      ]
+    },
+    "attribute-room": {
+      "title_template": "{Attribute} {Wallpaper} für {Room} | {brand}",
+      "description_template": "{product_count} {attribute} {Wallpaper}n für {Room}: was die Angabe konkret bedeutet, wo sie endet, und welche Wand sie trägt. Von {brand}.",
+      "keywords_template": [
+        "{attribute} {wallpaper} {room}",
+        "{attribute} {wallpaper}",
+        "{wallpaper} für {room}",
+        "{attribute} {wallpaper} für {room}"
+      ]
+    }
   }
 }

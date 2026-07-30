@@ -28,6 +28,15 @@ import {
   updatePage,
   type PageRecord,
 } from "./repository.server";
+import {
+  REVIEW_MARKER,
+  altTextBackfillReason,
+  cannibalizationReason,
+  joinReviewReasons,
+  thinPageReason,
+  withoutReason,
+} from "./review-reasons";
+import { LIVE_PAGE_STATUSES } from "./status";
 
 /**
  * The core loop, orchestrated:
@@ -44,7 +53,11 @@ export class PipelineRejection extends Error {
   constructor(
     message: string,
     public readonly kind:
-      "no-page-type" | "duplicate" | "blocked-similar" | "slug-taken",
+      | "no-page-type"
+      | "duplicate"
+      | "blocked-similar"
+      | "slug-taken"
+      | "not-approved",
   ) {
     super(message);
   }
@@ -63,6 +76,16 @@ export async function generatePageForKeyword(
 ): Promise<PipelineOutcome> {
   const keyword = await getKeyword(shop, keywordId);
   if (!keyword) throw new Error(`Keyword ${keywordId} not found`);
+
+  // The brief puts approve/reject *before* generation, so the gate belongs
+  // here rather than only in which buttons the UI renders. `failed` is
+  // allowed because retrying a failed generation is the same approval.
+  if (keyword.status !== "approved" && keyword.status !== "failed") {
+    throw new PipelineRejection(
+      `"${keyword.phrase}" is ${keyword.status}, not approved. Approve the keyword before generating a page for it.`,
+      "not-approved",
+    );
+  }
 
   const settings = await getSettings(shop);
   const catalog = await fetchCatalog(admin);
@@ -172,20 +195,23 @@ export async function regeneratePage(
   const reviewReasons: string[] = [];
   if (products.length < settings.minProducts) {
     reviewReasons.push(
-      `Only ${products.length} matching products (minimum ${settings.minProducts}) — thin page, held from publishing.`,
+      thinPageReason(products.length, settings.minProducts),
     );
   }
   if (generation.backfilledAltTextIds.length > 0) {
     reviewReasons.push(
-      `Alt text for ${generation.backfilledAltTextIds.length} product(s) was backfilled deterministically.`,
+      altTextBackfillReason(generation.backfilledAltTextIds.length),
     );
   }
-  const status =
-    page.status === "published"
-      ? "published"
-      : reviewReasons.length
-        ? "needs_review"
-        : "draft";
+  // A page that is already live keeps its footing: regenerating content is
+  // not a reason to take it down. That includes a consolidated page — its
+  // content is stored and inspectable, but its URL is a 301, so regeneration
+  // changes nothing a visitor sees and must not resurrect it as an article.
+  const status = LIVE_PAGE_STATUSES.includes(page.status)
+    ? page.status
+    : reviewReasons.length
+      ? "needs_review"
+      : "draft";
 
   const seo = assembleSeoPayload({
     shop,
@@ -212,7 +238,7 @@ export async function regeneratePage(
     content: generation.content,
     seo,
     status,
-    reviewReason: reviewReasons.length ? reviewReasons.join(" ") : null,
+    reviewReason: joinReviewReasons(reviewReasons),
   });
 
   // A live page must not silently diverge from what the admin now shows.
@@ -225,7 +251,9 @@ export async function regeneratePage(
     // Publishing clears the review note, because going live is what resolves
     // one. A caveat raised by this regeneration is still true, so it is
     // written back — advisory on a live page rather than blocking.
-    await updatePage(shop, pageId, { reviewReason: reviewReasons.join(" ") });
+    await updatePage(shop, pageId, {
+      reviewReason: joinReviewReasons(reviewReasons),
+    });
   }
 
   const updated = await getPage(shop, pageId);
@@ -246,28 +274,21 @@ export async function applyProductSelection(
   if (!page) throw new Error(`Page ${pageId} not found`);
   const settings = await getSettings(shop);
 
-  const belowThreshold = productIds.length < settings.minProducts;
-  const thresholdReason = `Only ${productIds.length} matching products (minimum ${settings.minProducts}) — thin page, held from publishing.`;
-
-  // Preserve non-threshold reasons; replace/remove the threshold one.
-  const otherReasons = (page.reviewReason ?? "")
-    .split(/(?<=\.)\s+/)
-    .filter(
-      (reason) => reason && !reason.includes("thin page, held from publishing"),
-    );
-  const reasons = belowThreshold
-    ? [thresholdReason, ...otherReasons]
-    : otherReasons;
+  // Preserve every other reason; replace or drop only the threshold one.
+  const otherReasons = withoutReason(page.reviewReason, REVIEW_MARKER.THIN);
+  const reasons =
+    productIds.length < settings.minProducts
+      ? [thinPageReason(productIds.length, settings.minProducts), ...otherReasons]
+      : otherReasons;
 
   await updatePage(shop, pageId, {
     productIds,
-    status:
-      page.status === "published"
-        ? "published"
-        : reasons.length
-          ? "needs_review"
-          : "draft",
-    reviewReason: reasons.length ? reasons.join(" ") : null,
+    status: LIVE_PAGE_STATUSES.includes(page.status)
+      ? page.status
+      : reasons.length
+        ? "needs_review"
+        : "draft",
+    reviewReason: joinReviewReasons(reasons),
   });
 }
 
@@ -308,6 +329,7 @@ async function runPipeline(
   const similarity = checkSimilarity(
     intent,
     sameLocalePages.map((page) => ({
+      id: page.id,
       title: page.title,
       slug: page.slug,
       intent: page.intent,
@@ -351,13 +373,15 @@ async function runPipeline(
   // prompt, the rendered body and the JSON-LD Offer cannot disagree.
   products = await priceForMarket(admin, products, locale);
 
-  // Canonical consolidation, decided by language rather than by locale:
-  // same-language markets compete and consolidate, different languages are
-  // separate pages paired by hreflang. See seo/canonical.server.ts.
+  // Canonical consolidation. Locale is never a reason to consolidate — every
+  // market page is canonical for itself and its variants are paired by
+  // hreflang. Consolidation applies to same-market near-duplicates, which is
+  // exactly what the similarity flag above detects. See seo/canonical.server.ts.
   const canonical = chooseCanonicalTarget(
-    { locale: locale.code, clusterKey: key },
-    settings.defaultLocale,
-    allPages,
+    { locale: locale.code },
+    similarity.level === "flag"
+      ? { ...similarity.against, locale: locale.code, score: similarity.score }
+      : null,
   );
 
   // AI generation, validated against the page type's output_schema.
@@ -389,17 +413,24 @@ async function runPipeline(
   const reviewReasons: string[] = [];
   if (products.length < settings.minProducts) {
     reviewReasons.push(
-      `Only ${products.length} matching products (minimum ${settings.minProducts}) — thin page, held from publishing.`,
+      thinPageReason(products.length, settings.minProducts),
     );
   }
   if (similarity.level === "flag") {
+    // The consolidated variant may now promise the pages will not compete,
+    // because publishing installs a real 301 rather than recording an
+    // intention. See publishing/consolidation.server.ts.
     reviewReasons.push(
-      `Similar (${similarity.score.toFixed(2)}) to "${similarity.against.title}" — review for cannibalization.`,
+      cannibalizationReason(
+        similarity.score,
+        similarity.against.title,
+        Boolean(canonical.target),
+      ),
     );
   }
   if (generation.backfilledAltTextIds.length > 0) {
     reviewReasons.push(
-      `Alt text for ${generation.backfilledAltTextIds.length} product(s) was backfilled deterministically.`,
+      altTextBackfillReason(generation.backfilledAltTextIds.length),
     );
   }
   const status = reviewReasons.length > 0 ? "needs_review" : "draft";
@@ -435,7 +466,7 @@ async function runPipeline(
     seo,
     clusterKey: key,
     canonicalOfId: canonical.target?.id ?? null,
-    reviewReason: reviewReasons.length ? reviewReasons.join(" ") : null,
+    reviewReason: joinReviewReasons(reviewReasons),
   });
 
   return { page, match };

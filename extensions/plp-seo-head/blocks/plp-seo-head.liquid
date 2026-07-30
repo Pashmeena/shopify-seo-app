@@ -8,13 +8,15 @@
   search engines. There is no way to put a head tag there from an article
   body, and Shopify emits hreflang only for its own Markets URLs.
 
-  Deliberately absent: `<link rel="canonical">`. Themes already emit a
-  self-referencing canonical for every article, which is exactly what this app
-  wants for all but one case, and a second, conflicting canonical tag is worse
-  than none — search engines discard both hints. The one case it cannot serve
-  is consolidating two same-language markets onto one page; that relationship
-  is recorded in the stored SEO payload and sitemap-ai.xml, and owning the
-  head outright needs template-based publishing. See the README.
+  Deliberately absent: `<link rel="canonical">`. Every Theme Store theme
+  already emits a self-referencing canonical for an article and an app
+  extension cannot remove it, so adding a second one naming a different URL is
+  a mixed signal search engines may discard entirely. Under the app's canonical
+  policy every market page is canonical for itself, so the theme's tag is
+  already the right one; locale variants are related by the hreflang above,
+  never by consolidation. The single exception — two near-duplicate pages in
+  the *same* market — is recorded in sitemap-ai.xml, and emitting it as a head
+  tag needs template-based publishing. See the README.
 
   The payload is written by the app on publish, to the storefront-readable
   metafield wp_plp.seo. `article` is nil outside article templates, so `plp`

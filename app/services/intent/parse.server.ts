@@ -1,5 +1,9 @@
 import { listPageTypes } from "../../config/index.server";
-import { INTENT_FACETS, type IntentFacet } from "../../config/types";
+import {
+  INTENT_FACETS,
+  type IntentFacet,
+  type PageTypeConfig,
+} from "../../config/types";
 import { completeValidatedJson, getValidator } from "../ai/json-client.server";
 import { getAiProvider, getAiStatus } from "../ai/provider.server";
 import { addFacetValue, extractFacets } from "../facets/vocabulary.server";
@@ -67,12 +71,48 @@ function applyDerivedFacets(facets: IntentProfile["facets"]): void {
 }
 
 /**
+ * Whether an intent satisfies everything a page type asks of it: each required
+ * facet present, and — where the page type constrains a facet's values — at
+ * least one of the intent's values for that facet on the allowed list.
+ *
+ * The constraint half is what keeps a narrow page type narrow. `useCase` alone
+ * is satisfied by `kids` and `humid rooms` as readily as by `renters`, so
+ * without it a page type about German tenancy law claims every German use-case
+ * keyword.
+ */
+function pageTypeApplies(
+  pageType: PageTypeConfig,
+  facets: IntentProfile["facets"],
+): boolean {
+  return pageType.required_facets.every((facet) => {
+    const values = facets[facet] ?? [];
+    if (values.length === 0) return false;
+    const allowed = pageType.required_facet_values?.[facet];
+    return !allowed || values.some((value) => allowed.includes(value));
+  });
+}
+
+/** Number of required facets this page type also constrains by value. */
+function constraintCount(pageType: PageTypeConfig): number {
+  return Object.keys(pageType.required_facet_values ?? {}).length;
+}
+
+/**
  * Route an intent to the most specific page type that applies in this market.
  *
- * Specificity is the number of required facets, then whether the page type
- * names its markets. A locale-specific page type exists because that market
- * has something the others do not, so when it competes with a general page
- * type on equal facets it should win.
+ * Specificity is compared in a fixed order, most structural first:
+ *
+ * 1. more required facets — a page type keyed on style *and* room says more
+ *    about the query than one keyed on a use case alone;
+ * 2. more value-constrained facets — a page type that names the exact use case
+ *    it serves is narrower than one that accepts any;
+ * 3. restricted to markets — such a page type exists because its market has
+ *    something the others do not, so it should win a genuine tie there;
+ * 4. `routing_priority` — the explicit domain judgment, for page types that
+ *    are structurally indistinguishable;
+ * 5. id, so the outcome is deterministic. Without this last comparison the
+ *    winner of a full tie came from glob order, i.e. from filenames — which
+ *    means renaming a config file could silently re-route keywords.
  */
 export function routePageType(
   facets: IntentProfile["facets"],
@@ -80,13 +120,14 @@ export function routePageType(
 ): string | null {
   const candidates = listPageTypes()
     .filter((pageType) => !pageType.locales || pageType.locales.includes(locale))
-    .filter((pageType) =>
-      pageType.required_facets.every((facet) => (facets[facet]?.length ?? 0) > 0),
-    )
+    .filter((pageType) => pageTypeApplies(pageType, facets))
     .sort(
       (a, b) =>
         b.required_facets.length - a.required_facets.length ||
-        Number(Boolean(b.locales)) - Number(Boolean(a.locales)),
+        constraintCount(b) - constraintCount(a) ||
+        Number(Boolean(b.locales)) - Number(Boolean(a.locales)) ||
+        (b.routing_priority ?? 0) - (a.routing_priority ?? 0) ||
+        a.id.localeCompare(b.id),
     );
   return candidates[0]?.id ?? null;
 }

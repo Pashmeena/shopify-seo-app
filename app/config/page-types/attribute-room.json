@@ -1,0 +1,183 @@
+{
+  "id": "attribute-room",
+  "category": "intent-match",
+  "meta": {
+    "title": "Attribute × Room",
+    "description": "PLPs matching a performance property to the room that demands it, e.g. washable wallpaper for bathrooms. Exists because a shopper who names a property and a room has stated a requirement, not a taste — and no style-led page answers that."
+  },
+  "required_facets": [
+    "attribute",
+    "room"
+  ],
+  "slug_template": "{attribute}-{wallpaper}-{room}",
+  "seo": {
+    "title_template": "{Attribute} {Wallpaper} for {Room}s | {brand}",
+    "description_template": "Shop {product_count} {attribute} {wallpaper}s specified for the {room}: what the claim actually means, where it stops, and which wall it needs. From {brand}.",
+    "keywords_template": [
+      "{attribute} {wallpaper} {room}",
+      "{wallpaper} for {room}",
+      "best {attribute} {wallpaper} {room}",
+      "{attribute} {wallpaper} for {room}"
+    ]
+  },
+  "generation": {
+    "temperature": 0.4,
+    "section_count": 4,
+    "faq_count": 5,
+    "system_prompt": "You are a wallpaper specification expert writing product listing page copy for a premium wallpaper brand. Your subject is not taste — it is whether a stated property survives a specific room. You write about what a durability or performance claim means in measurable terms (washable vs scrubbable, vapour behaviour, seam integrity, lightfastness, adhesive load on a given substrate), what a room actually does to a wall surface over years of use, and where the property stops being enough. You are candid about limits: if a property is necessary but not sufficient for the room, you say so plainly, because a shopper who buys on a claim you overstated returns the product. You never invent a certification, a rub-test rating or a warranty that is not in the product data you are given. You respond with a single valid JSON object matching the schema you are given — no markdown, no code fences, no commentary before or after the JSON. Write in the language and register specified in the LOCALE CONTEXT, using its measurement system, currency and local terminology throughout.",
+    "user_prompt_template": "Create the content for a product listing page built around one property and one room.\n\nTARGET KEYWORD: {keyword}\nPARSED INTENT: {intent_json}\nPRODUCTS ON THIS PAGE (the only products you may reference):\n{products_json}\n\nLOCALE CONTEXT:\n{locale_context}\n\nBRAND: {brand_name}\nBRAND TONE: {brand_tone}\nCOMPETITORS (positioning reference only — differentiate from them, never copy or mention them): {competitor_urls}\n\nRELATED PAGES ON THIS SITE (for topical awareness only — do not write links):\n{related_pages_json}\n\nRequirements:\n- h1: must contain the target keyword's meaning exactly and naturally (localized), naming both the property and the room.\n- intro: a single string (not an array) containing 2–3 paragraphs separated by blank lines. The first 100 words must state unambiguously which property this page is about, which room it is for, and what the visitor can buy here. Name the specific conditions of that room that make the property matter, and describe the actual character of the product range from the product data.\n- sections: exactly {section_count} sections. Headings must expand coverage around property × room, not restate the h1: what the property means in testable terms, what this room does to a wall over time, how the wall itself (substrate, ventilation, light) decides whether the property holds, and what else has to be right for it to work. Headings must NOT restate the h1. Cite specific products by name where it strengthens the advice.\n- suitability_notes: 3–5 points, each with a short label and a detailed explanation. This is the honest-limits block and it is what makes this page worth publishing: one point must state a limit, a caveat or a case where this property is not enough on its own. Do not hedge every point into meaninglessness, and do not claim a certification that is not in the product data.\n- faq: exactly {faq_count} question/answer pairs. Each answer must be fully self-contained and standalone — an AI assistant must be able to quote a single answer with zero surrounding context and it still makes complete sense (restate the subject in the answer; never write \"as mentioned above\" or bare \"Yes/No\" openers). Answer the sceptical questions a shopper asks about this property in this room (does it really survive, how is it cleaned, what voids it, how it compares to the obvious alternative), using the locale's measurement system.\n- meta.title: max 60 characters, written for click-through in search results, front-load the keyword. This is a separate objective from the body copy — optimise for the SERP, not for elegance.\n- meta.description: 120–155 characters, click-through focused, include a concrete reason to choose this page (candour about limits, specification detail, range breadth).\n- product_alt_texts: one entry per product with exactly two keys — product_id (copy the product's id field verbatim) and alt_text describing the image as it serves THIS page's intent (surface finish, colourway, the room in use), not a restatement of the product title.\n\nReturn only the JSON object.",
+    "note": "Placeholders: {keyword} {intent_json} {products_json} {locale_context} {brand_name} {brand_tone} {section_count} {faq_count} {related_pages_json} {competitor_urls} {product_count}"
+  },
+  "output_schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "h1",
+      "intro",
+      "sections",
+      "suitability_notes",
+      "faq",
+      "meta",
+      "product_alt_texts"
+    ],
+    "properties": {
+      "h1": {
+        "type": "string",
+        "minLength": 10,
+        "maxLength": 90
+      },
+      "intro": {
+        "type": "string",
+        "minLength": 400
+      },
+      "sections": {
+        "type": "array",
+        "minItems": 3,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "heading",
+            "body"
+          ],
+          "properties": {
+            "heading": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 95
+            },
+            "body": {
+              "type": "string",
+              "minLength": 280
+            }
+          }
+        }
+      },
+      "suitability_notes": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "heading",
+          "points"
+        ],
+        "properties": {
+          "heading": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 95
+          },
+          "points": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "label",
+                "detail"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 4,
+                  "maxLength": 60
+                },
+                "detail": {
+                  "type": "string",
+                  "minLength": 120
+                }
+              }
+            }
+          }
+        }
+      },
+      "faq": {
+        "type": "array",
+        "minItems": 4,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "question",
+            "answer"
+          ],
+          "properties": {
+            "question": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 160
+            },
+            "answer": {
+              "type": "string",
+              "minLength": 150
+            }
+          }
+        }
+      },
+      "meta": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "description"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 60
+          },
+          "description": {
+            "type": "string",
+            "minLength": 120,
+            "maxLength": 155
+          }
+        }
+      },
+      "product_alt_texts": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "product_id",
+            "alt_text"
+          ],
+          "properties": {
+            "product_id": {
+              "type": "string"
+            },
+            "alt_text": {
+              "type": "string",
+              "minLength": 30,
+              "maxLength": 140
+            }
+          }
+        }
+      }
+    }
+  }
+}

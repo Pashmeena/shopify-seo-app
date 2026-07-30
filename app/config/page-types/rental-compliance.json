@@ -11,15 +11,20 @@
   "required_facets": [
     "useCase"
   ],
+  "required_facet_values": {
+    "useCase": [
+      "renters"
+    ]
+  },
   "slug_template": "{wallpaper}-{useCase}-rueckstandslos-ablösbar",
   "seo": {
-    "title_template": "{Material} Tapete für die {UseCase} | {brand}",
-    "description_template": "{product_count} rückstandslos ablösbare Tapeten für die {UseCase}: Kaution sichern, Schönheitsreparatur erfüllen, Wände unbeschädigt zurückgeben. Beratung von {brand}.",
+    "title_template": "{Material} {Wallpaper} für die {UseCase} | {brand}",
+    "description_template": "{product_count} rückstandslos ablösbare {Wallpaper}n für die {UseCase}: Kaution sichern, Wände unbeschädigt zurückgeben. Beratung von {brand}.",
     "keywords_template": [
-      "tapete {useCase} rückstandslos",
-      "ablösbare tapete {useCase}",
-      "tapete {useCase} schönheitsreparatur",
-      "tapete kaution wand beschädigen"
+      "{wallpaper} {useCase} rückstandslos",
+      "ablösbare {wallpaper} {useCase}",
+      "{wallpaper} {useCase} schönheitsreparatur",
+      "{wallpaper} kaution wand beschädigen"
     ]
   },
   "generation": {

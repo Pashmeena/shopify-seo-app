@@ -106,9 +106,49 @@ describe("page type routing", () => {
     ).toBe("style-room");
   });
 
+  it("routes an attribute plus a room to the attribute-room page type", () => {
+    // A stated property plus a room is a requirement, not a taste, and no
+    // style-led page answers it. Before this page type existed the query
+    // resolved to no page type at all.
+    expect(parse("washable wallpaper bathroom").pageTypeId).toBe("attribute-room");
+    expect(parse("abwaschbare tapete badezimmer", "de-DE").pageTypeId).toBe(
+      "attribute-room",
+    );
+  });
+
+  it("prefers style over attribute when a keyword carries both plus a room", () => {
+    // style-room and attribute-room are structurally identical — two required
+    // facets, no constraints, no market restriction — so the tie falls to
+    // routing_priority. Someone searching "sustainable botanical wallpaper
+    // living room" is shopping a style that happens to be sustainable.
+    expect(
+      routePageType(
+        {
+          style: ["botanical"],
+          attribute: ["sustainable"],
+          room: ["living room"],
+        },
+        "en-US",
+      ),
+    ).toBe("style-room");
+  });
+
   it("routes nothing when no page type's required facets are present", () => {
     expect(parse("green wallpaper").pageTypeId).toBeNull();
     expect(routePageType({}, "en-US")).toBeNull();
+  });
+
+  it("is decided by configuration, never by which file loaded first", () => {
+    // The sort used to end at facet count and market restriction, so a full tie
+    // was broken by glob order — meaning renaming a config file could silently
+    // re-route live keywords. The last comparison is now the page type id.
+    const facets = { attribute: ["washable"], room: ["bathroom"] };
+
+    expect(
+      new Set(
+        Array.from({ length: 25 }, () => routePageType(facets, "en-US")),
+      ).size,
+    ).toBe(1);
   });
 });
 
@@ -117,9 +157,37 @@ describe("locale-specific page types", () => {
 
   it("prefers a market-specific page type over a general one in that market", () => {
     // rental-compliance exists only for de-DE, where German tenancy law makes
-    // residue-free removal a contractual argument. Both it and use-case need
-    // one facet, so the market-specific one wins the tie.
+    // residue-free removal a contractual argument. It and use-case both need
+    // one facet, but rental-compliance also constrains that facet's value, so
+    // it is the more specific of the two.
     expect(routePageType(renterIntent, "de-DE")).toBe("rental-compliance");
+  });
+
+  it("does not claim a German use case that is not renting", () => {
+    // The bug this closes. rental-compliance needs a useCase, and so does
+    // use-case; with no value constraint the market-specific page type won
+    // every tie, so *every* German use-case keyword was routed to a page about
+    // tenancy law. A German kids-room keyword produced a page about deposit
+    // recovery — right products, entirely wrong subject.
+    for (const useCase of ["kids", "humid rooms", "high traffic"]) {
+      expect(routePageType({ useCase: [useCase] }, "de-DE")).toBe("use-case");
+    }
+  });
+
+  it("does not claim a German kids room via its derived use case", () => {
+    // The path that made the bug easy to hit: "kids room" derives useCase
+    // `kids` automatically, so the keyword never had to mention a use case to
+    // be captured.
+    const parsed = parse("tapete kinderzimmer", "de-DE");
+
+    expect(parsed.facets.useCase).toEqual(["kids"]);
+    expect(parsed.pageTypeId).not.toBe("rental-compliance");
+  });
+
+  it("still claims a German renting keyword phrased without the word Mietwohnung", () => {
+    expect(parse("ablösbare tapete für mieter", "de-DE").pageTypeId).toBe(
+      "rental-compliance",
+    );
   });
 
   it("is invisible to every other market", () => {

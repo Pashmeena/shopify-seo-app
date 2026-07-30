@@ -253,6 +253,34 @@ export async function updatePage(
   });
 }
 
+/**
+ * Delete a page and hand its keyword back to the merchant.
+ *
+ * The keyword was moved to `generated` when the page was created, and that
+ * status offers no actions in the queue — no approve, no regenerate. Deleting
+ * the page it produced would otherwise strand the keyword permanently, since
+ * re-adding the same phrase is a no-op against the unique constraint. Putting
+ * it back to `approved` makes deletion an undo rather than a dead end.
+ */
 export async function deletePage(shop: string, id: string): Promise<void> {
+  const page = await prisma.plpPage.findFirst({
+    where: { id, shop },
+    select: { keywordId: true },
+  });
+
   await prisma.plpPage.deleteMany({ where: { id, shop } });
+
+  if (!page?.keywordId) return;
+
+  // Only if this was the keyword's last page — a keyword can legitimately
+  // still own others.
+  const remaining = await prisma.plpPage.count({
+    where: { shop, keywordId: page.keywordId },
+  });
+  if (remaining > 0) return;
+
+  await prisma.keyword.updateMany({
+    where: { id: page.keywordId, shop, status: "generated" },
+    data: { status: "approved", clusterKey: null, error: null },
+  });
 }

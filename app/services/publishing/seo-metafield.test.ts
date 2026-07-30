@@ -42,10 +42,12 @@ describe("toSeoHeadPayload", () => {
     );
   });
 
-  it("carries the canonical through for reference", () => {
-    expect(toSeoHeadPayload(seo()).canonical).toBe(
-      "https://demo.myshopify.com/blogs/seo-plp/en-us-page",
-    );
+  it("carries no canonical, because the block must not emit one", () => {
+    // The theme already emits a self-referencing canonical for every article
+    // and an app extension cannot remove it; a second one naming a different
+    // URL is a mixed signal Google may discard entirely. Shipping the field
+    // to a block that never reads it only implies otherwise.
+    expect(toSeoHeadPayload(seo())).not.toHaveProperty("canonical");
   });
 
   it("carries noindex through", () => {
@@ -53,9 +55,8 @@ describe("toSeoHeadPayload", () => {
     expect(toSeoHeadPayload(seo({ noindex: false })).noindex).toBe(false);
   });
 
-  it("produces exactly the three keys the Liquid block reads", () => {
+  it("produces exactly the two keys the Liquid block reads", () => {
     expect(Object.keys(toSeoHeadPayload(seo())).sort()).toEqual([
-      "canonical",
       "hreflang",
       "noindex",
     ]);
