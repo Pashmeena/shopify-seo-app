@@ -1,0 +1,52 @@
+{%- comment -%}
+  Emits the head tags a generated PLP needs that Shopify does not provide for
+  blog articles.
+
+  hreflang is the reason this block exists. Locale variants of a PLP have to
+  reference each other with `<link rel="alternate" hreflang>` in the document
+  head, and a non-reciprocal or absent annotation is simply discarded by
+  search engines. There is no way to put a head tag there from an article
+  body, and Shopify emits hreflang only for its own Markets URLs.
+
+  Deliberately absent: `<link rel="canonical">`. Themes already emit a
+  self-referencing canonical for every article, which is exactly what this app
+  wants for all but one case, and a second, conflicting canonical tag is worse
+  than none — search engines discard both hints. The one case it cannot serve
+  is consolidating two same-language markets onto one page; that relationship
+  is recorded in the stored SEO payload and sitemap-ai.xml, and owning the
+  head outright needs template-based publishing. See the README.
+
+  The payload is written by the app on publish, to the storefront-readable
+  metafield wp_plp.seo. `article` is nil outside article templates, so `plp`
+  is nil there and nothing is emitted.
+{%- endcomment -%}
+
+{%- liquid
+  assign plp = article.metafields.wp_plp.seo.value
+-%}
+
+{%- if plp -%}
+  {%- for alternate in plp.hreflang -%}
+    {%- if alternate.locale and alternate.url -%}
+      <link rel="alternate" hreflang="{{ alternate.locale }}" href="{{ alternate.url }}">
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- comment -%}
+    Belt and braces alongside the seo.hidden metafield the app also sets. A
+    page held for review never reaches the storefront at all, so this should
+    never fire; if it does, something upstream is wrong and the page must not
+    be indexed while it is.
+  {%- endcomment -%}
+  {%- if plp.noindex -%}
+    <meta name="robots" content="noindex, follow">
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "PLP SEO tags",
+  "target": "head",
+  "settings": []
+}
+{% endschema %}

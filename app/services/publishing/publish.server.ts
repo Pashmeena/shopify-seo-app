@@ -9,6 +9,11 @@ import { getSettings, type ResolvedSettings } from "../settings/settings.server"
 import type { AdminClient } from "../shopify/admin.server";
 import { getPage, listPages, updatePage, type PageRecord } from "../plp/repository.server";
 import { createArticle, ensureBlog, setArticleSeo, updateArticle } from "./blog.server";
+import {
+  ensureSeoHeadDefinition,
+  setArticleSeoHead,
+  toSeoHeadPayload,
+} from "./seo-metafield.server";
 import { renderArticleHtml } from "./render-html.server";
 
 /**
@@ -148,6 +153,10 @@ export async function publishPage(
     metaDescription: seo.metaDescription,
     noindex: seo.noindex,
   });
+  // hreflang has to be a head tag, which an article body cannot carry, so the
+  // theme extension reads it from here. See seo-metafield.server.ts.
+  await ensureSeoHeadDefinition(admin, shop);
+  await setArticleSeoHead(admin, articleId, toSeoHeadPayload(seo));
 
   await updatePage(shop, page.id, {
     status: "published",
@@ -232,14 +241,19 @@ async function refreshAffectedPages(
     const bodyChanged =
       JSON.stringify(seo.internalLinks) !==
       JSON.stringify(page.seo?.internalLinks ?? []);
-    if (bodyChanged && page.articleId) {
-      await updateArticle(admin, page.articleId, {
-        title: page.content!.h1,
-        body: renderArticleHtml({ content: page.content!, products, seo }),
-        summary: seo.metaDescription,
-        tags: ["wp-plp", page.pageTypeId, page.locale],
-        authorName: settings.brandName,
-      });
+    if (page.articleId) {
+      if (bodyChanged) {
+        await updateArticle(admin, page.articleId, {
+          title: page.content!.h1,
+          body: renderArticleHtml({ content: page.content!, products, seo }),
+          summary: seo.metaDescription,
+          tags: ["wp-plp", page.pageTypeId, page.locale],
+          authorName: settings.brandName,
+        });
+      }
+      // Always: the cross-locale half of this refresh exists precisely to
+      // keep hreflang reciprocal, and hreflang lives in this metafield.
+      await setArticleSeoHead(admin, page.articleId, toSeoHeadPayload(seo));
     }
     await updatePage(shop, page.id, { seo });
   }
