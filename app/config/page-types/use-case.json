@@ -10,7 +10,7 @@
   ],
   "slug_template": "{material?}-{wallpaper}-{useCase}",
   "seo": {
-    "title_template": "{material} Wallpaper for {useCase} | {brand}",
+    "title_template": "{Material} Wallpaper for {UseCase} | {brand}",
     "description_template": "{product_count} wallpapers that actually work for {useCase}: practical picks, honest limits and a step-by-step buying guide from {brand}.",
     "keywords_template": [
       "{material} wallpaper {useCase}",

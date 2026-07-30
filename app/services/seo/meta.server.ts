@@ -16,6 +16,22 @@ import type { IntentProfile } from "../intent/types";
 const MAX_TITLE = 60;
 const MAX_DESCRIPTION = 155;
 
+/** Facet values are stored lowercase because they also build slugs. */
+function capitalizeWords(value: string): string {
+  return value.replace(/(^|[\s-])(\p{Ll})/gu, (_, boundary, letter) =>
+    `${boundary}${letter.toUpperCase()}`,
+  );
+}
+
+/**
+ * Template values, each facet in two forms.
+ *
+ * `{style}` is the value as stored — lowercase, right for mid-sentence use in
+ * an English description. `{Style}` is capitalized, right for a title, and
+ * required rather than optional in German, where nouns are capitalized
+ * wherever they appear. Which one to use is the config author's call, so both
+ * are offered instead of guessing per position.
+ */
 function templateValues(
   intent: IntentProfile,
   locale: LocaleConfig,
@@ -26,22 +42,42 @@ function templateValues(
     const value = intent.facets[facet]?.[0];
     return value ? localizeFacetValue(value, locale) : "";
   };
-  return {
-    style: localizedFacet("style"),
-    room: localizedFacet("room"),
-    color: localizedFacet("color"),
-    material: localizedFacet("material"),
-    attribute: localizedFacet("attribute"),
-    useCase: localizedFacet("useCase"),
+
+  const facets = ["style", "room", "color", "material", "attribute", "useCase"] as const;
+  const values: Record<string, string | number> = {
     brand,
     product_count: productCount,
   };
+  for (const facet of facets) {
+    const value = localizedFacet(facet);
+    values[facet] = value;
+    values[capitalizeWords(facet.slice(0, 1)) + facet.slice(1)] =
+      capitalizeWords(value);
+  }
+  return values;
 }
 
 export interface ResolvedMeta {
   title: string;
   description: string;
   keywords: string[];
+}
+
+/**
+ * A token the intent does not carry resolves to an empty string, which leaves
+ * a doubled or leading space behind. Templates are written for the fully
+ * populated case, so tidying up here is cheaper than making every template
+ * defensive.
+ */
+function tidy(text: string): string {
+  return (
+    text
+      .replace(/\s+/g, " ")
+      // Punctuation that hugs the preceding word. Not the pipe: it separates
+      // the title from the brand and wants a space on both sides.
+      .replace(/\s+([,.:;!?])/g, "$1")
+      .trim()
+  );
 }
 
 export function resolveMeta(
@@ -54,14 +90,16 @@ export function resolveMeta(
 ): ResolvedMeta {
   const values = templateValues(intent, locale, brand, productCount);
 
-  const fallbackTitle = fillTemplate(pageType.seo.title_template, values);
-  const fallbackDescription = fillTemplate(pageType.seo.description_template, values);
+  const fallbackTitle = tidy(fillTemplate(pageType.seo.title_template, values));
+  const fallbackDescription = tidy(
+    fillTemplate(pageType.seo.description_template, values),
+  );
 
   return {
     title: truncate(content.meta?.title || fallbackTitle, MAX_TITLE),
     description: truncate(content.meta?.description || fallbackDescription, MAX_DESCRIPTION),
     keywords: pageType.seo.keywords_template
-      .map((template) => fillTemplate(template, values).replace(/\s+/g, " ").trim())
+      .map((template) => tidy(fillTemplate(template, values)))
       .filter((keyword) => keyword.length > 0),
   };
 }

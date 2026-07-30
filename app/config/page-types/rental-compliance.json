@@ -13,8 +13,8 @@
   ],
   "slug_template": "{wallpaper}-{useCase}-rueckstandslos-ablösbar",
   "seo": {
-    "title_template": "{material} Tapete für die {useCase} | {brand}",
-    "description_template": "{product_count} rückstandslos ablösbare Tapeten für die {useCase}: Kaution sichern, Schönheitsreparatur erfüllen, Wände unbeschädigt zurückgeben. Beratung von {brand}.",
+    "title_template": "{Material} Tapete für die {UseCase} | {brand}",
+    "description_template": "{product_count} rückstandslos ablösbare Tapeten für die {UseCase}: Kaution sichern, Schönheitsreparatur erfüllen, Wände unbeschädigt zurückgeben. Beratung von {brand}.",
     "keywords_template": [
       "tapete {useCase} rückstandslos",
       "ablösbare tapete {useCase}",

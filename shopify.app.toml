@@ -24,6 +24,11 @@ include_config_on_deploy = true
 # Shopify signs proxied requests, so the handlers authenticate the shop rather
 # than accepting it as a query parameter. An app cannot own the true store
 # root (/llms.txt) — see the README for what a merchant does about that.
+#
+# `url` is a placeholder, as `application_url` above is. Both are rewritten to
+# the dev tunnel by automatically_update_urls_on_dev. If the proxy URL is ever
+# left pointing here, the app-domain routes in app/routes/llms[.]txt.tsx still
+# work and Settings links to them.
 [app_proxy]
 url = "https://example.com/proxy"
 subpath = "seo"

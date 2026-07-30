@@ -43,7 +43,7 @@ Suggested demo: seed → discover → generate `botanical wallpaper living room`
 > Without an AI key: seeding, discovery, rules-based intent parsing and matching all work. Generation reports a clear configuration error.
 
 ```bash
-npm test           # 362 unit tests
+npm test           # 377 unit tests
 npm run typecheck
 npm run lint
 npm run build
@@ -189,6 +189,7 @@ See [Limitations](#limitations). In priority order:
 | Alt-text coverage | Enforced in code, since the schema cannot know the product count. Missing entries get a deterministic intent-based fallback and the page is flagged noting the backfill. | Guarantees every product image has alt text without failing a whole generation for one omission. |
 | Noindex | Draft and review pages **never leave the database** — the strongest noindex. `seo.hidden` and a robots meta fallback in the theme extension cover anything that must exist unindexed. | Shopify indexes published content immediately; the safest draft is one that isn't there. |
 | Example outputs | Committed AI content, but products and the entire SEO payload are **re-derived by the real matcher and assembler**, with a test asserting the files still match. | The examples are a deliverable a reviewer reads as evidence. Hand-written ones had already drifted into claiming a shared facet that the page they pointed at did not have. |
+| SEO template tokens | Facets are offered in two forms: `{style}` as stored (lowercase, for mid-sentence use) and `{Style}` capitalized. | Values are stored lowercase because they also build slugs. A title needs them capitalized, and German needs them capitalized wherever a noun appears — so the config author chooses per position rather than the code guessing. |
 | Default AI models | `claude-opus-5` / `gpt-4o` / `gemini-2.5-flash`, overridable via `AI_MODEL`. Temperature comes from page-type config where the provider supports it (Claude Opus 5 removed sampling parameters, so the Anthropic adapter does not send it). | Current defaults; one env var to change. |
 
 ---
@@ -214,7 +215,7 @@ Simplifications, not oversights.
 
 ## Testing
 
-362 unit tests, no store or API key required: `npm test`.
+377 unit tests, no store or API key required: `npm test`.
 
 Everything below the Shopify and AI boundaries is pure and tested — vocabulary and phrase matching, facet derivation, matching and scoring, cluster keys and similarity thresholds, canonical policy, slug localization, SEO assembly, CSV ingestion and column mapping, the validated-JSON client's retry and give-up behaviour, HTML escaping, `llms.txt` and `sitemap-ai.xml`, and the config registry's invariants.
 

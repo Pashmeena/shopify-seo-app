@@ -11,7 +11,7 @@
   ],
   "slug_template": "{style}-{wallpaper}-{room}",
   "seo": {
-    "title_template": "{style} Wallpaper for {room} | {brand}",
+    "title_template": "{Style} Wallpaper for {Room}s | {brand}",
     "description_template": "Shop {product_count} {style} wallpapers chosen for the {room}. Colours, pattern scale and pairing advice from {brand}.",
     "keywords_template": [
       "{style} wallpaper {room}",

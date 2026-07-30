@@ -1,6 +1,7 @@
 import Ajv from "ajv";
 import { describe, expect, it } from "vitest";
 import { getLocale, listLocales, listPageTypes } from "./index.server";
+import { buildSlug } from "../services/seo/slug.server";
 import { INTENT_FACETS } from "./types";
 
 /**
@@ -62,6 +63,58 @@ describe("page types", () => {
       for (const token of used) {
         expect(known).toContain(token.slice(1, -1));
       }
+    },
+  );
+
+  it.each(pageTypes.map((pageType) => [pageType.id, pageType] as const))(
+    "%s declares every placeholder its SEO templates use",
+    (_id, pageType) => {
+      // Facets come in two forms: `{style}` as stored, `{Style}` capitalized
+      // for titles and for German, where nouns always are. A typo in either
+      // renders as an empty string and silently drops part of the title.
+      const facets = ["style", "room", "color", "material", "attribute", "useCase"];
+      const known = new Set([
+        ...facets,
+        ...facets.map((facet) => facet[0].toUpperCase() + facet.slice(1)),
+        "brand",
+        "product_count",
+      ]);
+      const templates = [
+        pageType.seo.title_template,
+        pageType.seo.description_template,
+        ...pageType.seo.keywords_template,
+      ];
+
+      for (const template of templates) {
+        for (const token of template.match(/\{([a-zA-Z0-9_]+)\}/g) ?? []) {
+          expect(known).toContain(token.slice(1, -1));
+        }
+      }
+    },
+  );
+
+  it.each(pageTypes.map((pageType) => [pageType.id, pageType] as const))(
+    "%s builds a URL-safe slug from its template",
+    (_id, pageType) => {
+      const locale = getLocale(pageType.locales?.[0] ?? "en-US");
+      const facets = Object.fromEntries(
+        pageType.required_facets.map((facet) => [facet, ["renters"]]),
+      );
+
+      expect(
+        buildSlug(
+          pageType,
+          {
+            keyword: "probe",
+            locale: locale.code,
+            facets,
+            pageTypeId: pageType.id,
+            confidence: 1,
+            method: "rules",
+          },
+          locale,
+        ),
+      ).toMatch(/^[a-z0-9-]+$/);
     },
   );
 
