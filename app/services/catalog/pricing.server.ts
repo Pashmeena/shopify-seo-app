@@ -99,21 +99,63 @@ export function applyMarketPrices(
   });
 }
 
+/** "These products, priced for this market." */
+export type MarketPriceResolver = (
+  products: CatalogProduct[],
+  locale: LocaleConfig,
+) => Promise<CatalogProduct[]>;
+
 /**
- * The single entry point for "these products, priced for this market".
+ * A resolver that remembers what it has already looked up, scoped to one
+ * operation.
  *
- * Used by generation, regeneration and publishing so the prompt, the rendered
- * page and the JSON-LD `Offer` can never disagree about currency.
+ * Publishing touches more than the page being published: it re-derives every
+ * page the publish invalidated, and those pages overlap heavily in products
+ * and share a handful of countries between them. Without this, publishing one
+ * page into a locale with twenty published siblings costs twenty pricing
+ * queries for largely the same products.
+ *
+ * Products with no market price are remembered as looked-up too, so an
+ * unpriced product is not re-queried once per page.
+ */
+export function createMarketPriceResolver(admin: AdminClient): MarketPriceResolver {
+  const byCountry = new Map<
+    string,
+    { prices: Map<string, MarketPrice>; lookedUp: Set<string> }
+  >();
+
+  return async (products, locale) => {
+    let cached = byCountry.get(locale.country);
+    if (!cached) {
+      cached = { prices: new Map(), lookedUp: new Set() };
+      byCountry.set(locale.country, cached);
+    }
+
+    const missing = products
+      .map((product) => product.id)
+      .filter((id) => !cached.lookedUp.has(id));
+
+    if (missing.length > 0) {
+      const fetched = await fetchMarketPrices(admin, missing, locale.country);
+      for (const id of missing) cached.lookedUp.add(id);
+      for (const [id, price] of fetched) cached.prices.set(id, price);
+    }
+
+    return applyMarketPrices(products, cached.prices);
+  };
+}
+
+/**
+ * One-shot pricing, for callers that price a single page.
+ *
+ * Generation, regeneration and publishing all route through this or through a
+ * shared resolver, so the prompt, the rendered page and the JSON-LD `Offer`
+ * can never disagree about currency.
  */
 export async function priceForMarket(
   admin: AdminClient,
   products: CatalogProduct[],
   locale: LocaleConfig,
 ): Promise<CatalogProduct[]> {
-  const prices = await fetchMarketPrices(
-    admin,
-    products.map((product) => product.id),
-    locale.country,
-  );
-  return applyMarketPrices(products, prices);
+  return createMarketPriceResolver(admin)(products, locale);
 }

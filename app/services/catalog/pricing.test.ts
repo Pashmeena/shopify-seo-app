@@ -3,6 +3,7 @@ import { product } from "../../test-support/catalog";
 import type { AdminClient } from "../shopify/admin.server";
 import {
   applyMarketPrices,
+  createMarketPriceResolver,
   fetchMarketPrices,
   type MarketPrice,
 } from "./pricing.server";
@@ -85,6 +86,64 @@ describe("fetchMarketPrices", () => {
     );
 
     expect([...prices.keys()]).toEqual(["gid://p/3"]);
+  });
+});
+
+describe("createMarketPriceResolver", () => {
+  const locale = { country: "DE", currency: "EUR" } as Parameters<
+    ReturnType<typeof createMarketPriceResolver>
+  >[1];
+
+  it("looks a product up once across repeated calls", async () => {
+    const products = [product({ handle: "a" }), product({ handle: "b" })];
+    const admin = adminReturning({
+      data: {
+        nodes: products.map((entry) => node(entry.id, "119.00", "EUR")),
+      },
+    });
+    const pricing = createMarketPriceResolver(admin);
+
+    await pricing(products, locale);
+    const second = await pricing(products, locale);
+
+    expect(admin.graphql).toHaveBeenCalledTimes(1);
+    expect(second[0]).toMatchObject({ price: 119, currencyCode: "EUR" });
+  });
+
+  it("asks only for the products it has not seen", async () => {
+    const first = product({ handle: "a" });
+    const second = product({ handle: "b" });
+    const admin = adminReturning({ data: { nodes: [] } });
+    const pricing = createMarketPriceResolver(admin);
+
+    await pricing([first], locale);
+    await pricing([first, second], locale);
+
+    expect(admin.graphql).toHaveBeenNthCalledWith(2, expect.any(String), {
+      variables: { ids: [second.id], country: "DE" },
+    });
+  });
+
+  it("does not re-query a product the market had no price for", async () => {
+    const products = [product({ handle: "a" })];
+    const admin = adminReturning({ data: { nodes: [] } });
+    const pricing = createMarketPriceResolver(admin);
+
+    await pricing(products, locale);
+    await pricing(products, locale);
+
+    expect(admin.graphql).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps markets separate", async () => {
+    const products = [product({ handle: "a" })];
+    const admin = adminReturning({ data: { nodes: [] } });
+    const pricing = createMarketPriceResolver(admin);
+
+    await pricing(products, locale);
+    await pricing(products, { country: "GB", currency: "GBP" } as typeof locale);
+
+    expect(admin.graphql).toHaveBeenCalledTimes(2);
   });
 });
 

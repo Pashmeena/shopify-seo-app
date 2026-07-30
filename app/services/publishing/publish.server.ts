@@ -1,5 +1,8 @@
 import { fetchCatalogById } from "../catalog/products.server";
-import { priceForMarket } from "../catalog/pricing.server";
+import {
+  createMarketPriceResolver,
+  type MarketPriceResolver,
+} from "../catalog/pricing.server";
 import type { CatalogProduct } from "../catalog/types";
 import { getLocale, getPageType } from "../../config/index.server";
 import { resolveMeta } from "../seo/meta.server";
@@ -34,14 +37,14 @@ export class PublishBlockedError extends Error {}
  * same currency the copy was written in.
  */
 async function resolveProducts(
-  admin: AdminClient,
+  pricing: MarketPriceResolver,
   page: PageRecord,
   catalogById: Map<string, CatalogProduct>,
 ): Promise<CatalogProduct[]> {
   const products = page.productIds
     .map((id) => catalogById.get(id))
     .filter((product): product is CatalogProduct => Boolean(product));
-  return priceForMarket(admin, products, getLocale(page.locale));
+  return pricing(products, getLocale(page.locale));
 }
 
 /** Rebuild a page's SEO payload against current published state. */
@@ -100,7 +103,10 @@ export async function publishPage(
 
   const storedSettings = await getSettings(shop);
   const catalogById = await fetchCatalogById(admin);
-  const products = await resolveProducts(admin, page, catalogById);
+  // One resolver for the whole publish, including the refresh of affected
+  // pages, so overlapping products are priced once rather than once per page.
+  const pricing = createMarketPriceResolver(admin);
+  const products = await resolveProducts(pricing, page, catalogById);
   const blog = await ensureBlog(admin, storedSettings.blogHandle);
   // Shopify normalizes handles server-side — all URLs must be built from
   // the handle the blog actually has, not the raw setting.
@@ -167,7 +173,7 @@ export async function publishPage(
     reviewReason: null,
   });
 
-  await refreshAffectedPages(admin, shop, settings, catalogById, page);
+  await refreshAffectedPages(admin, shop, settings, catalogById, pricing, page);
 
   const published = await getPage(shop, page.id);
   if (!published) throw new Error("Page vanished during publish");
@@ -229,12 +235,13 @@ async function refreshAffectedPages(
   shop: string,
   settings: ResolvedSettings,
   catalogById: Map<string, CatalogProduct>,
+  pricing: MarketPriceResolver,
   justPublished: PageRecord,
 ): Promise<void> {
   const allPages = await listPages(shop);
 
   for (const page of affectedByPublish(allPages, justPublished)) {
-    const products = await resolveProducts(admin, page, catalogById);
+    const products = await resolveProducts(pricing, page, catalogById);
     const seo = rebuildSeo(shop, settings, page, products, allPages);
     if (JSON.stringify(seo) === JSON.stringify(page.seo)) continue;
 
