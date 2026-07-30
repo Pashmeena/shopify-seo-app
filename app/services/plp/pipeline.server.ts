@@ -10,6 +10,7 @@ import type { IntentProfile } from "../intent/types";
 import { matchProducts, type MatchResult } from "../matching/match.server";
 import { assembleSeoPayload } from "../seo/assemble.server";
 import { resolveMeta } from "../seo/meta.server";
+import { chooseCanonicalTarget } from "../seo/canonical.server";
 import { checkSimilarity, clusterKey } from "../seo/similarity.server";
 import { buildSlug } from "../seo/slug.server";
 import { getSettings } from "../settings/settings.server";
@@ -347,12 +348,14 @@ async function runPipeline(
     products = [...ranked, ...additions];
   }
 
-  // Canonical consolidation — an equivalent page in the default locale
-  // becomes the canonical; this page is its locale variant.
-  const canonicalPage =
-    locale.code !== settings.defaultLocale
-      ? await findPageByCluster(shop, key, settings.defaultLocale)
-      : null;
+  // Canonical consolidation, decided by language rather than by locale:
+  // same-language markets compete and consolidate, different languages are
+  // separate pages paired by hreflang. See seo/canonical.server.ts.
+  const canonical = chooseCanonicalTarget(
+    { locale: locale.code, clusterKey: key },
+    settings.defaultLocale,
+    allPages,
+  );
 
   // AI generation, validated against the page type's output_schema.
   const generation = await generatePlpContent({
@@ -407,7 +410,7 @@ async function runPipeline(
       intent,
       clusterKey: key,
       status,
-      canonicalSlug: canonicalPage?.slug ?? null,
+      canonicalSlug: canonical.target?.slug ?? null,
     },
     content: generation.content,
     products,
@@ -428,7 +431,7 @@ async function runPipeline(
     content: generation.content,
     seo,
     clusterKey: key,
-    canonicalOfId: canonicalPage?.id ?? null,
+    canonicalOfId: canonical.target?.id ?? null,
     reviewReason: reviewReasons.length ? reviewReasons.join(" ") : null,
   });
 

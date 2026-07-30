@@ -1,0 +1,16 @@
+{
+  "code": "en-AU",
+  "label": "English (Australia)",
+  "languageCode": "en",
+  "languageName": "English",
+  "market": "Australia",
+  "currency": "AUD",
+  "measurementSystem": "metric",
+  "slugPrefix": "en-au",
+  "hreflang": "en-AU",
+  "promptContext": "Language: Australian English, Commonwealth spelling (colour, grey, metre, neighbourhood). Audience: Australian homeowners and renters. Measurements: metric — quote roll sizes like 52 cm × 10 m and wall areas in square metres; never use feet or inches. Currency: AUD with the $ symbol, written A$129 where ambiguity matters. Terminology: 'wallpaper paste' or 'wallpaper adhesive' (both are used), 'feature wall' (not 'accent wall'), 'gyprock' or 'plasterboard' (never 'drywall'), 'skirting boards' (not 'baseboards'), 'cornice' (not 'crown molding'), 'nursery', 'rumpus room', 'Queenslander' for the classic timber home. Cultural context: harsh direct sunlight makes fade resistance a genuine buying concern, and humidity matters in Brisbane and the tropical north; renting is common with strict end-of-lease condition reports, so removability without wall damage is a strong argument; sample swatches ship nationally but allow for longer delivery to WA and regional areas. Seasonal references are inverted relative to the northern hemisphere — never assume a northern-hemisphere season. Search phrasing tends to be '<style> wallpaper <room>' or 'wallpaper ideas <room>'.",
+  "facetTranslations": {},
+  "tokens": {
+    "wallpaper": "wallpaper"
+  }
+}

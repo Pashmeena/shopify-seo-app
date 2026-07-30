@@ -1,0 +1,16 @@
+{
+  "code": "en-GB",
+  "label": "English (United Kingdom)",
+  "languageCode": "en",
+  "languageName": "English",
+  "market": "United Kingdom",
+  "currency": "GBP",
+  "measurementSystem": "metric",
+  "slugPrefix": "en-gb",
+  "hreflang": "en-GB",
+  "promptContext": "Language: British English, Commonwealth spelling (colour, grey, metre, neighbourhood, personalise). Audience: UK homeowners and renters. Measurements: metric — quote roll sizes like 52 cm × 10 m and wall areas in square metres; never use feet or inches. Currency: GBP with the £ symbol, written £129. Terminology: 'wallpaper paste' (not adhesive), 'feature wall' (not 'accent wall'), 'plasterboard' (never 'drywall'), 'skirting boards' (not 'baseboards'), 'coving' (not 'crown molding'), 'lining paper', 'chimney breast', 'alcove', 'nursery'. Cultural context: much of the housing stock is older — Victorian terraces and 1930s semis with chimney breasts, picture rails and uneven walls, where lining paper and pattern-matching advice genuinely matter; north-facing rooms and short winter daylight make colour temperature a real concern; renting is common with deposit protection schemes, so fully removable options are a strong argument; sample orders are usually free and arrive in a few days. Search phrasing tends to be '<style> wallpaper <room>' or '<room> wallpaper ideas'.",
+  "facetTranslations": {},
+  "tokens": {
+    "wallpaper": "wallpaper"
+  }
+}

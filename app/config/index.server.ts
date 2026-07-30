@@ -75,6 +75,15 @@ export function getLocale(code: string): LocaleConfig {
   return config;
 }
 
+/**
+ * Non-throwing lookup, for decisions that run over stored pages. A locale
+ * config can be removed after pages were generated in it, and a pure
+ * decision should treat that as "unknown market" rather than crash.
+ */
+export function findLocale(code: string): LocaleConfig | null {
+  return locales.get(code) ?? null;
+}
+
 /** Localize a canonical facet value (falls back to the English value). */
 export function localizeFacetValue(value: string, locale: LocaleConfig): string {
   return locale.facetTranslations[value.toLowerCase()] ?? value;

@@ -1,5 +1,5 @@
 {
-  "_comment": "Example pipeline output for the de-DE locale variant of the style × room page. Same intent cluster as the en-US example, therefore canonicalOf points at the en-US page and both appear in each other's hreflang set. Content is genuinely market-aware (Sie-Form, metric, EUR, deutsche Terminologie), not translated.",
+  "_comment": "Example pipeline output for the de-DE locale variant of the style x room page. Same intent cluster as the en-US example, so the two reference each other via hreflang while each keeps a self-referencing canonical. Content is genuinely market-aware (Sie-Form, metric, EUR, deutsche Terminologie), not translated.",
   "keyword": "botanische tapete wohnzimmer",
   "locale": "de-DE",
   "page_type": "style-room",
@@ -128,8 +128,8 @@
       "tapete wohnzimmer botanisch",
       "beste botanische tapete wohnzimmer"
     ],
-    "canonicalUrl": "https://your-store.myshopify.com/blogs/seo-plp/en-us-botanical-wallpaper-living-room",
-    "_canonical_note": "This de-DE page is a locale variant of the same intent cluster as the en-US page; the en-US page (default locale) is designated canonical and both list each other in hreflang.",
+    "canonicalUrl": "https://your-store.myshopify.com/blogs/seo-plp/de-de-botanische-tapete-wohnzimmer",
+    "_canonical_note": "Self-referencing. This de-DE page shares an intent cluster with the en-US page, but a different-language variant is not a near-duplicate: canonicalising it onto the English URL would tell Google not to index the German page at all, forfeiting the German market. The two are paired by hreflang instead. Canonical consolidation applies only between same-language markets (en-US and en-AU), where the copy genuinely overlaps enough to compete.",
     "hreflang": [
       {
         "locale": "en-US",
