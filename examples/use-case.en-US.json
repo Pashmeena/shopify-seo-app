@@ -7,9 +7,15 @@
     "keyword": "peel and stick wallpaper for renters",
     "locale": "en-US",
     "facets": {
-      "material": ["peel and stick"],
-      "useCase": ["renters"],
-      "audience": ["renters"]
+      "material": [
+        "peel and stick"
+      ],
+      "useCase": [
+        "renters"
+      ],
+      "audience": [
+        "renters"
+      ]
     },
     "pageTypeId": "use-case",
     "confidence": 1,
@@ -19,14 +25,14 @@
     "count": 8,
     "threshold": 6,
     "handles": [
+      "sleepy-clouds",
+      "rainbow-stripes",
       "monstera-line-art",
       "trailing-ivy",
       "cherry-blossom-mist",
       "paradise-parrots",
       "scandi-triangles",
-      "sleepy-clouds",
-      "safari-parade",
-      "rainbow-stripes"
+      "safari-parade"
     ]
   },
   "content": {
@@ -106,14 +112,38 @@
       "description": "8 deposit-safe peel and stick wallpapers that remove clean on moving day. Honest wall-prep advice, a step-by-step guide, rolls from $52."
     },
     "product_alt_texts": [
-      { "product_id": "monstera-line-art", "alt_text": "Removable monstera line-art peel and stick wallpaper, ideal accent wall for renters" },
-      { "product_id": "trailing-ivy", "alt_text": "Trailing ivy peel and stick wallpaper panel being applied to a rented apartment wall" },
-      { "product_id": "cherry-blossom-mist", "alt_text": "Pale pink cherry blossom peel and stick wallpaper, a deposit-safe bedroom accent" },
-      { "product_id": "paradise-parrots", "alt_text": "Bright parrot peel and stick wallpaper that removes cleanly from rental kids' rooms" },
-      { "product_id": "scandi-triangles", "alt_text": "Pastel Scandi triangle peel and stick wallpaper, forgiving pattern for uneven rental walls" },
-      { "product_id": "sleepy-clouds", "alt_text": "Powder blue cloud peel and stick wallpaper for a rented nursery, fully removable" },
-      { "product_id": "safari-parade", "alt_text": "Sandy safari animal peel and stick wallpaper, tenancy-safe decor for kids' rooms" },
-      { "product_id": "rainbow-stripes", "alt_text": "Faded pastel rainbow stripe peel and stick wallpaper, wipeable and renter-removable" }
+      {
+        "product_id": "monstera-line-art",
+        "alt_text": "Removable monstera line-art peel and stick wallpaper, ideal accent wall for renters"
+      },
+      {
+        "product_id": "trailing-ivy",
+        "alt_text": "Trailing ivy peel and stick wallpaper panel being applied to a rented apartment wall"
+      },
+      {
+        "product_id": "cherry-blossom-mist",
+        "alt_text": "Pale pink cherry blossom peel and stick wallpaper, a deposit-safe bedroom accent"
+      },
+      {
+        "product_id": "paradise-parrots",
+        "alt_text": "Bright parrot peel and stick wallpaper that removes cleanly from rental kids' rooms"
+      },
+      {
+        "product_id": "scandi-triangles",
+        "alt_text": "Pastel Scandi triangle peel and stick wallpaper, forgiving pattern for uneven rental walls"
+      },
+      {
+        "product_id": "sleepy-clouds",
+        "alt_text": "Powder blue cloud peel and stick wallpaper for a rented nursery, fully removable"
+      },
+      {
+        "product_id": "safari-parade",
+        "alt_text": "Sandy safari animal peel and stick wallpaper, tenancy-safe decor for kids' rooms"
+      },
+      {
+        "product_id": "rainbow-stripes",
+        "alt_text": "Faded pastel rainbow stripe peel and stick wallpaper, wipeable and renter-removable"
+      }
     ]
   },
   "seo": {
@@ -123,19 +153,317 @@
       "peel and stick wallpaper renters",
       "wallpaper for renters",
       "best wallpaper renters",
-      "removable wallpaper rental"
+      "wallpaper renters"
     ],
     "canonicalUrl": "https://your-store.myshopify.com/blogs/seo-plp/en-us-peel-and-stick-wallpaper-renters",
     "hreflang": [
-      { "locale": "en-US", "url": "https://your-store.myshopify.com/blogs/seo-plp/en-us-peel-and-stick-wallpaper-renters" }
+      {
+        "locale": "en-US",
+        "url": "https://your-store.myshopify.com/blogs/seo-plp/en-us-peel-and-stick-wallpaper-renters"
+      }
     ],
     "jsonLd": [
-      { "@type": "CollectionPage", "_note": "CollectionPage + ItemList with the 8 products above, real prices/URLs" },
-      { "@type": "FAQPage", "_note": "One Question/Answer node per FAQ entry above" },
-      { "@type": "BreadcrumbList", "_note": "Home → Inspiration → this page" }
+      {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "@id": "https://your-store.myshopify.com/blogs/seo-plp/en-us-peel-and-stick-wallpaper-renters",
+        "url": "https://your-store.myshopify.com/blogs/seo-plp/en-us-peel-and-stick-wallpaper-renters",
+        "name": "Peel and Stick Wallpaper for Renters",
+        "description": "8 deposit-safe peel and stick wallpapers that remove clean on moving day. Honest wall-prep advice, a step-by-step guide, rolls from $52.",
+        "inLanguage": "en-US",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Wild Palace",
+          "url": "https://your-store.myshopify.com"
+        },
+        "mainEntity": {
+          "@type": "ItemList",
+          "numberOfItems": 8,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "item": {
+                "@type": "Product",
+                "name": "Sleepy Clouds",
+                "url": "https://your-store.myshopify.com/products/sleepy-clouds",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/sleepy-clouds/900/1200.jpg",
+                  "description": "Powder blue cloud peel and stick wallpaper for a rented nursery, fully removable"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "54.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/sleepy-clouds"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "item": {
+                "@type": "Product",
+                "name": "Rainbow Stripes",
+                "url": "https://your-store.myshopify.com/products/rainbow-stripes",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/rainbow-stripes/900/1200.jpg",
+                  "description": "Faded pastel rainbow stripe peel and stick wallpaper, wipeable and renter-removable"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "52.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/rainbow-stripes"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "item": {
+                "@type": "Product",
+                "name": "Monstera Line Art",
+                "url": "https://your-store.myshopify.com/products/monstera-line-art",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/monstera-line-art/900/1200.jpg",
+                  "description": "Removable monstera line-art peel and stick wallpaper, ideal accent wall for renters"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "64.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/monstera-line-art"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "item": {
+                "@type": "Product",
+                "name": "Trailing Ivy",
+                "url": "https://your-store.myshopify.com/products/trailing-ivy",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/trailing-ivy/900/1200.jpg",
+                  "description": "Trailing ivy peel and stick wallpaper panel being applied to a rented apartment wall"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "58.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/trailing-ivy"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 5,
+              "item": {
+                "@type": "Product",
+                "name": "Cherry Blossom Mist",
+                "url": "https://your-store.myshopify.com/products/cherry-blossom-mist",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/cherry-blossom-mist/900/1200.jpg",
+                  "description": "Pale pink cherry blossom peel and stick wallpaper, a deposit-safe bedroom accent"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "62.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/cherry-blossom-mist"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 6,
+              "item": {
+                "@type": "Product",
+                "name": "Paradise Parrots",
+                "url": "https://your-store.myshopify.com/products/paradise-parrots",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/paradise-parrots/900/1200.jpg",
+                  "description": "Bright parrot peel and stick wallpaper that removes cleanly from rental kids' rooms"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "60.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/paradise-parrots"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 7,
+              "item": {
+                "@type": "Product",
+                "name": "Scandi Triangles",
+                "url": "https://your-store.myshopify.com/products/scandi-triangles",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/scandi-triangles/900/1200.jpg",
+                  "description": "Pastel Scandi triangle peel and stick wallpaper, forgiving pattern for uneven rental walls"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "56.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/scandi-triangles"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 8,
+              "item": {
+                "@type": "Product",
+                "name": "Safari Parade",
+                "url": "https://your-store.myshopify.com/products/safari-parade",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/safari-parade/900/1200.jpg",
+                  "description": "Sandy safari animal peel and stick wallpaper, tenancy-safe decor for kids' rooms"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "58.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/safari-parade"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "inLanguage": "en-US",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Will peel and stick wallpaper damage my rental's walls or cost me my deposit?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Peel and stick wallpaper removes cleanly from sound, fully cured painted walls without residue, which is why it's the standard recommendation for renters protecting a deposit. The real risk is the wall itself: flaking paint, unprimed patches or paint applied in the last month can lift during removal. Test one strip in a hidden spot for 48 hours before papering a whole wall, and remove panels slowly at a sharp angle on moving day."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does peel and stick wallpaper last on a wall?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Quality peel and stick wallpaper stays flat and adhered for years — comfortably the length of a multi-year tenancy — provided the wall was clean and the paint sound at application. The common failure mode isn't age but bad prep: dust or cleaning-product residue under the panel makes corners lift within weeks. Kitchens and bathrooms with heavy steam shorten its life; in living rooms and bedrooms, expect it to outlast your lease."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I reuse peel and stick wallpaper in my next apartment?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, peel and stick wallpaper can usually be reused if you remove it patiently: peel each panel back on itself slowly, keep dust off the adhesive side, and roll panels around a tube rather than folding them. Expect slightly reduced tack on second application — fine for a smooth wall, less reliable in humid rooms. Panels trimmed tightly around sockets survive the move better if you tucked rather than cut them."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does peel and stick wallpaper work on textured or bumpy walls?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Peel and stick wallpaper works on lightly textured walls — fine orange-peel texture disappears under most patterns — but it will not grip properly on heavy texture, woodchip, or existing wallpaper. Adhesive needs continuous contact with the surface; on pronounced texture it only touches the high points and edges lift within days. If a strip of masking tape sticks firmly to your wall overnight, peel and stick will hold too."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What's the difference between peel and stick and traditional wallpaper for a rental?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Peel and stick wallpaper is self-adhesive, repositionable and removable without water or chemicals, making it the rental-safe option; traditional pasted wallpaper bonds to the wall and needs scoring, soaking and scraping to remove, which almost always damages paint and forfeits deposits. The trade-off is that pasted non-woven papers offer larger formats and a flatter, more furniture-like finish — the right choice only when the wall is yours."
+            }
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://your-store.myshopify.com"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Inspiration",
+            "item": "https://your-store.myshopify.com/blogs/seo-plp"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Peel and Stick Wallpaper for Renters",
+            "item": "https://your-store.myshopify.com/blogs/seo-plp/en-us-peel-and-stick-wallpaper-renters"
+          }
+        ]
+      }
     ],
     "internalLinks": [
-      { "title": "Botanical Wallpaper for Living Rooms", "slug": "en-us-botanical-wallpaper-living-room", "sharedFacets": ["material:peel and stick"] }
+      {
+        "title": "Peel and Stick Wallpaper for Kids' Rooms",
+        "slug": "en-us-peel-and-stick-wallpaper-kids-room",
+        "url": "https://your-store.myshopify.com/blogs/seo-plp/en-us-peel-and-stick-wallpaper-kids-room",
+        "sharedFacets": [
+          "material:peel and stick"
+        ]
+      }
     ],
     "noindex": false
   }

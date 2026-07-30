@@ -19,18 +19,19 @@
     "method": "rules"
   },
   "matched_products": {
-    "count": 9,
+    "count": 10,
     "threshold": 6,
     "handles": [
-      "emerald-palm-canopy",
-      "fern-study",
       "wild-meadow",
-      "midnight-jungle",
-      "eucalyptus-drift",
       "monstera-line-art",
       "botanical-sketchbook",
+      "emerald-palm-canopy",
+      "fern-study",
+      "midnight-jungle",
+      "eucalyptus-drift",
       "trailing-ivy",
-      "silk-garden-birds"
+      "silk-garden-birds",
+      "banana-leaf-breeze"
     ]
   },
   "content": {
@@ -82,24 +83,8 @@
     },
     "product_alt_texts": [
       {
-        "product_id": "emerald-palm-canopy",
-        "alt_text": "Emerald green palm leaf wallpaper on a living room feature wall behind a linen sofa"
-      },
-      {
-        "product_id": "fern-study",
-        "alt_text": "Hand-drawn fern botanical wallpaper in forest green, styled in a bright living room"
-      },
-      {
         "product_id": "wild-meadow",
         "alt_text": "Soft sage meadow grass wallpaper giving a living room an airy botanical backdrop"
-      },
-      {
-        "product_id": "midnight-jungle",
-        "alt_text": "Dark botanical jungle wallpaper with near-black foliage for a moody living room wall"
-      },
-      {
-        "product_id": "eucalyptus-drift",
-        "alt_text": "Grey-green eucalyptus sprig wallpaper bringing calm botanical colour to a living room"
       },
       {
         "product_id": "monstera-line-art",
@@ -110,12 +95,32 @@
         "alt_text": "Vintage botanical sketch wallpaper with Latin plant names on ivory, living room styling"
       },
       {
+        "product_id": "emerald-palm-canopy",
+        "alt_text": "Emerald green palm leaf wallpaper on a living room feature wall behind a linen sofa"
+      },
+      {
+        "product_id": "fern-study",
+        "alt_text": "Hand-drawn fern botanical wallpaper in forest green, styled in a bright living room"
+      },
+      {
+        "product_id": "midnight-jungle",
+        "alt_text": "Dark botanical jungle wallpaper with near-black foliage for a moody living room wall"
+      },
+      {
+        "product_id": "eucalyptus-drift",
+        "alt_text": "Grey-green eucalyptus sprig wallpaper bringing calm botanical colour to a living room"
+      },
+      {
         "product_id": "trailing-ivy",
         "alt_text": "Peel and stick trailing ivy wallpaper adding removable botanical charm to a living room"
       },
       {
         "product_id": "silk-garden-birds",
         "alt_text": "Chinoiserie songbird and flowering branch wallpaper on duck-egg blue in a living room"
+      },
+      {
+        "product_id": "banana-leaf-breeze",
+        "alt_text": "Loose banana leaf wallpaper in fresh mid-greens, a relaxed botanical for living room walls"
       }
     ]
   },
@@ -141,22 +146,352 @@
     ],
     "jsonLd": [
       {
+        "@context": "https://schema.org",
         "@type": "CollectionPage",
-        "_note": "Full CollectionPage + ItemList/ListItem per product with real prices and URLs — assembled deterministically in code, see app/services/seo/json-ld.server.ts"
+        "@id": "https://your-store.myshopify.com/blogs/seo-plp/en-us-botanical-wallpaper-living-room",
+        "url": "https://your-store.myshopify.com/blogs/seo-plp/en-us-botanical-wallpaper-living-room",
+        "name": "Botanical Wallpaper for Living Rooms",
+        "description": "Shop 9 botanical living room wallpapers, from airy sage meadows to midnight jungles. Pattern-scale advice, samples first, rolls from $58.",
+        "inLanguage": "en-US",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Wild Palace",
+          "url": "https://your-store.myshopify.com"
+        },
+        "mainEntity": {
+          "@type": "ItemList",
+          "numberOfItems": 10,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "item": {
+                "@type": "Product",
+                "name": "Wild Meadow",
+                "url": "https://your-store.myshopify.com/products/wild-meadow",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/wild-meadow/900/1200.jpg",
+                  "description": "Soft sage meadow grass wallpaper giving a living room an airy botanical backdrop"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "76.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/wild-meadow"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "item": {
+                "@type": "Product",
+                "name": "Monstera Line Art",
+                "url": "https://your-store.myshopify.com/products/monstera-line-art",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/monstera-line-art/900/1200.jpg",
+                  "description": "Minimalist terracotta monstera line-art wallpaper, a subtle botanical for living rooms"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "64.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/monstera-line-art"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "item": {
+                "@type": "Product",
+                "name": "Botanical Sketchbook",
+                "url": "https://your-store.myshopify.com/products/botanical-sketchbook",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/botanical-sketchbook/900/1200.jpg",
+                  "description": "Vintage botanical sketch wallpaper with Latin plant names on ivory, living room styling"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "79.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/botanical-sketchbook"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "item": {
+                "@type": "Product",
+                "name": "Emerald Palm Canopy",
+                "url": "https://your-store.myshopify.com/products/emerald-palm-canopy",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/emerald-palm-canopy/900/1200.jpg",
+                  "description": "Emerald green palm leaf wallpaper on a living room feature wall behind a linen sofa"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "98.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/emerald-palm-canopy"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 5,
+              "item": {
+                "@type": "Product",
+                "name": "Fern Study",
+                "url": "https://your-store.myshopify.com/products/fern-study",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/fern-study/900/1200.jpg",
+                  "description": "Hand-drawn fern botanical wallpaper in forest green, styled in a bright living room"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "89.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/fern-study"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 6,
+              "item": {
+                "@type": "Product",
+                "name": "Midnight Jungle",
+                "url": "https://your-store.myshopify.com/products/midnight-jungle",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/midnight-jungle/900/1200.jpg",
+                  "description": "Dark botanical jungle wallpaper with near-black foliage for a moody living room wall"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "104.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/midnight-jungle"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 7,
+              "item": {
+                "@type": "Product",
+                "name": "Eucalyptus Drift",
+                "url": "https://your-store.myshopify.com/products/eucalyptus-drift",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/eucalyptus-drift/900/1200.jpg",
+                  "description": "Grey-green eucalyptus sprig wallpaper bringing calm botanical colour to a living room"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "85.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/eucalyptus-drift"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 8,
+              "item": {
+                "@type": "Product",
+                "name": "Trailing Ivy",
+                "url": "https://your-store.myshopify.com/products/trailing-ivy",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/trailing-ivy/900/1200.jpg",
+                  "description": "Peel and stick trailing ivy wallpaper adding removable botanical charm to a living room"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "58.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/trailing-ivy"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 9,
+              "item": {
+                "@type": "Product",
+                "name": "Silk Garden Birds",
+                "url": "https://your-store.myshopify.com/products/silk-garden-birds",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/silk-garden-birds/900/1200.jpg",
+                  "description": "Chinoiserie songbird and flowering branch wallpaper on duck-egg blue in a living room"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "124.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/silk-garden-birds"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 10,
+              "item": {
+                "@type": "Product",
+                "name": "Banana Leaf Breeze",
+                "url": "https://your-store.myshopify.com/products/banana-leaf-breeze",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/banana-leaf-breeze/900/1200.jpg",
+                  "description": "Loose banana leaf wallpaper in fresh mid-greens, a relaxed botanical for living room walls"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "90.00",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/banana-leaf-breeze"
+                }
+              }
+            }
+          ]
+        }
       },
       {
+        "@context": "https://schema.org",
         "@type": "FAQPage",
-        "_note": "One Question/Answer node per FAQ entry above"
+        "inLanguage": "en-US",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Which botanical wallpaper works best in a small living room?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In a small living room, small-scale, light-ground botanical wallpapers work best: designs like Wild Meadow (sage grasses on off-white) or Eucalyptus Drift (grey-green sprigs on chalk white) add greenery without shrinking the space. Large dark designs need viewing distance; below roughly 2.5 metres of sightline they read as texture rather than pattern, so save enveloping papers like Midnight Jungle for bigger rooms or single alcoves."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is dark botanical wallpaper a mistake in a living room?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Dark botanical wallpaper is not a mistake in a living room if the room has either good natural light or deliberate evening lighting. A near-black design such as Midnight Jungle looks dramatic and layered behind lamplight and becomes the room's identity after dusk. It is a mistake in small north-facing rooms with a single ceiling light, where dark foliage flattens into a shadowy mass — choose a mid-green like Emerald Palm Canopy there instead."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How many rolls of wallpaper do I need for one living room feature wall?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For a typical living room feature wall of about 12 ft × 8 ft (3.6 m × 2.4 m), you need three standard 20.9 in × 33 ft rolls of wallpaper, because each roll yields three full-height drops at that ceiling height. Large pattern repeats reduce usable drops per roll, so for designs with a repeat over 60 cm — like Emerald Palm Canopy — order a fourth roll to cover pattern matching and trimming waste."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I hang botanical wallpaper myself or do I need a decorator?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You can hang most botanical wallpaper on this page yourself: non-woven, paste-the-wall papers like Fern Study and Eucalyptus Drift are the most DIY-friendly format, needing only wall paste, a brush, a plumb line and a sharp blade. Book a decorator for walls with tricky features (chimney breasts, coving, many sockets) or for large-repeat designs where mismatched seams would be conspicuous across a wide, uninterrupted wall."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you offer samples of botanical wallpaper before buying full rolls?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes — every botanical wallpaper in the Wild Palace range can be ordered as a physical sample swatch shipped to your door before you commit to full rolls. Tape the sample to the living room wall you plan to paper and look at it at morning, afternoon and lamplight hours; greens shift more than any other colour family with light direction, and a two-day sample test prevents an expensive wrong call."
+            }
+          }
+        ]
       },
       {
+        "@context": "https://schema.org",
         "@type": "BreadcrumbList",
-        "_note": "Home → Inspiration → this page"
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://your-store.myshopify.com"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Inspiration",
+            "item": "https://your-store.myshopify.com/blogs/seo-plp"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Botanical Wallpaper for Living Rooms",
+            "item": "https://your-store.myshopify.com/blogs/seo-plp/en-us-botanical-wallpaper-living-room"
+          }
+        ]
       }
     ],
     "internalLinks": [
       {
         "title": "Botanical Wallpaper for Bedrooms",
         "slug": "en-us-botanical-wallpaper-bedroom",
+        "url": "https://your-store.myshopify.com/blogs/seo-plp/en-us-botanical-wallpaper-bedroom",
         "sharedFacets": [
           "style:botanical"
         ]
@@ -164,6 +499,7 @@
       {
         "title": "Tropical Wallpaper for Living Rooms",
         "slug": "en-us-tropical-wallpaper-living-room",
+        "url": "https://your-store.myshopify.com/blogs/seo-plp/en-us-tropical-wallpaper-living-room",
         "sharedFacets": [
           "room:living room"
         ]

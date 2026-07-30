@@ -19,18 +19,19 @@
     "method": "rules"
   },
   "matched_products": {
-    "count": 9,
+    "count": 10,
     "threshold": 6,
     "handles": [
-      "emerald-palm-canopy",
-      "fern-study",
       "wild-meadow",
-      "midnight-jungle",
-      "eucalyptus-drift",
       "monstera-line-art",
       "botanical-sketchbook",
+      "emerald-palm-canopy",
+      "fern-study",
+      "midnight-jungle",
+      "eucalyptus-drift",
       "trailing-ivy",
-      "silk-garden-birds"
+      "silk-garden-birds",
+      "banana-leaf-breeze"
     ]
   },
   "content": {
@@ -82,24 +83,8 @@
     },
     "product_alt_texts": [
       {
-        "product_id": "emerald-palm-canopy",
-        "alt_text": "Smaragdgrüne Palmenblatt-Tapete an einer Wohnzimmer-Akzentwand hinter einem Leinensofa"
-      },
-      {
-        "product_id": "fern-study",
-        "alt_text": "Handgezeichnete Farn-Tapete in Waldgrün, botanischer Look für helle Wohnzimmer"
-      },
-      {
         "product_id": "wild-meadow",
         "alt_text": "Zarte Wiesengras-Tapete in Salbeigrün als luftiger botanischer Hintergrund im Wohnzimmer"
-      },
-      {
-        "product_id": "midnight-jungle",
-        "alt_text": "Dunkle Dschungel-Tapete mit fast schwarzem Blattwerk für eine dramatische Wohnzimmerwand"
-      },
-      {
-        "product_id": "eucalyptus-drift",
-        "alt_text": "Graugrüne Eukalyptus-Tapete bringt ruhige botanische Farbe ins Wohnzimmer"
       },
       {
         "product_id": "monstera-line-art",
@@ -110,12 +95,32 @@
         "alt_text": "Vintage-Tapete mit botanischen Skizzen und lateinischen Pflanzennamen auf Elfenbein"
       },
       {
+        "product_id": "emerald-palm-canopy",
+        "alt_text": "Smaragdgrüne Palmenblatt-Tapete an einer Wohnzimmer-Akzentwand hinter einem Leinensofa"
+      },
+      {
+        "product_id": "fern-study",
+        "alt_text": "Handgezeichnete Farn-Tapete in Waldgrün, botanischer Look für helle Wohnzimmer"
+      },
+      {
+        "product_id": "midnight-jungle",
+        "alt_text": "Dunkle Dschungel-Tapete mit fast schwarzem Blattwerk für eine dramatische Wohnzimmerwand"
+      },
+      {
+        "product_id": "eucalyptus-drift",
+        "alt_text": "Graugrüne Eukalyptus-Tapete bringt ruhige botanische Farbe ins Wohnzimmer"
+      },
+      {
         "product_id": "trailing-ivy",
         "alt_text": "Selbstklebende Efeuranken-Tapete, rückstandslos ablösbar — ideal für Mietwohnungen"
       },
       {
         "product_id": "silk-garden-birds",
         "alt_text": "Chinoiserie-Tapete mit Singvögeln und Blütenzweigen auf Entenei-Blau im Wohnzimmer"
+      },
+      {
+        "product_id": "banana-leaf-breeze",
+        "alt_text": "Locker gezeichnete Bananenblatt-Tapete in frischen Mittelgrüntönen, entspannt botanisch fürs Wohnzimmer"
       }
     ]
   },
@@ -123,35 +128,363 @@
     "metaTitle": "Botanische Tapete fürs Wohnzimmer | Wild Palace",
     "metaDescription": "9 botanische Wohnzimmer-Tapeten: von luftigen Gräsern bis zum Mitternachtsdschungel. Mit Rapport-Beratung, Musterservice, Rollen ab 58 €.",
     "keywords": [
-      "botanische tapete wohnzimmer",
-      "botanische wohnzimmer tapete",
-      "tapete wohnzimmer botanisch",
-      "beste botanische tapete wohnzimmer"
+      "botanische wallpaper wohnzimmer",
+      "botanische wohnzimmer wallpaper",
+      "botanische wallpaper ideas wohnzimmer",
+      "best botanische wallpaper for wohnzimmer"
     ],
     "canonicalUrl": "https://your-store.myshopify.com/blogs/seo-plp/de-de-botanische-tapete-wohnzimmer",
-    "_canonical_note": "Self-referencing. This de-DE page shares an intent cluster with the en-US page, but a different-language variant is not a near-duplicate: canonicalising it onto the English URL would tell Google not to index the German page at all, forfeiting the German market. The two are paired by hreflang instead. Canonical consolidation applies only between same-language markets (en-US and en-AU), where the copy genuinely overlaps enough to compete.",
     "hreflang": [
-      {
-        "locale": "en-US",
-        "url": "https://your-store.myshopify.com/blogs/seo-plp/en-us-botanical-wallpaper-living-room"
-      },
       {
         "locale": "de-DE",
         "url": "https://your-store.myshopify.com/blogs/seo-plp/de-de-botanische-tapete-wohnzimmer"
+      },
+      {
+        "locale": "en-US",
+        "url": "https://your-store.myshopify.com/blogs/seo-plp/en-us-botanical-wallpaper-living-room"
       }
     ],
     "jsonLd": [
       {
+        "@context": "https://schema.org",
         "@type": "CollectionPage",
-        "_note": "inLanguage de-DE; ItemList with the 8 products, prices in store currency (see README currency note)"
+        "@id": "https://your-store.myshopify.com/blogs/seo-plp/de-de-botanische-tapete-wohnzimmer",
+        "url": "https://your-store.myshopify.com/blogs/seo-plp/de-de-botanische-tapete-wohnzimmer",
+        "name": "Botanische Tapete fürs Wohnzimmer",
+        "description": "9 botanische Wohnzimmer-Tapeten: von luftigen Gräsern bis zum Mitternachtsdschungel. Mit Rapport-Beratung, Musterservice, Rollen ab 58 €.",
+        "inLanguage": "de-DE",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Wild Palace",
+          "url": "https://your-store.myshopify.com"
+        },
+        "mainEntity": {
+          "@type": "ItemList",
+          "numberOfItems": 10,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "item": {
+                "@type": "Product",
+                "name": "Wild Meadow",
+                "url": "https://your-store.myshopify.com/products/wild-meadow",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/wild-meadow/900/1200.jpg",
+                  "description": "Zarte Wiesengras-Tapete in Salbeigrün als luftiger botanischer Hintergrund im Wohnzimmer"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "71.44",
+                  "priceCurrency": "EUR",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/wild-meadow"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "item": {
+                "@type": "Product",
+                "name": "Monstera Line Art",
+                "url": "https://your-store.myshopify.com/products/monstera-line-art",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/monstera-line-art/900/1200.jpg",
+                  "description": "Minimalistische Monstera-Tapete in Terrakotta-Linien, dezente Botanik fürs Wohnzimmer"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "60.16",
+                  "priceCurrency": "EUR",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/monstera-line-art"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "item": {
+                "@type": "Product",
+                "name": "Botanical Sketchbook",
+                "url": "https://your-store.myshopify.com/products/botanical-sketchbook",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/botanical-sketchbook/900/1200.jpg",
+                  "description": "Vintage-Tapete mit botanischen Skizzen und lateinischen Pflanzennamen auf Elfenbein"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "74.26",
+                  "priceCurrency": "EUR",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/botanical-sketchbook"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "item": {
+                "@type": "Product",
+                "name": "Emerald Palm Canopy",
+                "url": "https://your-store.myshopify.com/products/emerald-palm-canopy",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/emerald-palm-canopy/900/1200.jpg",
+                  "description": "Smaragdgrüne Palmenblatt-Tapete an einer Wohnzimmer-Akzentwand hinter einem Leinensofa"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "92.12",
+                  "priceCurrency": "EUR",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/emerald-palm-canopy"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 5,
+              "item": {
+                "@type": "Product",
+                "name": "Fern Study",
+                "url": "https://your-store.myshopify.com/products/fern-study",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/fern-study/900/1200.jpg",
+                  "description": "Handgezeichnete Farn-Tapete in Waldgrün, botanischer Look für helle Wohnzimmer"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "83.66",
+                  "priceCurrency": "EUR",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/fern-study"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 6,
+              "item": {
+                "@type": "Product",
+                "name": "Midnight Jungle",
+                "url": "https://your-store.myshopify.com/products/midnight-jungle",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/midnight-jungle/900/1200.jpg",
+                  "description": "Dunkle Dschungel-Tapete mit fast schwarzem Blattwerk für eine dramatische Wohnzimmerwand"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "97.76",
+                  "priceCurrency": "EUR",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/midnight-jungle"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 7,
+              "item": {
+                "@type": "Product",
+                "name": "Eucalyptus Drift",
+                "url": "https://your-store.myshopify.com/products/eucalyptus-drift",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/eucalyptus-drift/900/1200.jpg",
+                  "description": "Graugrüne Eukalyptus-Tapete bringt ruhige botanische Farbe ins Wohnzimmer"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "79.90",
+                  "priceCurrency": "EUR",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/eucalyptus-drift"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 8,
+              "item": {
+                "@type": "Product",
+                "name": "Trailing Ivy",
+                "url": "https://your-store.myshopify.com/products/trailing-ivy",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/trailing-ivy/900/1200.jpg",
+                  "description": "Selbstklebende Efeuranken-Tapete, rückstandslos ablösbar — ideal für Mietwohnungen"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "54.52",
+                  "priceCurrency": "EUR",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/trailing-ivy"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 9,
+              "item": {
+                "@type": "Product",
+                "name": "Silk Garden Birds",
+                "url": "https://your-store.myshopify.com/products/silk-garden-birds",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/silk-garden-birds/900/1200.jpg",
+                  "description": "Chinoiserie-Tapete mit Singvögeln und Blütenzweigen auf Entenei-Blau im Wohnzimmer"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "116.56",
+                  "priceCurrency": "EUR",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/silk-garden-birds"
+                }
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 10,
+              "item": {
+                "@type": "Product",
+                "name": "Banana Leaf Breeze",
+                "url": "https://your-store.myshopify.com/products/banana-leaf-breeze",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://picsum.photos/seed/banana-leaf-breeze/900/1200.jpg",
+                  "description": "Locker gezeichnete Bananenblatt-Tapete in frischen Mittelgrüntönen, entspannt botanisch fürs Wohnzimmer"
+                },
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Wild Palace"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "84.60",
+                  "priceCurrency": "EUR",
+                  "availability": "https://schema.org/InStock",
+                  "url": "https://your-store.myshopify.com/products/banana-leaf-breeze"
+                }
+              }
+            }
+          ]
+        }
       },
       {
+        "@context": "https://schema.org",
         "@type": "FAQPage",
-        "_note": "German Question/Answer nodes from the FAQ above"
+        "inLanguage": "de-DE",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Welche botanische Tapete eignet sich für ein kleines Wohnzimmer?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Für kleine Wohnzimmer eignen sich kleinteilige botanische Tapeten auf hellem Grund am besten: Designs wie Wild Meadow (Wiesengräser in Salbeigrün auf Cremeweiß) oder Eucalyptus Drift (graugrüne Zweige auf Kalkweiß) bringen Grün in den Raum, ohne ihn optisch zu verkleinern. Großformatige dunkle Muster brauchen Betrachtungsabstand — unter etwa zweieinhalb Metern Sichtachse wirken sie als dunkle Fläche statt als Muster und gehören eher in große Räume."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Ist eine dunkle botanische Tapete im Wohnzimmer ein Fehler?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Eine dunkle botanische Tapete ist im Wohnzimmer kein Fehler, wenn der Raum entweder gutes Tageslicht oder eine bewusst gesetzte Abendbeleuchtung hat. Ein fast schwarzes Design wie Midnight Jungle wirkt hinter Lampenlicht dramatisch und tief gestaffelt und wird nach Einbruch der Dunkelheit zur Identität des Raums. In kleinen Nordzimmern mit einer einzelnen Deckenleuchte verflacht dunkles Blattwerk dagegen zur Schattenmasse — dort ist ein mittleres Grün wie Emerald Palm Canopy die bessere Wahl."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Wie viele Rollen Tapete brauche ich für eine Wohnzimmer-Akzentwand?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Für eine typische Akzentwand von 3,6 m Breite und 2,4 m Höhe benötigen Sie drei Standardrollen (53 cm × 10,05 m), denn jede Rolle ergibt bei dieser Deckenhöhe drei volle Bahnen. Große Rapporte verringern die nutzbaren Bahnen pro Rolle: Bei Designs mit über 60 cm Musterversatz — etwa Emerald Palm Canopy — planen Sie eine vierte Rolle für Anschluss und Verschnitt ein. Im Altbau mit 3 m Deckenhöhe liefert eine Rolle nur noch zwei volle Bahnen."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Kann ich eine Vliestapete selbst anbringen oder brauche ich einen Maler?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Eine Vliestapete können Sie in der Regel selbst anbringen: Bei der Wandklebetechnik kommt der Tapetenkleister direkt auf die Wand, die Bahn wird trocken eingelegt — nötig sind nur Kleister, Bürste, Lot und ein scharfes Cuttermesser, eine Weichzeit entfällt. Einen Maler lohnt es bei schwierigen Wänden (Erker, Stuck, viele Steckdosen), auf Raufaser-Untergrund, der erst entfernt werden sollte, oder bei großen Rapporten, deren Stöße über eine breite freie Wand hinweg exakt sitzen müssen."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Gibt es Musterstücke der botanischen Tapeten vor dem Kauf ganzer Rollen?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ja — jede botanische Tapete von Wild Palace können Sie vor dem Rollenkauf als Musterstück bestellen. Kleben Sie das Muster an die Wohnzimmerwand, die tapeziert werden soll, und beurteilen Sie es morgens, nachmittags und bei Lampenlicht: Grüntöne verschieben sich stärker mit der Lichtrichtung als jede andere Farbfamilie. Zwei Tage Mustertest kosten nichts — eine Fehlentscheidung bei Rollen ab 58 € pro Stück dagegen schon."
+            }
+          }
+        ]
       },
       {
+        "@context": "https://schema.org",
         "@type": "BreadcrumbList",
-        "_note": "Home → Inspiration → diese Seite"
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://your-store.myshopify.com"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Inspiration",
+            "item": "https://your-store.myshopify.com/blogs/seo-plp"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Botanische Tapete fürs Wohnzimmer",
+            "item": "https://your-store.myshopify.com/blogs/seo-plp/de-de-botanische-tapete-wohnzimmer"
+          }
+        ]
       }
     ],
     "internalLinks": [],
