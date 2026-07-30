@@ -2,6 +2,7 @@ import { getLocale, getPageType } from "../../config/index.server";
 import { truncate } from "../../lib/text";
 import { AiOutputInvalidError } from "../ai/json-client.server";
 import { fetchCatalog } from "../catalog/products.server";
+import { priceForMarket } from "../catalog/pricing.server";
 import type { CatalogProduct } from "../catalog/types";
 import { generatePlpContent } from "../generation/generate.server";
 import { buildLexicon } from "../intent/lexicon.server";
@@ -102,6 +103,7 @@ export async function generatePageForKeyword(
       ));
 
     const outcome = await runPipeline(
+      admin,
       shop,
       keyword.id,
       intent,
@@ -152,10 +154,16 @@ export async function regeneratePage(
   const settings = await getSettings(shop);
   const catalog = await fetchCatalog(admin);
   const included = new Set(page.productIds);
-  const products = catalog.filter((product) => included.has(product.id));
   const pageType = getPageType(page.pageTypeId);
   const locale = getLocale(page.locale);
   const allPages = await listPages(shop);
+  // Priced for this page's market, so the prompt, the rendered body and the
+  // JSON-LD Offer all quote the same currency.
+  const products = await priceForMarket(
+    admin,
+    catalog.filter((product) => included.has(product.id)),
+    locale,
+  );
 
   const generation = await generatePlpContent({
     pageType,
@@ -274,6 +282,7 @@ export async function applyProductSelection(
 }
 
 async function runPipeline(
+  admin: AdminClient,
   shop: string,
   keywordId: string,
   intent: IntentProfile,
@@ -347,6 +356,10 @@ async function runPipeline(
     );
     products = [...ranked, ...additions];
   }
+
+  // Priced for this page's market before anything reads a price, so the
+  // prompt, the rendered body and the JSON-LD Offer cannot disagree.
+  products = await priceForMarket(admin, products, locale);
 
   // Canonical consolidation, decided by language rather than by locale:
   // same-language markets compete and consolidate, different languages are

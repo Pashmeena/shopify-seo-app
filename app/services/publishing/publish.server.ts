@@ -1,4 +1,5 @@
 import { fetchCatalogById } from "../catalog/products.server";
+import { priceForMarket } from "../catalog/pricing.server";
 import type { CatalogProduct } from "../catalog/types";
 import { getLocale, getPageType } from "../../config/index.server";
 import { resolveMeta } from "../seo/meta.server";
@@ -22,13 +23,20 @@ import { renderArticleHtml } from "./render-html.server";
 
 export class PublishBlockedError extends Error {}
 
-function resolveProducts(
+/**
+ * The page's products, priced for the page's own market. Every caller here
+ * goes through this, so a published article and its JSON-LD always quote the
+ * same currency the copy was written in.
+ */
+async function resolveProducts(
+  admin: AdminClient,
   page: PageRecord,
   catalogById: Map<string, CatalogProduct>,
-): CatalogProduct[] {
-  return page.productIds
+): Promise<CatalogProduct[]> {
+  const products = page.productIds
     .map((id) => catalogById.get(id))
     .filter((product): product is CatalogProduct => Boolean(product));
+  return priceForMarket(admin, products, getLocale(page.locale));
 }
 
 /** Rebuild a page's SEO payload against current published state. */
@@ -87,7 +95,7 @@ export async function publishPage(
 
   const storedSettings = await getSettings(shop);
   const catalogById = await fetchCatalogById(admin);
-  const products = resolveProducts(page, catalogById);
+  const products = await resolveProducts(admin, page, catalogById);
   const blog = await ensureBlog(admin, storedSettings.blogHandle);
   // Shopify normalizes handles server-side — all URLs must be built from
   // the handle the blog actually has, not the raw setting.
@@ -217,7 +225,7 @@ async function refreshAffectedPages(
   const allPages = await listPages(shop);
 
   for (const page of affectedByPublish(allPages, justPublished)) {
-    const products = resolveProducts(page, catalogById);
+    const products = await resolveProducts(admin, page, catalogById);
     const seo = rebuildSeo(shop, settings, page, products, allPages);
     if (JSON.stringify(seo) === JSON.stringify(page.seo)) continue;
 

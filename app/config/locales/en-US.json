@@ -5,6 +5,7 @@
   "languageName": "English",
   "market": "United States",
   "currency": "USD",
+  "country": "US",
   "measurementSystem": "imperial",
   "slugPrefix": "en-us",
   "hreflang": "en-US",

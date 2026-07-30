@@ -5,6 +5,7 @@
   "languageName": "German",
   "market": "Germany",
   "currency": "EUR",
+  "country": "DE",
   "measurementSystem": "metric",
   "slugPrefix": "de-de",
   "hreflang": "de-DE",

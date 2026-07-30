@@ -64,6 +64,11 @@ export interface LocaleConfig {
   languageName: string;
   market: string;
   currency: string;
+  /**
+   * ISO 3166-1 alpha-2 country, used to resolve Shopify Markets
+   * contextual pricing so schema markup carries the market currency.
+   */
+  country: string;
   measurementSystem: "imperial" | "metric";
   /** Prefixed onto slugs/handles, e.g. `de-de-botanische-tapete-wohnzimmer`. */
   slugPrefix: string;

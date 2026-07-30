@@ -5,6 +5,7 @@
   "languageName": "English",
   "market": "Australia",
   "currency": "AUD",
+  "country": "AU",
   "measurementSystem": "metric",
   "slugPrefix": "en-au",
   "hreflang": "en-AU",

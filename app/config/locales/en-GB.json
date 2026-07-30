@@ -5,6 +5,7 @@
   "languageName": "English",
   "market": "United Kingdom",
   "currency": "GBP",
+  "country": "GB",
   "measurementSystem": "metric",
   "slugPrefix": "en-gb",
   "hreflang": "en-GB",

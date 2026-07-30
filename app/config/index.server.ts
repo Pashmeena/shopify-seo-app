@@ -35,6 +35,10 @@ function validateLocale(config: LocaleConfig, file: string): LocaleConfig {
   assert(config.promptContext, `${config.code} is missing "promptContext"`);
   assert(config.currency, `${config.code} is missing "currency"`);
   assert(
+    /^[A-Z]{2}$/.test(config.country ?? ""),
+    `${config.code} needs a two-letter uppercase "country" (ISO 3166-1 alpha-2)`,
+  );
+  assert(
     config.measurementSystem === "imperial" || config.measurementSystem === "metric",
     `${config.code} measurementSystem must be "imperial" or "metric"`,
   );
