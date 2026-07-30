@@ -18,6 +18,17 @@ use_legacy_install_flow = false
 automatically_update_urls_on_dev = true
 include_config_on_deploy = true
 
+# Serves llms.txt and sitemap-ai.xml from the store's own domain:
+#   https://<store>/apps/seo/llms.txt
+#   https://<store>/apps/seo/sitemap-ai.xml
+# Shopify signs proxied requests, so the handlers authenticate the shop rather
+# than accepting it as a query parameter. An app cannot own the true store
+# root (/llms.txt) — see the README for what a merchant does about that.
+[app_proxy]
+url = "https://example.com/proxy"
+subpath = "seo"
+prefix = "apps"
+
 [webhooks]
 api_version = "2026-07"
 

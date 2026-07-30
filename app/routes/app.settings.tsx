@@ -318,24 +318,44 @@ export default function Settings() {
                   <Text as="h2" variant="headingMd">
                     AI presence files
                   </Text>
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    Live on your own domain, via App Proxy. These are the URLs
+                    to give crawlers.
+                  </Text>
                   <Text as="p" variant="bodySm">
-                    <PolarisLink url={`/llms.txt?shop=${shop}`} target="_blank">
-                      llms.txt
+                    <PolarisLink
+                      url={`https://${shop}/apps/seo/llms.txt`}
+                      target="_blank"
+                    >
+                      /apps/seo/llms.txt
                     </PolarisLink>
                   </Text>
                   <Text as="p" variant="bodySm">
+                    <PolarisLink
+                      url={`https://${shop}/apps/seo/sitemap-ai.xml`}
+                      target="_blank"
+                    >
+                      /apps/seo/sitemap-ai.xml
+                    </PolarisLink>
+                  </Text>
+                  <Divider />
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    Both update the moment a PLP is published. To answer at the
+                    true store root, add a redirect from <code>/llms.txt</code>{" "}
+                    to the proxy path — an app cannot claim the root itself.
+                  </Text>
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    Unsigned dev copies:{" "}
+                    <PolarisLink url={`/llms.txt?shop=${shop}`} target="_blank">
+                      llms.txt
+                    </PolarisLink>
+                    {" · "}
                     <PolarisLink
                       url={`/sitemap-ai.xml?shop=${shop}`}
                       target="_blank"
                     >
                       sitemap-ai.xml
                     </PolarisLink>
-                  </Text>
-                  <Divider />
-                  <Text as="p" tone="subdued" variant="bodySm">
-                    Served from the app locally; in production these would be
-                    exposed at the store root via a Shopify App Proxy (see
-                    README).
                   </Text>
                 </BlockStack>
               </Card>
