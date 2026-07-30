@@ -95,17 +95,60 @@ describe("page type routing", () => {
     // A kids-room keyword satisfies use-case (via the derived kids use case)
     // and style-room; style-room requires more facets, so it wins.
     expect(
-      routePageType({
-        style: ["botanical"],
-        room: ["kids room"],
-        useCase: ["kids"],
-      }),
+      routePageType(
+        {
+          style: ["botanical"],
+          room: ["kids room"],
+          useCase: ["kids"],
+        },
+        "en-US",
+      ),
     ).toBe("style-room");
   });
 
   it("routes nothing when no page type's required facets are present", () => {
     expect(parse("green wallpaper").pageTypeId).toBeNull();
-    expect(routePageType({})).toBeNull();
+    expect(routePageType({}, "en-US")).toBeNull();
+  });
+});
+
+describe("locale-specific page types", () => {
+  const renterIntent = { useCase: ["renters"] };
+
+  it("prefers a market-specific page type over a general one in that market", () => {
+    // rental-compliance exists only for de-DE, where German tenancy law makes
+    // residue-free removal a contractual argument. Both it and use-case need
+    // one facet, so the market-specific one wins the tie.
+    expect(routePageType(renterIntent, "de-DE")).toBe("rental-compliance");
+  });
+
+  it("is invisible to every other market", () => {
+    for (const locale of ["en-US", "en-AU", "en-GB"]) {
+      expect(routePageType(renterIntent, locale)).toBe("use-case");
+    }
+  });
+
+  it("routes a German renter keyword to it end to end", () => {
+    expect(parse("selbstklebende tapete mietwohnung", "de-DE").pageTypeId).toBe(
+      "rental-compliance",
+    );
+  });
+
+  it("routes the same keyword's English equivalent to the general page type", () => {
+    expect(parse("peel and stick wallpaper for renters").pageTypeId).toBe(
+      "use-case",
+    );
+  });
+
+  it("still prefers more required facets over market specificity", () => {
+    // style-room needs two facets; rental-compliance needs one. Facet count
+    // is the primary sort, so a German style x room keyword is not hijacked.
+    expect(
+      routePageType(
+        { style: ["botanical"], room: ["living room"], useCase: ["renters"] },
+        "de-DE",
+      ),
+    ).toBe("style-room");
   });
 });
 

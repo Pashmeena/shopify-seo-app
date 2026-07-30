@@ -49,7 +49,7 @@ export function parseWithRules(
     keyword,
     locale,
     facets,
-    pageTypeId: routePageType(facets),
+    pageTypeId: routePageType(facets, locale),
     confidence: significantTokens === 0 ? 0 : matchedTokens / significantTokens,
     method: "rules",
   };
@@ -67,15 +67,27 @@ function applyDerivedFacets(facets: IntentProfile["facets"]): void {
 }
 
 /**
- * Route an intent to the most specific page type whose required facets are
- * all present. Specificity = number of required facets.
+ * Route an intent to the most specific page type that applies in this market.
+ *
+ * Specificity is the number of required facets, then whether the page type
+ * names its markets. A locale-specific page type exists because that market
+ * has something the others do not, so when it competes with a general page
+ * type on equal facets it should win.
  */
-export function routePageType(facets: IntentProfile["facets"]): string | null {
+export function routePageType(
+  facets: IntentProfile["facets"],
+  locale: string,
+): string | null {
   const candidates = listPageTypes()
+    .filter((pageType) => !pageType.locales || pageType.locales.includes(locale))
     .filter((pageType) =>
       pageType.required_facets.every((facet) => (facets[facet]?.length ?? 0) > 0),
     )
-    .sort((a, b) => b.required_facets.length - a.required_facets.length);
+    .sort(
+      (a, b) =>
+        b.required_facets.length - a.required_facets.length ||
+        Number(Boolean(b.locales)) - Number(Boolean(a.locales)),
+    );
   return candidates[0]?.id ?? null;
 }
 
@@ -113,7 +125,7 @@ async function enrichWithAi(rules: IntentProfile): Promise<IntentProfile> {
   return {
     ...rules,
     facets: merged,
-    pageTypeId: routePageType(merged),
+    pageTypeId: routePageType(merged, rules.locale),
     confidence: Math.max(rules.confidence, 0.8),
     method: "hybrid",
   };

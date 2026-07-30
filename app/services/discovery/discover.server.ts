@@ -94,7 +94,7 @@ function candidateIntent(facets: IntentProfile["facets"], phrase: string, locale
     keyword: phrase,
     locale,
     facets,
-    pageTypeId: routePageType(facets),
+    pageTypeId: routePageType(facets, locale),
     confidence: 1,
     method: "rules",
   };
@@ -139,8 +139,13 @@ export async function discoverKeywords(
   for (const shape of CANDIDATE_SHAPES) {
     for (const facets of facetCombinations(catalog, shape.facets)) {
       scanned++;
-      const intent = candidateIntent(facets, "candidate", "en-US");
-      if (!intent.pageTypeId) continue;
+      // Routable in at least one enabled market. A combination can have no
+      // page type in en-US and a locale-specific one in de-DE.
+      const routable = locales.some(
+        (locale) => routePageType(facets, locale.code) !== null,
+      );
+      if (!routable) continue;
+      const intent = candidateIntent(facets, "candidate", locales[0].code);
       const key = clusterKey(intent);
       if (seenClusterKeys.has(key)) continue;
       seenClusterKeys.add(key);
@@ -157,6 +162,7 @@ export async function discoverKeywords(
     for (const [index, candidate] of viable.entries()) {
       const phrase = phrases[index];
       const intent = candidateIntent(candidate.facets, phrase, locale.code);
+      if (!intent.pageTypeId) continue;
       const key = clusterKey(intent);
       if (coveredClusters.has(`${locale.code}::${key}`)) {
         skippedExisting++;

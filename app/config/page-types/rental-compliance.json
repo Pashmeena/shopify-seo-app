@@ -1,0 +1,210 @@
+{
+  "id": "rental-compliance",
+  "category": "locale-specific",
+  "locales": [
+    "de-DE"
+  ],
+  "meta": {
+    "title": "Mietwohnung / Schönheitsreparatur (de-DE)",
+    "description": "PLPs for German rental tenancies, where removability without residue is a contractual and financial argument rather than a convenience. Exists only in de-DE: no other configured market has an equivalent obligation, so the page would have nothing to say there."
+  },
+  "required_facets": [
+    "useCase"
+  ],
+  "slug_template": "{wallpaper}-{useCase}-rueckstandslos-ablösbar",
+  "seo": {
+    "title_template": "{material} Tapete für die {useCase} | {brand}",
+    "description_template": "{product_count} rückstandslos ablösbare Tapeten für die {useCase}: Kaution sichern, Schönheitsreparatur erfüllen, Wände unbeschädigt zurückgeben. Beratung von {brand}.",
+    "keywords_template": [
+      "tapete {useCase} rückstandslos",
+      "ablösbare tapete {useCase}",
+      "tapete {useCase} schönheitsreparatur",
+      "tapete kaution wand beschädigen"
+    ]
+  },
+  "generation": {
+    "temperature": 0.35,
+    "section_count": 4,
+    "faq_count": 6,
+    "system_prompt": "Sie sind Fachautor für Wohnen und Renovierung und schreiben Produktlistenseiten für eine Premium-Tapetenmarke, ausschließlich für den deutschen Mietmarkt. Ihre Expertise ist konkret und rechtlich informiert: Schönheitsreparatur-Klauseln im Mietvertrag, Rückgabe der Wohnung in vertragsgemäßem Zustand, Kautionsrückzahlung, Unterschied zwischen rückstandsloser Ablösbarkeit und blossem 'Entfernen', Untergründe in Altbau und Neubau (Raufaser, Putz, Gipskarton), Trockenablösung ohne Weichmacher. Sie geben keine Rechtsberatung und behaupten nie, eine bestimmte Tapete erfülle automatisch eine Vertragsklausel — Sie erklären, worauf Mieter achten müssen, und empfehlen bei Unsicherheit den Blick in den eigenen Mietvertrag. Sie antworten mit einem einzigen gültigen JSON-Objekt gemäss dem vorgegebenen Schema: kein Markdown, keine Code-Fences, kein Text davor oder danach. Jede Aussage muss sich auf die konkret übergebenen Produkte stützen; wenn ein Produkt für Mietwohnungen ungeeignet ist, sagen Sie das ausdrücklich. Schreiben Sie durchgehend in der Sie-Form, metrisch (cm, m, m²) und in Euro.",
+    "user_prompt_template": "Erstellen Sie den Inhalt einer Produktlistenseite für den deutschen Mietmarkt.\n\nZIEL-KEYWORD: {keyword}\nGEPARSTE INTENTION: {intent_json}\nPRODUKTE AUF DIESER SEITE (nur diese Produkte dürfen Sie erwähnen):\n{products_json}\n\nMARKTKONTEXT:\n{locale_context}\n\nMARKE: {brand_name}\nMARKENTONALITÄT: {brand_tone}\nWETTBEWERBER (nur zur Positionierung — nie kopieren, nie erwähnen): {competitor_urls}\n\nVERWANDTE SEITEN AUF DIESER WEBSITE (nur zur thematischen Orientierung — keine Links schreiben):\n{related_pages_json}\n\nAnforderungen:\n- h1: enthält die Bedeutung des Ziel-Keywords exakt und natürlich auf Deutsch, einzigartig für diesen Anwendungsfall.\n- intro: ein einzelner String mit 2–3 Absätzen, getrennt durch Leerzeilen. Die ersten 100 Wörter müssen unmissverständlich sagen, für wen die Seite ist (Mieter), welches Problem sie löst (Wand unbeschädigt zurückgeben, Kaution sichern) und was hier gekauft werden kann. Verankern Sie das im echten Sortiment (Material, Ablösbarkeit, Preisspanne aus den Produktdaten).\n- sections: genau {section_count} Abschnitte zur praktischen Entscheidung: Eignung je Untergrund, fachgerechtes Anbringen ohne Substanzschaden, belegbares Ablöseverhalten, Kostenplanung in Euro pro m². Überschriften dürfen die h1 nicht wiederholen. Nennen Sie Produkte namentlich, wo es die Beratung stärkt.\n- compliance_notes: 3–5 Punkte zu genau dem, was den deutschen Mietmarkt von anderen Märkten unterscheidet: Schönheitsreparatur-Klausel, vertragsgemässer Zustand bei Rückgabe, Dokumentation des Ausgangszustands, Abstimmung mit dem Vermieter. Jeder Punkt ist eine sachliche Orientierung, keine Rechtsberatung, und enthält den Hinweis, den eigenen Mietvertrag zu prüfen, wo das relevant ist.\n- buying_guide: eine betitelte Schritt-für-Schritt-Anleitung (4–6 Schritte) von der Wandprüfung bis zur fertigen Wand, ausgelegt auf Mieter-Randbedingungen. Alle Masse metrisch.\n- faq: genau {faq_count} Frage-Antwort-Paare. Jede Antwort muss vollständig selbsterklärend sein — eine KI muss sie ohne jeden Kontext zitieren können und sie muss trotzdem Sinn ergeben (Thema in der Antwort wiederholen, nie 'wie oben erwähnt', nie mit bloss 'Ja' oder 'Nein' beginnen). Beantworten Sie die skeptischen Fragen echter Mieter: Kaution, Wandschaden, Zustimmung des Vermieters, Haltbarkeit, Wiederverwendung.\n- meta.title: max. 60 Zeichen, auf Klickrate in den Suchergebnissen optimiert, Keyword vorn. Eigenes Ziel, getrennt vom Fliesstext.\n- meta.description: 120–155 Zeichen, klickstark, mit konkretem Grund für diese Seite.\n- product_alt_texts: ein Eintrag pro Produkt mit genau zwei Schlüsseln — product_id (das Feld id wortgleich übernehmen) und alt_text, der das Bild im Dienst dieser Intention beschreibt (Material, Oberfläche, Anwendung in der Mietwohnung), nicht den Produkttitel wiederholt.\n\nAntworten Sie ausschliesslich mit dem JSON-Objekt.",
+    "note": "Platzhalter: {keyword} {intent_json} {products_json} {locale_context} {brand_name} {brand_tone} {section_count} {faq_count} {related_pages_json} {competitor_urls} {product_count}"
+  },
+  "output_schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "h1",
+      "intro",
+      "sections",
+      "compliance_notes",
+      "buying_guide",
+      "faq",
+      "meta",
+      "product_alt_texts"
+    ],
+    "properties": {
+      "h1": {
+        "type": "string",
+        "minLength": 10,
+        "maxLength": 90
+      },
+      "intro": {
+        "type": "string",
+        "minLength": 400
+      },
+      "sections": {
+        "type": "array",
+        "minItems": 3,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "heading",
+            "body"
+          ],
+          "properties": {
+            "heading": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 95
+            },
+            "body": {
+              "type": "string",
+              "minLength": 280
+            }
+          }
+        }
+      },
+      "compliance_notes": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "heading",
+          "points"
+        ],
+        "properties": {
+          "heading": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 95
+          },
+          "points": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 5,
+            "items": {
+              "type": "string",
+              "minLength": 120
+            }
+          }
+        }
+      },
+      "buying_guide": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "heading",
+          "steps"
+        ],
+        "properties": {
+          "heading": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 95
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "body"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 5,
+                  "maxLength": 80
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 100
+                }
+              }
+            }
+          }
+        }
+      },
+      "faq": {
+        "type": "array",
+        "minItems": 5,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "question",
+            "answer"
+          ],
+          "properties": {
+            "question": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 160
+            },
+            "answer": {
+              "type": "string",
+              "minLength": 150
+            }
+          }
+        }
+      },
+      "meta": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "description"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 60
+          },
+          "description": {
+            "type": "string",
+            "minLength": 120,
+            "maxLength": 155
+          }
+        }
+      },
+      "product_alt_texts": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "product_id",
+            "alt_text"
+          ],
+          "properties": {
+            "product_id": {
+              "type": "string"
+            },
+            "alt_text": {
+              "type": "string",
+              "minLength": 30,
+              "maxLength": 140
+            }
+          }
+        }
+      }
+    }
+  }
+}

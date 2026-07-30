@@ -12,6 +12,11 @@ export interface PlpContent {
     heading: string;
     steps: { title: string; body: string }[];
   };
+  /** Market-specific guidance. Required only by locale-specific page types. */
+  compliance_notes?: {
+    heading: string;
+    points: string[];
+  };
   faq: { question: string; answer: string }[];
   meta: { title: string; description: string };
   product_alt_texts: { product_id: string; alt_text: string }[];

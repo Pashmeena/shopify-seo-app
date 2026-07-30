@@ -70,6 +70,21 @@ ${steps}
 </section>`;
 }
 
+/** Market-specific guidance, from locale-specific page types. */
+function renderComplianceNotes(content: PlpContent): string {
+  const notes = content.compliance_notes;
+  if (!notes) return "";
+  const points = notes.points
+    .map((point) => `<li>${escapeHtml(point)}</li>`)
+    .join("\n");
+  return `<section class="plp-compliance">
+<h2>${escapeHtml(notes.heading)}</h2>
+<ul>
+${points}
+</ul>
+</section>`;
+}
+
 function renderFaq(content: PlpContent): string {
   const items = content.faq
     .map(
@@ -117,6 +132,7 @@ export function renderArticleHtml(input: RenderInput): string {
     products.map((product) => renderProductCard(input, product)).join("\n"),
     `</ul>`,
     renderSections(content),
+    renderComplianceNotes(content),
     renderBuyingGuide(content),
     renderFaq(content),
     renderInternalLinks(seo),

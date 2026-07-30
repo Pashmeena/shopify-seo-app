@@ -35,6 +35,18 @@ export interface PageTypeConfig {
    */
   required_facets: IntentFacet[];
   /**
+   * Markets this page type exists for. Omit for page types that apply
+   * everywhere.
+   *
+   * This is what makes a page type locale-specific rather than merely
+   * translated: a page whose reason to exist is a market's own law, housing
+   * stock or buying conventions has no counterpart elsewhere, and generating
+   * it for every locale would produce content with nothing to say. A page
+   * type that names its markets is treated as more specific than one that
+   * does not, so it wins the routing tie.
+   */
+  locales?: string[];
+  /**
    * Slug template. `{facet}` tokens resolve to locale-translated facet
    * values; `{wallpaper}` resolves through the locale's token table, so a
    * de-DE page gets `botanische-tapete-wohnzimmer` from the same template.

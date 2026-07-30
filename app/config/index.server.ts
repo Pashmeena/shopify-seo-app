@@ -27,6 +27,11 @@ function validatePageType(config: PageTypeConfig, file: string): PageTypeConfig 
   assert(config.generation?.system_prompt, `${config.id} is missing generation.system_prompt`);
   assert(config.generation?.user_prompt_template, `${config.id} is missing generation.user_prompt_template`);
   assert(config.output_schema?.type === "object", `${config.id} output_schema must describe an object`);
+  assert(
+    config.locales === undefined ||
+      (Array.isArray(config.locales) && config.locales.length > 0),
+    `${config.id} "locales" must be a non-empty array when present`,
+  );
   return config;
 }
 
@@ -58,6 +63,15 @@ const locales = new Map<string, LocaleConfig>(
     return [config.code, config];
   }),
 );
+
+for (const pageType of pageTypes.values()) {
+  for (const code of pageType.locales ?? []) {
+    assert(
+      locales.has(code),
+      `${pageType.id} is restricted to locale "${code}", which has no config in app/config/locales`,
+    );
+  }
+}
 
 export function listPageTypes(): PageTypeConfig[] {
   return [...pageTypes.values()];
