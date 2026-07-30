@@ -9,6 +9,7 @@ import { buildLexicon } from "../intent/lexicon.server";
 import { parseIntent } from "../intent/parse.server";
 import type { IntentProfile } from "../intent/types";
 import { matchProducts, type MatchResult } from "../matching/match.server";
+import { publishPage } from "../publishing/publish.server";
 import { assembleSeoPayload } from "../seo/assemble.server";
 import { resolveMeta } from "../seo/meta.server";
 import { chooseCanonicalTarget } from "../seo/canonical.server";
@@ -142,6 +143,9 @@ type Settings = Awaited<ReturnType<typeof getSettings>>;
  * Re-run generation for an existing page against its current product
  * selection (e.g. after the merchant adjusted products). Keeps identity
  * (slug, cluster, canonical) and re-evaluates review status.
+ *
+ * A page that is already live is republished as part of this, so the
+ * storefront never lags behind what the admin screen shows.
  */
 export async function regeneratePage(
   admin: AdminClient,
@@ -237,6 +241,19 @@ export async function regeneratePage(
     status,
     reviewReason: reviewReasons.length ? reviewReasons.join(" ") : null,
   });
+
+  // A live page must not silently diverge from what the admin now shows.
+  // Republishing pushes the new body, meta and JSON-LD to the article and
+  // refreshes whatever the change invalidated elsewhere.
+  if (status === "published") {
+    const republished = await publishPage(admin, shop, pageId);
+    if (reviewReasons.length === 0) return republished;
+
+    // Publishing clears the review note, because going live is what resolves
+    // one. A caveat raised by this regeneration is still true, so it is
+    // written back — advisory on a live page rather than blocking.
+    await updatePage(shop, pageId, { reviewReason: reviewReasons.join(" ") });
+  }
 
   const updated = await getPage(shop, pageId);
   if (!updated) throw new Error("Page vanished during regeneration");

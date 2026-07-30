@@ -107,8 +107,13 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
         };
       }
       case "regenerate": {
-        await regeneratePage(admin, shop, pageId);
-        return { success: "Content regenerated and revalidated." };
+        const page = await regeneratePage(admin, shop, pageId);
+        return {
+          success:
+            page.status === "published"
+              ? "Content regenerated, revalidated and republished to the storefront."
+              : "Content regenerated and revalidated.",
+        };
       }
       case "delete": {
         const page = await getPage(shop, pageId);
@@ -215,13 +220,22 @@ export default function PageDetail() {
             </BlockStack>
           </Banner>
         )}
+        {/* A caveat can be raised on a page that is already live, where it is
+            advisory rather than blocking. Without this it would be recorded
+            and never shown, since the banner above only covers needs_review. */}
+        {isPublished && page.reviewReason && (
+          <Banner title="Published, with a caveat" tone="warning">
+            <p>{page.reviewReason}</p>
+          </Banner>
+        )}
         {isPublished && page.articleUrl && (
           <Banner tone="success" title="Live on the storefront">
             <p>
               <PolarisLink url={page.articleUrl} target="_blank">
                 {page.articleUrl}
               </PolarisLink>
-              . Product or content changes require a republish.
+              . Regenerating republishes automatically; a product-selection
+              change needs an explicit republish.
             </p>
           </Banner>
         )}
