@@ -142,14 +142,29 @@ export default function PageDetail() {
       ? String(navigation.formData?.get("_action"))
       : null;
 
-  const [selection, setSelection] = useState<Record<string, boolean>>(() =>
+  const selectionFromLoader = () =>
     Object.fromEntries(
       [...panel.matched, ...panel.excluded].map((entry) => [
         entry.id,
         entry.included,
       ]),
-    ),
-  );
+    );
+
+  const [selection, setSelection] =
+    useState<Record<string, boolean>>(selectionFromLoader);
+
+  // Remix reuses this component across navigations, so a `useState`
+  // initializer alone would carry one page's checkbox state onto the next, and
+  // would not pick up a selection changed by an action. Resetting when the
+  // identity of the loaded page changes is the documented way to derive state
+  // from props without an effect.
+  const [syncedTo, setSyncedTo] = useState(`${page.id}:${page.updatedAt}`);
+  const loadedPage = `${page.id}:${page.updatedAt}`;
+  if (syncedTo !== loadedPage) {
+    setSyncedTo(loadedPage);
+    setSelection(selectionFromLoader());
+  }
+
   const selectedIds = Object.entries(selection)
     .filter(([, included]) => included)
     .map(([id]) => id);

@@ -31,6 +31,12 @@ export interface MatchPanelProduct {
   matchedFacets: Partial<Record<IntentFacet, string[]>>;
   /** Matched values evidenced only by product text, not a tag or collection. */
   inferredFacets: string[];
+  /**
+   * Matched values that not every matched product shares. The intent chips
+   * above the list already state the common ones, so a row only needs to show
+   * what actually distinguishes it.
+   */
+  distinguishingFacets: string[];
   /** Why the matcher rejected it. Null for products it accepted. */
   excludedReason: string | null;
   included: boolean;
@@ -43,7 +49,6 @@ export interface MatchPanel {
   matched: MatchPanelProduct[];
   /** Matcher-rejected products, each with the reason, selectable anyway. */
   excluded: MatchPanelProduct[];
-  selectedCount: number;
   /** True when the merchant's selection differs from the matcher's verdict. */
   overridden: boolean;
 }
@@ -81,6 +86,7 @@ export function buildMatchPanel(input: MatchPanelInput): MatchPanel {
     score: Number(scored.score.toFixed(2)),
     matchedFacets: scored.matchedFacets,
     inferredFacets: scored.inferredFacets,
+    distinguishingFacets: [],
     excludedReason: null,
     // No explicit selection yet means the matcher's verdict stands.
     included: selected === null ? true : selected.has(scored.product.id),
@@ -95,27 +101,27 @@ export function buildMatchPanel(input: MatchPanelInput): MatchPanel {
     score: 0,
     matchedFacets: {},
     inferredFacets: [],
+    distinguishingFacets: [],
     excludedReason: entry.reason,
     included: selected === null ? false : selected.has(entry.product.id),
   }));
 
-  const selectedCount = [...matched, ...excluded].filter(
-    (product) => product.included,
-  ).length;
+  for (const product of matched) {
+    product.distinguishingFacets = distinguishingFacets(product, matched);
+  }
 
   return {
     facets: intent.facets,
     minProducts,
     matched,
     excluded,
-    selectedCount,
     overridden: selectedIds !== null,
   };
 }
 
 /**
- * Facet values shared by every matched product, so a row can show only what
- * distinguishes it. The intent chips above the list already state the rest.
+ * Facet values this product matched that not every matched product shares.
+ * Exported for testing; consumers read the field it populates.
  */
 export function distinguishingFacets(
   product: MatchPanelProduct,

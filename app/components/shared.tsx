@@ -225,6 +225,7 @@ export interface PanelProduct {
   score: number;
   matchedFacets: Partial<Record<string, string[]>>;
   inferredFacets: string[];
+  distinguishingFacets: string[];
   excludedReason: string | null;
   included: boolean;
 }
@@ -246,6 +247,9 @@ function PanelRow({
     : [
         entry.price,
         `match score ${entry.score}`,
+        entry.distinguishingFacets.length
+          ? `also ${entry.distinguishingFacets.join(", ")}`
+          : null,
         entry.inferredFacets.length
           ? `inferred from product text: ${entry.inferredFacets.join(", ")}`
           : null,

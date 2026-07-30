@@ -68,7 +68,6 @@ describe("default selection", () => {
 
     expect(result.matched.every((entry) => entry.included)).toBe(true);
     expect(result.excluded.every((entry) => !entry.included)).toBe(true);
-    expect(result.selectedCount).toBe(1);
     expect(result.overridden).toBe(false);
   });
 
@@ -80,14 +79,15 @@ describe("default selection", () => {
     expect(
       result.excluded.find((entry) => entry.title === "Wild Meadow")?.included,
     ).toBe(true);
-    expect(result.selectedCount).toBe(1);
     expect(result.overridden).toBe(true);
   });
 
   it("treats an empty selection as a real choice, not as absent", () => {
     const result = panel([]);
 
-    expect(result.selectedCount).toBe(0);
+    expect(
+      [...result.matched, ...result.excluded].every((entry) => !entry.included),
+    ).toBe(true);
     expect(result.overridden).toBe(true);
   });
 
@@ -100,7 +100,6 @@ describe("default selection", () => {
     expect(added?.included).toBe(true);
     // The reason survives, so the UI can warn about the override.
     expect(added?.excludedReason).toBe("does not match style: botanical");
-    expect(result.selectedCount).toBe(2);
   });
 });
 

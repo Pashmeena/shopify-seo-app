@@ -55,33 +55,6 @@ export interface PipelineOutcome {
   match: MatchResult;
 }
 
-/** Parse (or re-parse) a keyword's intent and persist it. */
-export async function analyzeKeyword(
-  admin: AdminClient,
-  shop: string,
-  keywordId: string,
-): Promise<IntentProfile> {
-  const keyword = await getKeyword(shop, keywordId);
-  if (!keyword) throw new Error(`Keyword ${keywordId} not found`);
-
-  const settings = await getSettings(shop);
-  const catalog = await fetchCatalog(admin);
-  const intent = await parseIntent(
-    keyword.phrase,
-    keyword.locale,
-    buildLexicon(catalog),
-  );
-  const match = matchProducts(catalog, intent, settings.minProducts);
-
-  await updateKeyword(shop, keywordId, {
-    intent,
-    pageTypeId: intent.pageTypeId,
-    clusterKey: clusterKey(intent),
-    matchCount: match.matches.length,
-  });
-  return intent;
-}
-
 /** Run the full pipeline for an approved keyword, producing a PLP page. */
 export async function generatePageForKeyword(
   admin: AdminClient,
