@@ -20,6 +20,8 @@ export interface ProductFixture {
   collections?: ProductCollection[];
   price?: number;
   currencyCode?: string;
+  imageUrl?: string | null;
+  onlineStoreUrl?: string | null;
 }
 
 let sequence = 0;
@@ -42,9 +44,9 @@ export function product(fixture: ProductFixture = {}): CatalogProduct {
     collections,
     price: fixture.price ?? 89,
     currencyCode: fixture.currencyCode ?? "USD",
-    imageUrl: null,
+    imageUrl: fixture.imageUrl ?? null,
     imageAltText: null,
-    onlineStoreUrl: null,
+    onlineStoreUrl: fixture.onlineStoreUrl ?? null,
     ...deriveFacets({ tags, title, productType, collections }),
   };
 }
